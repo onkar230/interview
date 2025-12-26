@@ -260,6 +260,98 @@ function InterviewSessionContent() {
     }
   };
 
+  const handleRedoAnswer = () => {
+    // Remove the last user message and AI response to allow re-answering the same question
+    if (messages.length >= 2) {
+      // Remove last 2 messages (user answer + AI follow-up)
+      setMessages((prev) => prev.slice(0, -2));
+      // Decrement question count
+      setQuestionCount((prev) => Math.max(1, prev - 1));
+      // Remove the latest feedback item
+      setFeedbackHistory((prev) => prev.slice(1));
+      // Clear any errors
+      setError(null);
+    }
+  };
+
+  const handleSkipQuestion = async () => {
+    // Skip the current AI question and ask for a different one
+    if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
+      setMessages((prev) => prev.slice(0, -1));
+      setCurrentAudioUrl(null);
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        // Ask GPT-4 for a different question
+        const systemPrompt = generateInterviewPrompt(
+          industry,
+          role,
+          difficulty,
+          company,
+          jobDescription,
+          questionTypes,
+          customQuestions,
+          followUpIntensity
+        );
+
+        const conversationMessages = [
+          { role: 'system', content: systemPrompt },
+          ...messages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+          {
+            role: 'user',
+            content: 'The previous question was not relevant to my experience or the role. Please ask a different question that better aligns with the interview focus.'
+          },
+        ];
+
+        const messageResponse = await fetch('/api/interview/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: conversationMessages,
+            industry,
+            messageCount: questionCount,
+          }),
+        });
+
+        if (!messageResponse.ok) {
+          throw new Error('Failed to generate new question');
+        }
+
+        const { response: aiResponse } = await messageResponse.json();
+
+        // Generate TTS for new question
+        const ttsResponse = await fetch('/api/interview/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: aiResponse }),
+        });
+
+        let audioUrl = null;
+        if (ttsResponse.ok) {
+          const audioBlob = await ttsResponse.blob();
+          audioUrl = URL.createObjectURL(audioBlob);
+          setCurrentAudioUrl(audioUrl);
+        }
+
+        // Add new assistant message
+        const newMessage: Message = {
+          role: 'assistant',
+          content: aiResponse,
+          audioUrl: audioUrl || undefined,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, newMessage]);
+
+      } catch (err) {
+        console.error('Error skipping question:', err);
+        setError('Failed to generate new question. Please try again.');
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  };
+
   const handleEndInterview = async () => {
     setIsProcessing(true);
 
@@ -345,41 +437,179 @@ function InterviewSessionContent() {
         </div>
       </div>
 
-      {/* Top Section - Webcam + Feedback Side by Side */}
-      <div className="bg-gradient-to-b from-gray-100 to-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left: Webcam */}
-            <div className="flex-1 lg:w-[55%]">
-              {showWebcam ? (
-                <WebcamMirror
-                  isVisible={showWebcam}
-                  onClose={() => setShowWebcam(false)}
-                  mode="embedded"
-                  size="large"
-                />
-              ) : (
-                <div className="bg-white rounded-lg border border-gray-200 p-8 text-center h-96 flex flex-col items-center justify-center">
-                  <CameraOff className="h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-sm font-medium text-gray-600 mb-2">Webcam is hidden</p>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Enable your webcam to practice like a real video interview
-                  </p>
-                  <Button
-                    onClick={() => setShowWebcam(true)}
-                    variant="outline"
-                    size="sm"
+      {/* 3-Column Layout: Q&A (Left) | Webcam + Controls (Center) | Feedback (Right) */}
+      <div className="flex-1 bg-gradient-to-b from-gray-100 to-gray-50">
+        <div className="max-w-7xl mx-auto px-6 py-6 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+            {/* Left Column: Conversation/Q&A */}
+            <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 sticky top-0 bg-white pb-2 border-b">
+                Interview Conversation
+              </h3>
+              <div className="space-y-4">
+                {messages.map((message, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex gap-3 ${
+                      message.role === 'user' ? 'justify-end' : 'justify-start'
+                    }`}
                   >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Enable Webcam
-                  </Button>
+                    {message.role === 'assistant' && (
+                      <div className="flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Bot className="h-5 w-5 text-blue-600" />
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === 'user'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 border border-gray-200'
+                      }`}
+                    >
+                      <p className="text-xs whitespace-pre-wrap">{message.content}</p>
+                    </div>
+
+                    {message.role === 'user' && (
+                      <div className="flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-600" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {isProcessing && (
+                  <div className="flex items-center gap-2 text-gray-600 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{!isInitialized ? 'Preparing...' : 'AI thinking...'}</span>
+                  </div>
+                )}
+
+                {!isInitialized && isProcessing && (
+                  <div className="text-center mt-4">
+                    <p className="text-sm text-blue-600 font-medium">Take a deep breath. You've got this.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Center Column: Webcam + Controls */}
+            <div className="lg:col-span-1 flex flex-col gap-4">
+              {/* Webcam */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                {showWebcam ? (
+                  <WebcamMirror
+                    isVisible={showWebcam}
+                    onClose={() => setShowWebcam(false)}
+                    mode="embedded"
+                    size="large"
+                  />
+                ) : (
+                  <div className="p-8 text-center h-96 flex flex-col items-center justify-center">
+                    <CameraOff className="h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-sm font-medium text-gray-600 mb-2">Webcam is hidden</p>
+                    <p className="text-xs text-gray-500 mb-4">
+                      Enable your webcam to practice like a real video interview
+                    </p>
+                    <Button
+                      onClick={() => setShowWebcam(true)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      Enable Webcam
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Error display */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-800 text-sm">
+                  {error}
+                </div>
+              )}
+
+              {/* Voice Recorder */}
+              {!isProcessing && currentAudioUrl === null && (
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+                    <VoiceRecorder
+                      onRecordingComplete={handleRecordingComplete}
+                      isProcessing={isProcessing}
+                    />
+                  </div>
+
+                  {/* Skip Question Button - Show when AI just asked a question */}
+                  {messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+                    <div className="text-center">
+                      <Button
+                        onClick={handleSkipQuestion}
+                        variant="outline"
+                        className="border-purple-300 text-purple-600 hover:bg-purple-50 w-full"
+                      >
+                        ⤭ Skip This Question
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Question not relevant? Get a different one
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Redo Answer Button - Show after user has answered */}
+                  {messages.length >= 2 && messages[messages.length - 1].role === 'assistant' && (
+                    <div className="text-center">
+                      <Button
+                        onClick={handleRedoAnswer}
+                        variant="outline"
+                        className="border-orange-300 text-orange-600 hover:bg-orange-50 w-full"
+                      >
+                        ↻ Redo Last Answer
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Want to try a better answer?
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Current audio playing */}
+              {currentAudioUrl && (
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+                    <AudioPlayer
+                      audioUrl={currentAudioUrl}
+                      onPlaybackEnd={() => setCurrentAudioUrl(null)}
+                    />
+                  </div>
+
+                  {/* Skip Question Button - Available during audio playback */}
+                  {messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+                    <div className="text-center">
+                      <Button
+                        onClick={handleSkipQuestion}
+                        variant="outline"
+                        className="border-purple-300 text-purple-600 hover:bg-purple-50 w-full"
+                      >
+                        ⤭ Skip This Question
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Question not relevant? Get a different one
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Right: Feedback Panel */}
-            <div className="flex-1 lg:w-[45%]">
-              <div className="bg-white rounded-lg border border-gray-200 h-96 overflow-hidden">
+            {/* Right Column: Feedback Panel */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 <FeedbackPanel
                   feedbackHistory={feedbackHistory}
                   isAnalyzing={isAnalyzing}
@@ -388,86 +618,6 @@ function InterviewSessionContent() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Section - Conversation (Full Width) */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
-        <div className="space-y-6 mb-8">
-          {messages.map((message, idx) => (
-            <div
-              key={idx}
-              className={`flex gap-4 ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              {message.role === 'assistant' && (
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Bot className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              )}
-
-              <div
-                className={`max-w-2xl rounded-lg p-4 ${
-                  message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-gray-200'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-              </div>
-
-              {message.role === 'user' && (
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <User className="h-6 w-6 text-gray-600" />
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isProcessing && (
-            <div className="flex items-center gap-3 text-gray-600">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span>{!isInitialized ? 'Preparing your interview...' : 'AI is thinking...'}</span>
-            </div>
-          )}
-
-          {!isInitialized && isProcessing && (
-            <div className="text-center mt-4">
-              <p className="text-lg text-blue-600 font-medium">Take a deep breath. You've got this.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Error display */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 mb-8">
-            {error}
-          </div>
-        )}
-
-        {/* Voice Recorder */}
-        {!isProcessing && currentAudioUrl === null && (
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 max-w-2xl mx-auto">
-            <VoiceRecorder
-              onRecordingComplete={handleRecordingComplete}
-              isProcessing={isProcessing}
-            />
-          </div>
-        )}
-
-        {/* Current audio playing */}
-        {currentAudioUrl && (
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 max-w-2xl mx-auto">
-            <AudioPlayer
-              audioUrl={currentAudioUrl}
-              onPlaybackEnd={() => setCurrentAudioUrl(null)}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
