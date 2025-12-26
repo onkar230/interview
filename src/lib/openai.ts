@@ -170,26 +170,44 @@ Candidate's answer: "${answer}"
 ${contextInfo}
 ${fillerWordInfo}
 
-Provide immediate feedback in SWOT format. Be specific to THIS answer, not generic.
+Provide HONEST, CRITICAL feedback in SWOT format. Be specific to THIS answer, not generic.
 
-IMPORTANT GUIDELINES:
-- Strengths: What they did well in this specific answer (1-2 points, be concrete)
-- Weaknesses: What could be improved in their response (1-2 points, actionable)
-- Opportunities: What they missed or could have mentioned to strengthen their answer (1-2 points)
-- Threats: Any red flags or concerning patterns in this answer (0-1 point, only if critical - leave empty if none)
+CRITICAL ANALYSIS REQUIREMENTS:
+
+1. ANSWER STRUCTURE CHECK:
+   - Does the answer use a proper structure (STAR: Situation, Task, Action, Result | CAR: Context, Action, Result | PEEL: Point, Evidence, Explain, Link)?
+   - If NO structure is used or the answer is vague/rambling, YOU MUST flag this in WEAKNESSES or OPPORTUNITIES
+   - Specifically recommend using STAR, CAR, or PEEL method if the answer lacks structure
+
+2. HONESTY OVER KINDNESS:
+   - If the answer is terrible, vague, or one-sentence, DO NOT invent fake strengths
+   - It's OKAY to have 0 strengths if the answer is genuinely poor
+   - Be honest: "The answer was too vague", "No specific examples provided", "Answer lacks substance"
+
+3. RED FLAGS TO CATCH:
+   - One-word or one-sentence answers (e.g., "I'm good enough") → FLAG IN THREATS
+   - No concrete examples, metrics, or specifics → FLAG IN WEAKNESSES
+   - Rambling without clear point → FLAG IN WEAKNESSES
+   - Generic platitudes ("I work hard", "I'm a team player") → FLAG IN OPPORTUNITIES
+
+SWOT GUIDELINES:
+- Strengths: What they ACTUALLY did well (0-2 points). ONLY include if genuinely good. Empty array is fine.
+- Weaknesses: What's wrong with the answer (1-3 points, brutally honest). ALWAYS mention lack of structure if applicable.
+- Opportunities: What they should have done (1-3 points). Include "Use STAR/CAR/PEEL method" if needed.
+- Threats: Critical red flags (0-2 points). Include for terrible/lazy answers.
 
 Each point should be:
 - One sentence maximum
-- Specific to their actual answer
-- Constructive and actionable
-- Professional and encouraging
+- Brutally honest and specific
+- Actionable (tell them HOW to fix it)
+- Based on what they ACTUALLY said, not what you wish they said
 
 Respond in JSON format:
 {
-  "strengths": ["specific strength 1", "specific strength 2"],
-  "weaknesses": ["specific weakness 1", "specific weakness 2"],
-  "opportunities": ["missed point 1", "missed point 2"],
-  "threats": ["red flag"] or []
+  "strengths": ["actual strength 1"] or [],
+  "weaknesses": ["specific weakness 1", "Answer lacks structure - use STAR method (Situation, Task, Action, Result)"],
+  "opportunities": ["missed point 1", "Could have provided specific metrics or numbers"],
+  "threats": ["Answer is too vague and lacks substance"] or []
 }`;
 
   const completion = await client.chat.completions.create({
