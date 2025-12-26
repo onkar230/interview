@@ -385,6 +385,267 @@ export const COMPANY_STYLES: Record<string, CompanyStyle> = {
     culturalNotes:
       'Bain emphasizes teamwork and results. They have a collaborative culture and strong private equity practice. Expect case interviews with a focus on practical business outcomes.',
   },
+
+  oracle: {
+    values: [
+      'Customer first',
+      'Innovation',
+      'Teamwork',
+      'Integrity',
+      'Results-driven',
+    ],
+    interviewFocus: [
+      'Technical expertise',
+      'Enterprise solution thinking',
+      'Sales and business acumen',
+      'Problem-solving at scale',
+    ],
+    typicalQuestions: [
+      'Tell me about a time you implemented a large-scale technical solution',
+      'How would you handle a customer who is frustrated with our product?',
+      'Describe your experience with database systems and cloud infrastructure',
+      'Give an example of when you drove revenue or business growth',
+    ],
+    culturalNotes:
+      'Oracle is enterprise-focused with emphasis on technical depth and business impact. They value people who understand both technology and customer needs at scale.',
+  },
+
+  adobe: {
+    values: [
+      'Creativity',
+      'Innovation',
+      'Exceptional customer experiences',
+      'Integrity',
+      'Involvement',
+    ],
+    interviewFocus: [
+      'Creative problem-solving',
+      'Technical excellence',
+      'User experience focus',
+      'Collaboration and teamwork',
+    ],
+    typicalQuestions: [
+      'Tell me about a creative solution you developed for a complex problem',
+      'How do you balance creativity with technical constraints?',
+      'Describe a time you improved user experience in a product',
+      'Give an example of when you collaborated across teams to ship a feature',
+    ],
+    culturalNotes:
+      'Adobe values creativity, innovation, and user-centered design. They look for people passionate about creating exceptional digital experiences.',
+  },
+
+  salesforce: {
+    values: [
+      'Trust',
+      'Customer success',
+      'Innovation',
+      'Equality',
+      'Sustainability',
+    ],
+    interviewFocus: [
+      'Customer obsession',
+      'Ohana culture fit',
+      'Technical and business acumen',
+      'Values alignment',
+    ],
+    typicalQuestions: [
+      'Tell me about a time you went above and beyond for a customer',
+      'Describe how you build trust with stakeholders',
+      'Give an example of innovation that drove business impact',
+      'How do you approach equality and inclusion in your work?',
+    ],
+    culturalNotes:
+      'Salesforce has a strong "Ohana" (family) culture emphasizing trust, customer success, and giving back. They value people aligned with their core values.',
+  },
+
+  'morgan stanley': {
+    values: [
+      'Putting clients first',
+      'Doing the right thing',
+      'Leading with exceptional ideas',
+      'Committing to diversity and inclusion',
+      'Giving back',
+    ],
+    interviewFocus: [
+      'Financial analysis and modeling',
+      'Client relationship management',
+      'Ethical decision-making',
+      'Teamwork under pressure',
+    ],
+    typicalQuestions: [
+      'Walk me through a financial model you built',
+      'Tell me about a time you had to make a difficult ethical decision',
+      'How would you approach valuing [company or asset]?',
+      'Describe a situation where you managed competing client priorities',
+    ],
+    culturalNotes:
+      'Morgan Stanley emphasizes client service, integrity, and intellectual capital. They value analytical rigor combined with strong interpersonal skills.',
+  },
+
+  blackrock: {
+    values: [
+      'Fiduciary to our clients',
+      'One BlackRock',
+      'Passion to perform',
+      'Innovation',
+      'Commitment to excellence',
+    ],
+    interviewFocus: [
+      'Investment analysis',
+      'Risk management',
+      'Collaborative mindset',
+      'Analytical thinking',
+    ],
+    typicalQuestions: [
+      'How do you approach investment research and analysis?',
+      'Tell me about a time you identified an investment risk',
+      'Describe your experience with portfolio management',
+      'Give an example of when you collaborated across teams on a complex problem',
+    ],
+    culturalNotes:
+      'BlackRock is a global asset manager emphasizing fiduciary duty, collaboration ("One BlackRock"), and rigorous analysis. They value people who put clients first.',
+  },
+
+  spacex: {
+    values: [
+      'Make life multiplanetary',
+      'Innovation and rapid iteration',
+      'Extreme ownership',
+      'Technical excellence',
+    ],
+    interviewFocus: [
+      'Technical depth',
+      'Problem-solving under constraints',
+      'Mission passion',
+      'Ability to work at high pace',
+    ],
+    typicalQuestions: [
+      'Why SpaceX? Why do you want to make life multiplanetary?',
+      'Tell me about the hardest technical problem you\'ve solved',
+      'Describe a time you had to deliver results under extreme pressure',
+      'How would you optimize [rocket/spacecraft component or process]?',
+    ],
+    culturalNotes:
+      'SpaceX is intensely mission-driven with a fast-paced, high-pressure environment. They value technical excellence, scrappiness, and passion for space exploration.',
+  },
+
+  'clifford chance': {
+    values: [
+      'Excellence',
+      'Teamwork',
+      'Integrity',
+      'Respect',
+      'Client service',
+    ],
+    interviewFocus: [
+      'Legal analysis and reasoning',
+      'Commercial awareness',
+      'Communication skills',
+      'Teamwork and collaboration',
+    ],
+    typicalQuestions: [
+      'Tell me about a complex legal problem you analyzed',
+      'How do you stay updated with legal developments?',
+      'Describe a time you worked on a team to deliver client work',
+      'Give an example of when you balanced competing client interests',
+    ],
+    culturalNotes:
+      'Clifford Chance is a leading global law firm emphasizing excellence and client service. They value strong legal minds with commercial awareness and teamwork.',
+  },
+
+  linklaters: {
+    values: [
+      'Excellence in client service',
+      'Integrity',
+      'Teamwork',
+      'Innovation',
+      'Diversity',
+    ],
+    interviewFocus: [
+      'Legal knowledge and application',
+      'Commercial understanding',
+      'Client focus',
+      'Analytical thinking',
+    ],
+    typicalQuestions: [
+      'Walk me through how you would approach a corporate M&A transaction',
+      'Tell me about a time you provided excellent client service',
+      'How do you approach legal research for complex questions?',
+      'Describe a situation where you had to explain legal concepts to a non-lawyer',
+    ],
+    culturalNotes:
+      'Linklaters values intellectual rigor, client service, and commercial awareness. They look for lawyers who can think strategically and communicate clearly.',
+  },
+
+  'allen & overy': {
+    values: [
+      'Client excellence',
+      'Collaboration',
+      'Ambition',
+      'Inclusion',
+      'Innovation',
+    ],
+    interviewFocus: [
+      'Legal expertise',
+      'Commercial awareness',
+      'Global perspective',
+      'Problem-solving',
+    ],
+    typicalQuestions: [
+      'Tell me about your interest in [practice area]',
+      'How would you advise a client on [legal scenario]?',
+      'Describe a time you worked across cultures or jurisdictions',
+      'Give an example of when you showed commercial awareness',
+    ],
+    culturalNotes:
+      'Allen & Overy emphasizes global reach, innovation, and collaboration. They value lawyers with strong commercial understanding and cross-border expertise.',
+  },
+
+  freshfields: {
+    values: [
+      'Excellence',
+      'Partnership',
+      'Integrity',
+      'Diversity and inclusion',
+    ],
+    interviewFocus: [
+      'Legal analysis',
+      'Technical excellence',
+      'Client relationships',
+      'Collaborative approach',
+    ],
+    typicalQuestions: [
+      'Walk me through a legal issue you researched in depth',
+      'Tell me about a time you worked collaboratively on a complex matter',
+      'How do you approach client communication?',
+      'Describe your understanding of [legal area relevant to the firm]',
+    ],
+    culturalNotes:
+      'Freshfields is known for technical excellence and high-quality work. They value precision, collaboration, and lawyers who can handle complex transactions.',
+  },
+
+  'slaughter and may': {
+    values: [
+      'Technical excellence',
+      'Partnership approach',
+      'Integrated global practice',
+      'Long-term client relationships',
+    ],
+    interviewFocus: [
+      'Legal reasoning',
+      'Attention to detail',
+      'Commercial judgment',
+      'Cultural fit with partnership model',
+    ],
+    typicalQuestions: [
+      'Tell me about a time you had to analyze a complex legal problem',
+      'How do you approach working in a team without hierarchy?',
+      'Describe your understanding of our partnership model',
+      'Give an example of when attention to detail was critical',
+    ],
+    culturalNotes:
+      'Slaughter and May has a unique partnership structure with no formal hierarchy. They emphasize technical excellence, teamwork, and long-term thinking.',
+  },
 };
 
 /**
