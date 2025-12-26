@@ -106,6 +106,36 @@ export async function textToSpeech(text: string): Promise<ArrayBuffer> {
 }
 
 /**
+ * Detects filler words and verbal crutches in the answer
+ */
+function detectFillerWords(answer: string): { word: string; count: number }[] {
+  const fillers = [
+    { pattern: /\b(you know|y'know)\b/gi, word: 'you know' },
+    { pattern: /\b(like)\b/gi, word: 'like' },
+    { pattern: /\b(um|uh|umm|uhh)\b/gi, word: 'um/uh' },
+    { pattern: /\b(actually)\b/gi, word: 'actually' },
+    { pattern: /\b(basically)\b/gi, word: 'basically' },
+    { pattern: /\b(literally)\b/gi, word: 'literally' },
+    { pattern: /\b(kind of|sort of|kinda|sorta)\b/gi, word: 'kind of/sort of' },
+    { pattern: /\b(I think)\b/gi, word: 'I think' },
+    { pattern: /\b(I mean)\b/gi, word: 'I mean' },
+    { pattern: /\b(right\?|you see|you understand)\b/gi, word: 'right/you see' },
+  ];
+
+  const detected: { word: string; count: number }[] = [];
+
+  for (const filler of fillers) {
+    const matches = answer.match(filler.pattern);
+    if (matches && matches.length >= 2) { // Only flag if used 2+ times
+      detected.push({ word: filler.word, count: matches.length });
+    }
+  }
+
+  // Sort by count (most frequent first)
+  return detected.sort((a, b) => b.count - a.count);
+}
+
+/**
  * Analyzes a single answer in real-time and provides SWOT feedback
  */
 export async function analyzeAnswer(params: {
@@ -122,6 +152,12 @@ export async function analyzeAnswer(params: {
   const client = getOpenAIClient();
   const { question, answer, industry, conversationHistory } = params;
 
+  // Detect filler words
+  const fillerWords = detectFillerWords(answer);
+  const fillerWordInfo = fillerWords.length > 0
+    ? `\n\nFILLER WORDS DETECTED:\n${fillerWords.map(f => `- Used "${f.word}" ${f.count} times`).join('\n')}\nINCLUDE THIS IN WEAKNESSES/THREATS: The candidate should eliminate these verbal fillers to sound more confident and articulate.`
+    : '';
+
   const contextInfo = conversationHistory.length > 0
     ? `\n\nPrevious conversation context:\n${conversationHistory.slice(-4).map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}`
     : '';
@@ -132,6 +168,7 @@ Question asked: "${question}"
 
 Candidate's answer: "${answer}"
 ${contextInfo}
+${fillerWordInfo}
 
 Provide immediate feedback in SWOT format. Be specific to THIS answer, not generic.
 

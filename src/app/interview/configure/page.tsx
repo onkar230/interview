@@ -56,7 +56,7 @@ function ConfigureInterviewContent() {
 
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
-  const [difficulty, setDifficulty] = useState<Difficulty>('mid-level');
+  const difficulty: Difficulty = 'entry-level'; // Fixed to entry-level for student/grad-level jobs
   const [jobDescription, setJobDescription] = useState('');
   const [questionTypes, setQuestionTypes] = useState<string[]>([
     'behavioral',
@@ -258,27 +258,6 @@ function ConfigureInterviewContent() {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Experience Level */}
-            <div>
-              <label
-                htmlFor="difficulty"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Experience Level <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="difficulty"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors bg-white"
-              >
-                <option value="entry-level">Entry-level (0-3 years)</option>
-                <option value="mid-level">Mid-level (3-7 years)</option>
-                <option value="senior">Senior (7-12 years)</option>
-                <option value="executive">Executive (12+ years)</option>
-              </select>
             </div>
 
             {/* Follow-up Intensity */}

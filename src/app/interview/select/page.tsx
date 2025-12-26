@@ -31,6 +31,9 @@ const INDUSTRY_ICONS = {
 export default function SelectIndustryPage() {
   const router = useRouter();
 
+  // Focus on high-ROI industries for students/entry-level candidates
+  const AVAILABLE_INDUSTRIES: Industry[] = ['technology', 'engineering', 'finance', 'law'];
+
   const handleIndustrySelect = (industry: Industry) => {
     router.push(`/interview/configure?industry=${industry}`);
   };
@@ -51,7 +54,7 @@ export default function SelectIndustryPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(Object.keys(INDUSTRY_PROMPTS) as Industry[]).map((industry) => {
+          {AVAILABLE_INDUSTRIES.map((industry) => {
             const config = INDUSTRY_PROMPTS[industry];
             const Icon = INDUSTRY_ICONS[industry];
 

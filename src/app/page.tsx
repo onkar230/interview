@@ -9,16 +9,10 @@ import {
   SiApple,
   SiNetflix,
   SiGoldmansachs,
-  SiNike,
-  SiCocacola,
-  SiStarbucks,
-  SiMcdonalds,
-  SiMerck,
-  SiAbbvie,
   SiSalesforce,
   SiAdobe,
-  SiAccenture,
-  SiOracle
+  SiOracle,
+  SiTesla
 } from 'react-icons/si'; // Simple Icons from react-icons
 import { FaAmazon, FaMicrosoft } from 'react-icons/fa'; // Font Awesome brand icons
 
@@ -109,35 +103,22 @@ function AnimatedScoreSection() {
 // Company Logo Component using react-icons
 const CompanyLogo = ({ name }: { name: string }) => {
   // Map company names to React Icon components with their brand colors
-  // Diversified across industries: Tech, Finance, Consulting, Healthcare, Consumer, Entertainment
+  // Focused on Tech, Finance, Law & Engineering industries
   const iconMap: Record<string, { Icon: any; color: string } | null> = {
     // Tech/Software
     'Google': { Icon: SiGoogle, color: '#4285F4' },
     'Microsoft': { Icon: FaMicrosoft, color: '#00A4EF' },
     'Apple': { Icon: SiApple, color: '#FFFFFF' },
     'Amazon': { Icon: FaAmazon, color: '#FF9900' },
+    'Netflix': { Icon: SiNetflix, color: '#E50914' },
+    'Salesforce': { Icon: SiSalesforce, color: '#00A1E0' },
+    'Adobe': { Icon: SiAdobe, color: '#FF0000' },
+    'Oracle': { Icon: SiOracle, color: '#F80000' },
     // Finance
     'Goldman Sachs': { Icon: SiGoldmansachs, color: '#5C8AB1' },
     'JPMorgan': null, // Not available
-    // Consulting
-    'McKinsey': null, // Not available
-    'BCG': null, // Not available
-    'Deloitte': null, // Not available
-    'Accenture': { Icon: SiAccenture, color: '#A100FF' },
-    // Healthcare/Pharma
-    'Merck': { Icon: SiMerck, color: '#0080C9' },
-    'AbbVie': { Icon: SiAbbvie, color: '#071D49' },
-    // Consumer Brands
-    'Nike': { Icon: SiNike, color: '#FFFFFF' },
-    'Starbucks': { Icon: SiStarbucks, color: '#00704A' },
-    'Coca-Cola': { Icon: SiCocacola, color: '#F40009' },
-    'McDonald\'s': { Icon: SiMcdonalds, color: '#FFC72C' },
-    // Enterprise/SaaS
-    'Oracle': { Icon: SiOracle, color: '#F80000' },
-    'Salesforce': { Icon: SiSalesforce, color: '#00A1E0' },
-    'Adobe': { Icon: SiAdobe, color: '#FF0000' },
-    // Entertainment/Media
-    'Netflix': { Icon: SiNetflix, color: '#E50914' },
+    // Engineering
+    'Tesla': { Icon: SiTesla, color: '#CC0000' },
   };
 
   const iconData = iconMap[name];
@@ -146,9 +127,6 @@ const CompanyLogo = ({ name }: { name: string }) => {
     // Fallback for companies not in react-icons - show brand-colored text
     const colorMap: Record<string, string> = {
       'JPMorgan': '#0070CD',
-      'McKinsey': '#1E3A5F',
-      'BCG': '#009B77',
-      'Deloitte': '#86BC25',
     };
 
     return (
@@ -174,12 +152,11 @@ const CompanyLogo = ({ name }: { name: string }) => {
 
 // Company Logos Carousel
 function CompanyCarousel() {
-  // Diverse companies across all industries: Tech, Finance, Consulting, Healthcare, Consumer, Entertainment
+  // Companies across our 4 focus industries: Tech, Finance, Law, Engineering
   const companies = [
-    'Google', 'Goldman Sachs', 'Nike', 'Merck', 'McKinsey',
-    'Microsoft', 'JPMorgan', 'Starbucks', 'AbbVie', 'BCG',
-    'Apple', 'Salesforce', 'Coca-Cola', 'Deloitte', 'Accenture',
-    'Amazon', 'Adobe', 'McDonald\'s', 'Netflix', 'Oracle'
+    'Google', 'Goldman Sachs', 'Microsoft', 'JPMorgan',
+    'Apple', 'Amazon', 'Netflix', 'Salesforce',
+    'Adobe', 'Oracle', 'Tesla'
   ];
 
   // Double the array for seamless loop
@@ -341,7 +318,7 @@ export default function Home() {
           Practice Interviews For Jobs At
         </h2>
         <p className="text-xl text-gray-300 text-center mb-12">
-          Prepare for interviews at leading organizations across 9 industries
+          Prepare for Tech, Finance, Law & Engineering roles at top companies
         </p>
 
         <CompanyCarousel />
