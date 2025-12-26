@@ -1,0 +1,121 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import {
+  Code,
+  DollarSign,
+  Heart,
+  Megaphone,
+  TrendingUp,
+  Briefcase,
+  GraduationCap,
+  Wrench,
+  Scale
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Industry, INDUSTRY_PROMPTS } from '@/lib/interview-prompts';
+import ProgressSteps from '@/components/interview/ProgressSteps';
+
+const INDUSTRY_ICONS = {
+  technology: Code,
+  finance: DollarSign,
+  healthcare: Heart,
+  marketing: Megaphone,
+  sales: TrendingUp,
+  consulting: Briefcase,
+  education: GraduationCap,
+  engineering: Wrench,
+  law: Scale,
+};
+
+export default function SelectIndustryPage() {
+  const router = useRouter();
+
+  const handleIndustrySelect = (industry: Industry) => {
+    router.push(`/interview/configure?industry=${industry}`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Progress Steps */}
+        <ProgressSteps currentStep={1} />
+
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Select Your Industry
+          </h1>
+          <p className="text-lg text-gray-600">
+            Choose the industry that matches your career goals. We'll tailor the interview accordingly.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {(Object.keys(INDUSTRY_PROMPTS) as Industry[]).map((industry) => {
+            const config = INDUSTRY_PROMPTS[industry];
+            const Icon = INDUSTRY_ICONS[industry];
+
+            return (
+              <button
+                key={industry}
+                onClick={() => handleIndustrySelect(industry)}
+                className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-200 hover:scale-105 text-left group"
+              >
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                    <Icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 capitalize">
+                  {industry}
+                </h3>
+
+                <p className="text-sm text-gray-600 mb-4">
+                  {config.description}
+                </p>
+
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p className="font-medium">Focus Areas:</p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {config.focusAreas.slice(0, 3).map((area, idx) => (
+                      <li key={idx}>{area}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                    Start Interview
+                  </span>
+                  <svg
+                    className="h-5 w-5 text-blue-600 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/')}
+          >
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

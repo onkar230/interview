@@ -1,0 +1,239 @@
+/**
+ * OpenAI Client Configuration
+ *
+ * This file sets up the OpenAI client for the AI Mock Interview Platform.
+ * It will be used for:
+ * - Generating interview questions
+ * - Real-time conversation with GPT-4
+ * - Evaluating candidate responses
+ * - Text-to-Speech for voice interactions
+ */
+
+import OpenAI from 'openai';
+
+// TODO: Ensure OPENAI_API_KEY is set in .env.local before using in production
+// Note: Lazy initialization to prevent errors during build/development
+export const getOpenAIClient = () => {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('Missing OPENAI_API_KEY environment variable');
+  }
+
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+};
+
+/**
+ * Configuration for different OpenAI features
+ */
+export const OPENAI_CONFIG = {
+  // Model for interview conversations (using cheaper model for cost efficiency)
+  // gpt-4o-mini: $0.15/1M input, $0.60/1M output (60x cheaper than GPT-4 Turbo!)
+  CHAT_MODEL: 'gpt-4o-mini' as const,
+
+  // Model for real-time feedback (cheap is fine here)
+  FEEDBACK_MODEL: 'gpt-4o-mini' as const,
+
+  // Model for text-to-speech
+  TTS_MODEL: 'tts-1' as const,
+  TTS_VOICE: 'alloy' as const,
+
+  // Model for evaluations (keep quality high for final eval)
+  // gpt-4-turbo: $10/1M input, $30/1M output (better quality for final analysis)
+  EVALUATION_MODEL: 'gpt-4-turbo' as const,
+
+  // Temperature settings
+  TEMPERATURE: {
+    CREATIVE: 0.8,
+    BALANCED: 0.7,
+    DETERMINISTIC: 0.3,
+  },
+} as const;
+
+/**
+ * Helper Functions for OpenAI Integration
+ */
+
+/**
+ * Transcribes audio to text using Whisper
+ */
+export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  const client = getOpenAIClient();
+
+  // Convert Blob to File (required by OpenAI API)
+  const audioFile = new File([audioBlob], 'audio.webm', { type: audioBlob.type });
+
+  const transcription = await client.audio.transcriptions.create({
+    file: audioFile,
+    model: 'whisper-1',
+  });
+
+  return transcription.text;
+}
+
+/**
+ * Generates an AI response based on conversation history
+ */
+export async function generateResponse(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  industry: string
+): Promise<string> {
+  const client = getOpenAIClient();
+
+  const completion = await client.chat.completions.create({
+    model: OPENAI_CONFIG.CHAT_MODEL,
+    messages,
+    temperature: OPENAI_CONFIG.TEMPERATURE.BALANCED,
+    max_tokens: 500,
+  });
+
+  return completion.choices[0]?.message?.content || '';
+}
+
+/**
+ * Converts text to speech using OpenAI TTS
+ */
+export async function textToSpeech(text: string): Promise<ArrayBuffer> {
+  const client = getOpenAIClient();
+
+  const mp3 = await client.audio.speech.create({
+    model: OPENAI_CONFIG.TTS_MODEL,
+    voice: OPENAI_CONFIG.TTS_VOICE,
+    input: text,
+  });
+
+  return mp3.arrayBuffer();
+}
+
+/**
+ * Analyzes a single answer in real-time and provides SWOT feedback
+ */
+export async function analyzeAnswer(params: {
+  question: string;
+  answer: string;
+  industry: string;
+  conversationHistory: Array<{ role: string; content: string }>;
+}): Promise<{
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+}> {
+  const client = getOpenAIClient();
+  const { question, answer, industry, conversationHistory } = params;
+
+  const contextInfo = conversationHistory.length > 0
+    ? `\n\nPrevious conversation context:\n${conversationHistory.slice(-4).map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}`
+    : '';
+
+  const analysisPrompt = `You are an expert interviewer analyzing a candidate's answer in real-time during a ${industry} industry interview.
+
+Question asked: "${question}"
+
+Candidate's answer: "${answer}"
+${contextInfo}
+
+Provide immediate feedback in SWOT format. Be specific to THIS answer, not generic.
+
+IMPORTANT GUIDELINES:
+- Strengths: What they did well in this specific answer (1-2 points, be concrete)
+- Weaknesses: What could be improved in their response (1-2 points, actionable)
+- Opportunities: What they missed or could have mentioned to strengthen their answer (1-2 points)
+- Threats: Any red flags or concerning patterns in this answer (0-1 point, only if critical - leave empty if none)
+
+Each point should be:
+- One sentence maximum
+- Specific to their actual answer
+- Constructive and actionable
+- Professional and encouraging
+
+Respond in JSON format:
+{
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "weaknesses": ["specific weakness 1", "specific weakness 2"],
+  "opportunities": ["missed point 1", "missed point 2"],
+  "threats": ["red flag"] or []
+}`;
+
+  const completion = await client.chat.completions.create({
+    model: OPENAI_CONFIG.FEEDBACK_MODEL,
+    messages: [
+      { role: 'system', content: analysisPrompt },
+      { role: 'user', content: 'Analyze this answer now.' }
+    ],
+    temperature: OPENAI_CONFIG.TEMPERATURE.DETERMINISTIC,
+    response_format: { type: 'json_object' },
+  });
+
+  const result = JSON.parse(completion.choices[0]?.message?.content || '{}');
+
+  return {
+    strengths: result.strengths || [],
+    weaknesses: result.weaknesses || [],
+    opportunities: result.opportunities || [],
+    threats: result.threats || [],
+  };
+}
+
+/**
+ * Evaluates an interview conversation and provides detailed feedback
+ */
+export async function evaluateInterview(
+  transcript: Array<{ role: string; content: string }>,
+  industry: string
+): Promise<{
+  verdict: 'pass' | 'borderline' | 'fail';
+  strengths: string[];
+  weaknesses: string[];
+  dealBreakers: string[];
+  detailedFeedback: string;
+}> {
+  const client = getOpenAIClient();
+
+  const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyze the following interview conversation and provide a comprehensive evaluation.
+
+Industry: ${industry}
+
+Evaluate based on:
+1. Technical knowledge and competence
+2. Communication skills
+3. Problem-solving ability
+4. Relevant experience
+5. Cultural fit and professionalism
+
+Provide your evaluation in the following JSON format:
+{
+  "verdict": "pass" | "borderline" | "fail",
+  "strengths": ["strength 1", "strength 2", ...],
+  "weaknesses": ["weakness 1", "weakness 2", ...],
+  "dealBreakers": ["deal breaker 1", ...] (if any critical issues),
+  "detailedFeedback": "A comprehensive paragraph about the candidate's performance"
+}
+
+Be fair but honest. Pass means strong hire, borderline means potential with reservations, fail means clear no-hire.`;
+
+  const messages = [
+    { role: 'system' as const, content: evaluationPrompt },
+    {
+      role: 'user' as const,
+      content: `Interview Transcript:\n\n${transcript.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')}`
+    }
+  ];
+
+  const completion = await client.chat.completions.create({
+    model: OPENAI_CONFIG.EVALUATION_MODEL,
+    messages,
+    temperature: OPENAI_CONFIG.TEMPERATURE.DETERMINISTIC,
+    response_format: { type: 'json_object' },
+  });
+
+  const result = JSON.parse(completion.choices[0]?.message?.content || '{}');
+
+  return {
+    verdict: result.verdict || 'borderline',
+    strengths: result.strengths || [],
+    weaknesses: result.weaknesses || [],
+    dealBreakers: result.dealBreakers || [],
+    detailedFeedback: result.detailedFeedback || 'No feedback provided.',
+  };
+}
