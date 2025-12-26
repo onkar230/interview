@@ -203,7 +203,7 @@ function ConfigureInterviewContent() {
               )}
               {suggestions && (
                 <div className="mt-2">
-                  <p className="text-xs text-gray-500 mb-2">Popular companies for {industry}:</p>
+                  <p className="text-xs text-gray-400 mb-2">Popular companies for {industry}:</p>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.companies.map((companyName) => (
                       <button
@@ -243,7 +243,7 @@ function ConfigureInterviewContent() {
               )}
               {suggestions && (
                 <div className="mt-2">
-                  <p className="text-xs text-gray-500 mb-2">Common roles for {industry}:</p>
+                  <p className="text-xs text-gray-400 mb-2">Common roles for {industry}:</p>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.roles.map((roleName) => (
                       <button
@@ -268,7 +268,7 @@ function ConfigureInterviewContent() {
               >
                 Follow-up Question Intensity <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-gray-500 mb-3">
+              <p className="text-xs text-gray-400 mb-3">
                 Control how much the interviewer probes your answers. Real interviewers follow up on vague responses.
               </p>
               <select
@@ -307,7 +307,7 @@ function ConfigureInterviewContent() {
                 maxLength={2000}
                 className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-400">
                 {jobDescription.length}/2000 characters
               </p>
             </div>
@@ -317,7 +317,7 @@ function ConfigureInterviewContent() {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 What types of questions do you want to practice? (Optional)
               </label>
-              <p className="text-xs text-gray-500 mb-3">
+              <p className="text-xs text-gray-400 mb-3">
                 Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
               </p>
               <div className="space-y-2">
@@ -331,17 +331,17 @@ function ConfigureInterviewContent() {
                 ].map((type) => (
                   <label
                     key={type.id}
-                    className="flex items-start gap-3 p-3 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors"
+                    className="flex items-start gap-3 p-3 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors bg-slate-800/30"
                   >
                     <input
                       type="checkbox"
                       checked={questionTypes.includes(type.id)}
                       onChange={() => handleQuestionTypeToggle(type.id)}
-                      className="mt-1 h-4 w-4 text-pink-500 border-slate-600 rounded focus:ring-2 focus:ring-blue-500"
+                      className="mt-1 h-4 w-4 text-pink-500 border-slate-600 rounded focus:ring-2 focus:ring-pink-500 accent-pink-500"
                     />
                     <div className="flex-1">
-                      <div className="font-medium text-sm text-gray-900">{type.label}</div>
-                      <div className="text-xs text-gray-500">{type.description}</div>
+                      <div className="font-medium text-sm text-white">{type.label}</div>
+                      <div className="text-xs text-gray-400">{type.description}</div>
                     </div>
                   </label>
                 ))}
@@ -356,7 +356,7 @@ function ConfigureInterviewContent() {
               >
                 Add Your Own Questions (Optional)
               </label>
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-gray-400 mb-2">
                 Enter specific questions that you struggle with or want to practice. One question per line, max 5 questions.
               </p>
               <Textarea
@@ -367,7 +367,7 @@ function ConfigureInterviewContent() {
                 rows={5}
                 className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-400">
                 {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
               </p>
             </div>
