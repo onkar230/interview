@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import VoiceRecorder from '@/components/interview/VoiceRecorder';
@@ -47,6 +47,11 @@ function InterviewSessionContent() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Memoized callback to prevent AudioPlayer from re-playing on every render
+  const handleAudioPlaybackEnd = useCallback(() => {
+    setCurrentAudioUrl(null);
+  }, []);
 
   // Initialize interview with opening question
   useEffect(() => {
@@ -593,10 +598,10 @@ function InterviewSessionContent() {
               {/* Current audio playing */}
               {currentAudioUrl && (
                 <div className="space-y-3">
-                  <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
+                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg shadow-lg p-4">
                     <AudioPlayer
                       audioUrl={currentAudioUrl}
-                      onPlaybackEnd={() => setCurrentAudioUrl(null)}
+                      onPlaybackEnd={handleAudioPlaybackEnd}
                       audioRef={currentAudioRef}
                     />
                   </div>
