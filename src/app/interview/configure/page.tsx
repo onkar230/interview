@@ -175,7 +175,7 @@ function ConfigureInterviewContent() {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Industry
               </label>
-              <div className="px-4 py-3 bg-slate-700 rounded-lg border border-slate-600 text-gray-400 capitalize">
+              <div className="px-4 py-3 bg-white rounded-lg border border-slate-600 text-gray-900 capitalize font-medium">
                 {industry}
               </div>
             </div>
@@ -195,7 +195,7 @@ function ConfigureInterviewContent() {
                 placeholder={suggestions ? `e.g., ${suggestions.companies.slice(0, 3).join(', ')}` : 'e.g., Google, Meta'}
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className={errors.company ? 'border-red-500' : ''}
+                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.company ? 'border-red-500' : 'border-slate-600'}`}
                 aria-invalid={!!errors.company}
               />
               {errors.company && (
@@ -210,7 +210,7 @@ function ConfigureInterviewContent() {
                         key={companyName}
                         type="button"
                         onClick={() => setCompany(companyName)}
-                        className="px-3 py-1 text-xs rounded-full border border-slate-600 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-slate-600 bg-slate-700/50 text-gray-300 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
                       >
                         {companyName}
                       </button>
@@ -235,7 +235,7 @@ function ConfigureInterviewContent() {
                 placeholder={suggestions ? `e.g., ${suggestions.roles.slice(0, 2).join(', ')}` : 'e.g., Senior Software Engineer'}
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className={errors.role ? 'border-red-500' : ''}
+                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.role ? 'border-red-500' : 'border-slate-600'}`}
                 aria-invalid={!!errors.role}
               />
               {errors.role && (
@@ -250,7 +250,7 @@ function ConfigureInterviewContent() {
                         key={roleName}
                         type="button"
                         onClick={() => setRole(roleName)}
-                        className="px-3 py-1 text-xs rounded-full border border-slate-600 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-slate-600 bg-slate-700/50 text-gray-300 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
                       >
                         {roleName}
                       </button>
@@ -275,7 +275,7 @@ function ConfigureInterviewContent() {
                 id="followUpIntensity"
                 value={followUpIntensity}
                 onChange={(e) => setFollowUpIntensity(e.target.value as 'none' | 'light' | 'moderate' | 'intensive')}
-                className="w-full px-4 py-2 border border-slate-600 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-colors bg-white"
+                className="w-full px-4 py-2 border border-slate-600 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-colors bg-white text-gray-900"
               >
                 <option value="none">No Follow-ups - Move to next question immediately</option>
                 <option value="light">Light - Only follow up if answer is very vague (max 1 follow-up)</option>
@@ -305,7 +305,7 @@ function ConfigureInterviewContent() {
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={6}
                 maxLength={2000}
-                className="resize-y"
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
               />
               <p className="mt-1 text-sm text-gray-500">
                 {jobDescription.length}/2000 characters
@@ -365,7 +365,7 @@ function ConfigureInterviewContent() {
                 value={customQuestions}
                 onChange={(e) => setCustomQuestions(e.target.value)}
                 rows={5}
-                className="resize-y"
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
               />
               <p className="mt-1 text-sm text-gray-500">
                 {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
