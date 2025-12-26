@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import VoiceRecorder from '@/components/interview/VoiceRecorder';
@@ -46,6 +46,7 @@ function InterviewSessionContent() {
   const [feedbackHistory, setFeedbackHistory] = useState<FeedbackItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize interview with opening question
   useEffect(() => {
@@ -277,8 +278,18 @@ function InterviewSessionContent() {
   const handleSkipQuestion = async () => {
     // Skip the current AI question and ask for a different one
     if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
-      setMessages((prev) => prev.slice(0, -1));
+      // Stop and cleanup current audio immediately
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+        currentAudioRef.current = null;
+      }
+      if (currentAudioUrl) {
+        URL.revokeObjectURL(currentAudioUrl);
+      }
       setCurrentAudioUrl(null);
+
+      setMessages((prev) => prev.slice(0, -1));
       setIsProcessing(true);
       setError(null);
 
@@ -585,6 +596,7 @@ function InterviewSessionContent() {
                     <AudioPlayer
                       audioUrl={currentAudioUrl}
                       onPlaybackEnd={() => setCurrentAudioUrl(null)}
+                      audioRef={currentAudioRef}
                     />
                   </div>
 

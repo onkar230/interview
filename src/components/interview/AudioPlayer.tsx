@@ -7,10 +7,11 @@ interface AudioPlayerProps {
   audioUrl: string | null;
   autoPlay?: boolean;
   onPlaybackEnd?: () => void;
+  audioRef?: React.MutableRefObject<HTMLAudioElement | null>;
 }
 
-export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd }: AudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, audioRef: externalAudioRef }: AudioPlayerProps) {
+  const internalAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +23,12 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd }
     setError(null);
 
     const audio = new Audio(audioUrl);
-    audioRef.current = audio;
+    internalAudioRef.current = audio;
+
+    // Also set external ref if provided so parent can control audio
+    if (externalAudioRef) {
+      externalAudioRef.current = audio;
+    }
 
     audio.oncanplaythrough = () => {
       setIsLoading(false);
@@ -55,12 +61,16 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd }
     };
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
+      if (internalAudioRef.current) {
+        internalAudioRef.current.pause();
+        internalAudioRef.current.currentTime = 0;
+        internalAudioRef.current = null;
+      }
+      if (externalAudioRef) {
+        externalAudioRef.current = null;
       }
     };
-  }, [audioUrl, autoPlay, onPlaybackEnd]);
+  }, [audioUrl, autoPlay, onPlaybackEnd, externalAudioRef]);
 
   if (!audioUrl) return null;
 
