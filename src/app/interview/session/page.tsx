@@ -409,16 +409,16 @@ function InterviewSessionContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-white">
                 {role} Interview
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-300">
                 {company} | Question {questionCount} of 10
               </p>
             </div>
@@ -428,10 +428,10 @@ function InterviewSessionContent() {
                 variant="outline"
                 size="icon"
                 title={showWebcam ? "Hide webcam" : "Show webcam"}
-                className={showWebcam ? "bg-blue-50 border-blue-300" : ""}
+                className={showWebcam ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
               >
                 {showWebcam ? (
-                  <Camera className="h-4 w-4 text-blue-600" />
+                  <Camera className="h-4 w-4" />
                 ) : (
                   <CameraOff className="h-4 w-4" />
                 )}
@@ -440,6 +440,7 @@ function InterviewSessionContent() {
                 onClick={handleEndInterview}
                 variant="outline"
                 disabled={isProcessing}
+                className="border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
               >
                 End Interview & Get Results
               </Button>
@@ -449,12 +450,12 @@ function InterviewSessionContent() {
       </div>
 
       {/* 3-Column Layout: Q&A (Left) | Webcam + Controls (Center) | Feedback (Right) */}
-      <div className="flex-1 bg-gradient-to-b from-gray-100 to-gray-50">
+      <div className="flex-1 bg-gradient-to-b from-slate-900 to-purple-900/50">
         <div className="max-w-7xl mx-auto px-6 py-6 h-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Left Column: Conversation/Q&A */}
-            <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-              <h3 className="text-sm font-semibold text-gray-700 mb-4 sticky top-0 bg-white pb-2 border-b">
+            <div className="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <h3 className="text-sm font-semibold text-gray-300 mb-4 sticky top-0 bg-gradient-to-br from-slate-800 to-slate-900 pb-2 border-b border-slate-700">
                 Interview Conversation
               </h3>
               <div className="space-y-4">
@@ -467,8 +468,8 @@ function InterviewSessionContent() {
                   >
                     {message.role === 'assistant' && (
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                          <Bot className="h-5 w-5 text-blue-600" />
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
+                          <Bot className="h-5 w-5 text-pink-400" />
                         </div>
                       </div>
                     )}
@@ -476,8 +477,8 @@ function InterviewSessionContent() {
                     <div
                       className={`max-w-[80%] rounded-lg p-3 ${
                         message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 border border-gray-200'
+                          ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white'
+                          : 'bg-slate-700/50 border border-slate-600 text-gray-200'
                       }`}
                     >
                       <p className="text-xs whitespace-pre-wrap">{message.content}</p>
@@ -485,8 +486,8 @@ function InterviewSessionContent() {
 
                     {message.role === 'user' && (
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                          <User className="h-5 w-5 text-gray-600" />
+                        <div className="h-8 w-8 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-400" />
                         </div>
                       </div>
                     )}
@@ -494,15 +495,15 @@ function InterviewSessionContent() {
                 ))}
 
                 {isProcessing && (
-                  <div className="flex items-center gap-2 text-gray-600 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                  <div className="flex items-center gap-2 text-gray-300 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin text-pink-400" />
                     <span>{!isInitialized ? 'Preparing...' : 'AI thinking...'}</span>
                   </div>
                 )}
 
                 {!isInitialized && isProcessing && (
                   <div className="text-center mt-4">
-                    <p className="text-sm text-blue-600 font-medium">Take a deep breath. You've got this.</p>
+                    <p className="text-sm text-pink-400 font-medium">Take a deep breath. You've got this.</p>
                   </div>
                 )}
               </div>
@@ -511,7 +512,7 @@ function InterviewSessionContent() {
             {/* Center Column: Webcam + Controls */}
             <div className="lg:col-span-1 flex flex-col gap-4">
               {/* Webcam */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg overflow-hidden">
                 {showWebcam ? (
                   <WebcamMirror
                     isVisible={showWebcam}
@@ -540,7 +541,7 @@ function InterviewSessionContent() {
 
               {/* Error display */}
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-800 text-sm">
+                <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
                   {error}
                 </div>
               )}
@@ -621,7 +622,7 @@ function InterviewSessionContent() {
 
             {/* Right Column: Feedback Panel */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg border border-gray-200 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                 <FeedbackPanel
                   feedbackHistory={feedbackHistory}
                   isAnalyzing={isAnalyzing}

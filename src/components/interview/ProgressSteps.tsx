@@ -17,9 +17,9 @@ export default function ProgressSteps({ currentStep }: ProgressStepsProps) {
     <div className="max-w-2xl mx-auto mb-8">
       <div className="flex items-center justify-between relative">
         {/* Progress line */}
-        <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10">
+        <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-700 -z-10">
           <div
-            className="h-full bg-blue-600 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-500"
             style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
           />
         </div>
@@ -36,9 +36,9 @@ export default function ProgressSteps({ currentStep }: ProgressStepsProps) {
                 className={`
                   w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                   transition-all duration-300 relative z-10
-                  ${isCompleted ? 'bg-blue-600 text-white' : ''}
-                  ${isCurrent ? 'bg-blue-600 text-white ring-4 ring-blue-100' : ''}
-                  ${isUpcoming ? 'bg-white border-2 border-gray-300 text-gray-400' : ''}
+                  ${isCompleted ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white' : ''}
+                  ${isCurrent ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white ring-4 ring-pink-500/30' : ''}
+                  ${isUpcoming ? 'bg-slate-800 border-2 border-slate-600 text-gray-400' : ''}
                 `}
               >
                 {isCompleted ? (
@@ -52,9 +52,9 @@ export default function ProgressSteps({ currentStep }: ProgressStepsProps) {
               <div
                 className={`
                   mt-2 text-sm font-medium text-center
-                  ${isCurrent ? 'text-blue-600' : ''}
-                  ${isCompleted ? 'text-gray-700' : ''}
-                  ${isUpcoming ? 'text-gray-400' : ''}
+                  ${isCurrent ? 'text-pink-400' : ''}
+                  ${isCompleted ? 'text-gray-300' : ''}
+                  ${isUpcoming ? 'text-gray-500' : ''}
                 `}
               >
                 {step.label}

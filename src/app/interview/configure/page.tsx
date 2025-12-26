@@ -140,10 +140,10 @@ function ConfigureInterviewContent() {
 
   if (!industry) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="text-center">
-          <p className="text-red-600 mb-4">No industry selected</p>
-          <Button onClick={() => router.push('/interview/select')}>
+          <p className="text-red-400 mb-4">No industry selected</p>
+          <Button onClick={() => router.push('/interview/select')} className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
             Select Industry
           </Button>
         </div>
@@ -152,30 +152,30 @@ function ConfigureInterviewContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
       <div className="max-w-3xl mx-auto">
         {/* Progress Steps */}
         <ProgressSteps currentStep={2} />
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Customize Your Interview
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-300">
             Tell us about your interview to get the most realistic experience
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Industry (Read-only) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Industry
               </label>
-              <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-600 capitalize">
+              <div className="px-4 py-3 bg-slate-700 rounded-lg border border-slate-600 text-gray-400 capitalize">
                 {industry}
               </div>
             </div>
@@ -184,7 +184,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="company"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-300 mb-2"
               >
                 What company are you interviewing for?{' '}
                 <span className="text-red-500">*</span>
@@ -210,7 +210,7 @@ function ConfigureInterviewContent() {
                         key={companyName}
                         type="button"
                         onClick={() => setCompany(companyName)}
-                        className="px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-slate-600 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
                       >
                         {companyName}
                       </button>
@@ -224,7 +224,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="role"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-300 mb-2"
               >
                 What role are you applying for?{' '}
                 <span className="text-red-500">*</span>
@@ -250,7 +250,7 @@ function ConfigureInterviewContent() {
                         key={roleName}
                         type="button"
                         onClick={() => setRole(roleName)}
-                        className="px-3 py-1 text-xs rounded-full border border-gray-300 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-slate-600 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
                       >
                         {roleName}
                       </button>
@@ -264,7 +264,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="followUpIntensity"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-300 mb-2"
               >
                 Follow-up Question Intensity <span className="text-red-500">*</span>
               </label>
@@ -275,14 +275,14 @@ function ConfigureInterviewContent() {
                 id="followUpIntensity"
                 value={followUpIntensity}
                 onChange={(e) => setFollowUpIntensity(e.target.value as 'none' | 'light' | 'moderate' | 'intensive')}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors bg-white"
+                className="w-full px-4 py-2 border border-slate-600 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-colors bg-white"
               >
                 <option value="none">No Follow-ups - Move to next question immediately</option>
                 <option value="light">Light - Only follow up if answer is very vague (max 1 follow-up)</option>
                 <option value="moderate">Moderate - Follow up on vague answers (1-2 follow-ups) [Recommended]</option>
                 <option value="intensive">Intensive - Deep probing like real interviews (2-3 follow-ups)</option>
               </select>
-              <p className="mt-2 text-xs text-gray-600">
+              <p className="mt-2 text-xs text-gray-400">
                 {followUpIntensity === 'none' && '📝 Quick practice mode - cover more questions in less time'}
                 {followUpIntensity === 'light' && '🎯 Gentle practice - some follow-ups for very unclear answers'}
                 {followUpIntensity === 'moderate' && '⚖️ Balanced - realistic follow-ups without excessive pressure'}
@@ -294,7 +294,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="jobDescription"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-300 mb-2"
               >
                 Job Description (Optional)
               </label>
@@ -314,7 +314,7 @@ function ConfigureInterviewContent() {
 
             {/* Question Types */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 What types of questions do you want to practice? (Optional)
               </label>
               <p className="text-xs text-gray-500 mb-3">
@@ -331,13 +331,13 @@ function ConfigureInterviewContent() {
                 ].map((type) => (
                   <label
                     key={type.id}
-                    className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-start gap-3 p-3 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors"
                   >
                     <input
                       type="checkbox"
                       checked={questionTypes.includes(type.id)}
                       onChange={() => handleQuestionTypeToggle(type.id)}
-                      className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                      className="mt-1 h-4 w-4 text-pink-500 border-slate-600 rounded focus:ring-2 focus:ring-blue-500"
                     />
                     <div className="flex-1">
                       <div className="font-medium text-sm text-gray-900">{type.label}</div>
@@ -352,7 +352,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="customQuestions"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-300 mb-2"
               >
                 Add Your Own Questions (Optional)
               </label>
@@ -373,15 +373,15 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* Privacy Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
+            <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 flex gap-3">
               <div className="flex-shrink-0">
-                <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+                <Shield className="h-5 w-5 text-pink-400 mt-0.5" />
               </div>
               <div>
-                <h4 className="font-semibold text-blue-900 text-sm mb-1">
+                <h4 className="font-semibold text-white text-sm mb-1">
                   Your privacy is protected
                 </h4>
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-gray-300">
                   Your webcam feed stays on your device only. We never record, store, or transmit your video or audio. The AI only receives your spoken text.
                 </p>
               </div>
@@ -393,12 +393,12 @@ function ConfigureInterviewContent() {
                 type="button"
                 variant="outline"
                 onClick={() => router.push('/interview/select')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
-              <Button type="submit" className="flex-1">
+              <Button type="submit" className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
                 Start Interview
               </Button>
             </div>
@@ -406,7 +406,7 @@ function ConfigureInterviewContent() {
         </div>
 
         {/* Help Text */}
-        <div className="mt-6 text-center text-sm text-gray-600">
+        <div className="mt-6 text-center text-sm text-gray-400">
           <p>
             The more details you provide, the more realistic and tailored your
             interview will be.
@@ -422,7 +422,7 @@ export default function ConfigureInterviewPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
         </div>
       }
     >
