@@ -9,8 +9,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "AI Mock Interview Platform",
-  description: "Practice your interview skills with AI-powered interviews. Get real-time feedback and improve your performance across 8 different industries.",
-  keywords: ["interview", "AI", "practice", "mock interview", "career", "job search"],
+  description: "Practise your interview skills with AI-powered interviews. Get real-time feedback and improve your performance across 8 different industries.",
+  keywords: ["interview", "AI", "practise", "mock interview", "career", "job search"],
 };
 
 export default function RootLayout({

@@ -160,7 +160,7 @@ function ConfigureInterviewContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">
-            Customize Your Interview
+            Customise Your Interview
           </h1>
           <p className="text-lg text-gray-300">
             Tell us about your interview to get the most realistic experience
@@ -283,8 +283,8 @@ function ConfigureInterviewContent() {
                 <option value="intensive">Intensive - Deep probing like real interviews (2-3 follow-ups)</option>
               </select>
               <p className="mt-2 text-xs text-gray-400">
-                {followUpIntensity === 'none' && '📝 Quick practice mode - cover more questions in less time'}
-                {followUpIntensity === 'light' && '🎯 Gentle practice - some follow-ups for very unclear answers'}
+                {followUpIntensity === 'none' && '📝 Quick practise mode - cover more questions in less time'}
+                {followUpIntensity === 'light' && '🎯 Gentle practise - some follow-ups for very unclear answers'}
                 {followUpIntensity === 'moderate' && '⚖️ Balanced - realistic follow-ups without excessive pressure'}
                 {followUpIntensity === 'intensive' && '🔥 Maximum pressure - just like a real challenging interview'}
               </p>
@@ -315,14 +315,14 @@ function ConfigureInterviewContent() {
             {/* Question Types */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                What types of questions do you want to practice? (Optional)
+                What types of questions do you want to practise? (Optional)
               </label>
               <p className="text-xs text-gray-400 mb-3">
                 Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
               </p>
               <div className="space-y-2">
                 {[
-                  { id: 'behavioral', label: 'Behavioral', description: 'Tell me about a time when...' },
+                  { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
                   { id: 'technical', label: 'Technical/Role-specific', description: 'Industry-specific knowledge and skills' },
                   { id: 'competency', label: 'Competency-based', description: 'How would you handle...' },
                   { id: 'situational', label: 'Situational', description: 'What would you do if...' },
@@ -357,7 +357,7 @@ function ConfigureInterviewContent() {
                 Add Your Own Questions (Optional)
               </label>
               <p className="text-xs text-gray-400 mb-2">
-                Enter specific questions that you struggle with or want to practice. One question per line, max 5 questions.
+                Enter specific questions that you struggle with or want to practise. One question per line, max 5 questions.
               </p>
               <Textarea
                 id="customQuestions"

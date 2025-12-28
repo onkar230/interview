@@ -530,7 +530,7 @@ function InterviewSessionContent() {
                     <CameraOff className="h-12 w-12 text-gray-400 mb-4" />
                     <p className="text-sm font-medium text-gray-600 mb-2">Webcam is hidden</p>
                     <p className="text-xs text-gray-500 mb-4">
-                      Enable your webcam to practice like a real video interview
+                      Enable your webcam to practise like a real video interview
                     </p>
                     <Button
                       onClick={() => setShowWebcam(true)}

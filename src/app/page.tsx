@@ -304,7 +304,7 @@ export default function Home() {
             See Your Interview Performance In Real-Time
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Our AI analyzes your responses just like a real recruiter would, giving you instant
+            Our AI analyses your responses just like a real recruiter would, giving you instant
             feedback on your strengths and areas for improvement.
           </p>
         </div>
@@ -481,7 +481,7 @@ export default function Home() {
               </li>
               <li className="flex items-center gap-3 text-white">
                 <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
-                Custom question practice
+                Custom question practise
               </li>
               <li className="flex items-center gap-3 text-white">
                 <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
@@ -542,7 +542,7 @@ export default function Home() {
           Your career is your most valuable asset.
         </h2>
         <p className="text-xl text-gray-300 mb-8">
-          Start building it today with AI-powered interview practice.
+          Start building it today with AI-powered interview practise.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
