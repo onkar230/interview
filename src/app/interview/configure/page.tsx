@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { ArrowLeft, Loader2, Shield } from 'lucide-react';
 import { Industry, Difficulty } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
@@ -65,6 +66,7 @@ function ConfigureInterviewContent() {
   ]); // Default selections
   const [customQuestions, setCustomQuestions] = useState('');
   const [followUpIntensity, setFollowUpIntensity] = useState<'none' | 'light' | 'moderate' | 'intensive'>('moderate');
+  const [questionCount, setQuestionCount] = useState(10);
   const [errors, setErrors] = useState<{
     company?: string;
     role?: string;
@@ -134,6 +136,9 @@ function ConfigureInterviewContent() {
 
     // Add follow-up intensity
     params.append('followUpIntensity', followUpIntensity);
+
+    // Add question count
+    params.append('questionCount', questionCount.toString());
 
     router.push(`/interview/session?${params.toString()}`);
   };
@@ -287,6 +292,36 @@ function ConfigureInterviewContent() {
                 {followUpIntensity === 'light' && '🎯 Gentle practise - some follow-ups for very unclear answers'}
                 {followUpIntensity === 'moderate' && '⚖️ Balanced - realistic follow-ups without excessive pressure'}
                 {followUpIntensity === 'intensive' && '🔥 Maximum pressure - just like a real challenging interview'}
+              </p>
+            </div>
+
+            {/* Question Count Slider */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Number of Questions
+              </label>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-pink-400">{questionCount}</span>
+                  <span className="text-xs text-gray-400">questions</span>
+                </div>
+                <Slider
+                  value={[questionCount]}
+                  onValueChange={(value) => setQuestionCount(value[0])}
+                  min={1}
+                  max={10}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>1 (Quick)</span>
+                  <span>10 (Full)</span>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                {questionCount <= 3 && '⚡ Quick practise - focus on a few key areas'}
+                {questionCount > 3 && questionCount <= 6 && '🎯 Medium session - balanced coverage'}
+                {questionCount > 6 && '📋 Full interview - comprehensive practise'}
               </p>
             </div>
 

@@ -38,9 +38,9 @@ export const OPENAI_CONFIG = {
   TTS_MODEL: 'tts-1' as const,
   TTS_VOICE: 'alloy' as const,
 
-  // Model for evaluations (keep quality high for final eval)
-  // gpt-4-turbo: $10/1M input, $30/1M output (better quality for final analysis)
-  EVALUATION_MODEL: 'gpt-4-turbo' as const,
+  // Model for evaluations (use gpt-4o for reliability and speed)
+  // gpt-4o: $2.50/1M input, $10/1M output (fast, reliable, high quality)
+  EVALUATION_MODEL: 'gpt-4o' as const,
 
   // Temperature settings
   TEMPERATURE: {
@@ -88,6 +88,47 @@ export async function generateResponse(
   });
 
   return completion.choices[0]?.message?.content || '';
+}
+
+/**
+ * Generates a streaming AI response based on conversation history
+ * Returns a stream that can be piped to the response
+ */
+export async function generateStreamingResponse(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  industry: string
+): Promise<ReadableStream> {
+  const client = getOpenAIClient();
+
+  const stream = await client.chat.completions.create({
+    model: OPENAI_CONFIG.CHAT_MODEL,
+    messages,
+    temperature: OPENAI_CONFIG.TEMPERATURE.BALANCED,
+    max_tokens: 500,
+    stream: true,
+  });
+
+  // Convert OpenAI stream to ReadableStream
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of stream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          if (content) {
+            // Send as Server-Sent Events format
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+          }
+        }
+        // Send done signal
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+  });
 }
 
 /**
@@ -245,6 +286,8 @@ export async function evaluateInterview(
 }> {
   const client = getOpenAIClient();
 
+  console.log(`Evaluating interview with ${transcript.length} messages for ${industry} industry`);
+
   const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyze the following interview conversation and provide a comprehensive evaluation.
 
 Industry: ${industry}
@@ -275,20 +318,35 @@ Be fair but honest. Pass means strong hire, borderline means potential with rese
     }
   ];
 
-  const completion = await client.chat.completions.create({
-    model: OPENAI_CONFIG.EVALUATION_MODEL,
-    messages,
-    temperature: OPENAI_CONFIG.TEMPERATURE.DETERMINISTIC,
-    response_format: { type: 'json_object' },
-  });
+  try {
+    const completion = await client.chat.completions.create({
+      model: OPENAI_CONFIG.EVALUATION_MODEL,
+      messages,
+      temperature: OPENAI_CONFIG.TEMPERATURE.DETERMINISTIC,
+      response_format: { type: 'json_object' },
+      max_tokens: 2000, // Ensure enough tokens for detailed evaluation
+    });
 
-  const result = JSON.parse(completion.choices[0]?.message?.content || '{}');
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error('No content in evaluation response');
+    }
 
-  return {
-    verdict: result.verdict || 'borderline',
-    strengths: result.strengths || [],
-    weaknesses: result.weaknesses || [],
-    dealBreakers: result.dealBreakers || [],
-    detailedFeedback: result.detailedFeedback || 'No feedback provided.',
-  };
+    const result = JSON.parse(content);
+    console.log('Evaluation completed successfully');
+
+    return {
+      verdict: result.verdict || 'borderline',
+      strengths: result.strengths || [],
+      weaknesses: result.weaknesses || [],
+      dealBreakers: result.dealBreakers || [],
+      detailedFeedback: result.detailedFeedback || 'No feedback provided.',
+    };
+  } catch (error) {
+    console.error('Error in evaluateInterview:', error);
+    if (error instanceof Error) {
+      throw new Error(`Evaluation failed: ${error.message}`);
+    }
+    throw error;
+  }
 }

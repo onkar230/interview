@@ -15,9 +15,34 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const onPlaybackEndRef = useRef(onPlaybackEnd);
+  const lastAudioUrlRef = useRef<string | null>(null);
+
+  // Keep the callback ref updated
+  useEffect(() => {
+    onPlaybackEndRef.current = onPlaybackEnd;
+  }, [onPlaybackEnd]);
 
   useEffect(() => {
-    if (!audioUrl) return;
+    if (!audioUrl) {
+      lastAudioUrlRef.current = null;
+      return;
+    }
+
+    // Don't recreate audio if it's the same URL
+    if (audioUrl === lastAudioUrlRef.current) {
+      console.log('Same audio URL, skipping recreation');
+      return;
+    }
+
+    console.log('Creating new audio for URL:', audioUrl.substring(0, 50));
+    lastAudioUrlRef.current = audioUrl;
+
+    // Stop any existing audio before creating new one
+    if (internalAudioRef.current) {
+      internalAudioRef.current.pause();
+      internalAudioRef.current.currentTime = 0;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -50,8 +75,8 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
     audio.onended = () => {
       setIsPlaying(false);
-      if (onPlaybackEnd) {
-        onPlaybackEnd();
+      if (onPlaybackEndRef.current) {
+        onPlaybackEndRef.current();
       }
     };
 
@@ -70,7 +95,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
         externalAudioRef.current = null;
       }
     };
-  }, [audioUrl, autoPlay, onPlaybackEnd, externalAudioRef]);
+  }, [audioUrl, autoPlay]);
 
   if (!audioUrl) return null;
 

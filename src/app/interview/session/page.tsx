@@ -8,7 +8,7 @@ import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import { Industry, generateInterviewPrompt } from '@/lib/interview-prompts';
-import { Loader2, User, Bot, Camera, CameraOff } from 'lucide-react';
+import { Loader2, User, Bot, Camera, CameraOff, Maximize2, Minimize2 } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -28,6 +28,7 @@ function InterviewSessionContent() {
   const questionTypesParam = searchParams.get('questionTypes') || '';
   const customQuestionsParam = searchParams.get('customQuestions') || '';
   const followUpIntensity = (searchParams.get('followUpIntensity') as 'none' | 'light' | 'moderate' | 'intensive') || 'moderate';
+  const maxQuestions = parseInt(searchParams.get('questionCount') || '10', 10);
 
   // Parse question types from comma-separated string
   const questionTypes = questionTypesParam ? questionTypesParam.split(',') : [];
@@ -46,20 +47,100 @@ function InterviewSessionContent() {
   const [feedbackHistory, setFeedbackHistory] = useState<FeedbackItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
+  const [streamingText, setStreamingText] = useState<string>('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const initializingRef = useRef(false); // Prevent double initialization
 
   // Memoized callback to prevent AudioPlayer from re-playing on every render
   const handleAudioPlaybackEnd = useCallback(() => {
+    console.log('Audio playback ended, clearing audio URL');
     setCurrentAudioUrl(null);
   }, []);
 
+  // Helper function to handle streaming responses from GPT-4
+  const fetchStreamingResponse = async (
+    conversationMessages: Array<{ role: string; content: string }>,
+    currentQuestionCount: number
+  ): Promise<{ response: string; shouldEnd: boolean }> => {
+    const response = await fetch('/api/interview/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: conversationMessages,
+        industry,
+        messageCount: currentQuestionCount,
+        maxQuestions,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate response');
+    }
+
+    // Read the stream
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullResponse = '';
+
+    if (!reader) {
+      throw new Error('No response body');
+    }
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') {
+            break;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.content) {
+              fullResponse += parsed.content;
+              setStreamingText(fullResponse); // Update UI in real-time
+            }
+          } catch (e) {
+            // Skip invalid JSON
+          }
+        }
+      }
+    }
+
+    // Clear streaming text once done
+    setStreamingText('');
+
+    // Get metadata from headers
+    const shouldEnd = response.headers.get('X-Should-End') === 'true';
+
+    return { response: fullResponse, shouldEnd };
+  };
+
   // Initialize interview with opening question
   useEffect(() => {
-    if (!industry || isInitialized) return;
+    if (!industry || isInitialized || initializingRef.current) return;
 
     const initializeInterview = async () => {
+      // Prevent double initialization (React Strict Mode runs effects twice)
+      initializingRef.current = true;
       setIsProcessing(true);
+
+      // Clear any existing audio before starting
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+        currentAudioRef.current = null;
+      }
+      setCurrentAudioUrl(null);
+
       try {
+        console.log('Initializing interview...');
         const systemPrompt = generateInterviewPrompt(
           industry,
           role,
@@ -68,50 +149,44 @@ function InterviewSessionContent() {
           jobDescription,
           questionTypes,
           customQuestions,
-          followUpIntensity
+          followUpIntensity,
+          maxQuestions
         );
 
-        const response = await fetch('/api/interview/message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: 'Start the interview with an introduction and your first question.' }
-            ],
-            industry,
-            messageCount: 0,
-          }),
-        });
+        // Get streaming response
+        const { response: aiResponse } = await fetchStreamingResponse(
+          [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: 'Start the interview with an introduction and your first question.' }
+          ],
+          0
+        );
 
-        if (!response.ok) {
-          throw new Error('Failed to start interview');
-        }
-
-        const data = await response.json();
-
+        console.log('Got AI response, generating TTS...');
         // Get TTS for opening question
         const ttsResponse = await fetch('/api/interview/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: data.response }),
+          body: JSON.stringify({ text: aiResponse }),
         });
 
         if (ttsResponse.ok) {
           const audioBlob = await ttsResponse.blob();
           const audioUrl = URL.createObjectURL(audioBlob);
+          console.log('Setting initial audio URL');
           setCurrentAudioUrl(audioUrl);
         }
 
         setMessages([
           {
             role: 'assistant',
-            content: data.response,
+            content: aiResponse,
             timestamp: new Date(),
           },
         ]);
         setQuestionCount(1);
         setIsInitialized(true);
+        console.log('Interview initialized successfully');
       } catch (err) {
         console.error('Error initializing interview:', err);
         setError('Failed to start interview. Please check your API key and try again.');
@@ -177,7 +252,8 @@ function InterviewSessionContent() {
         jobDescription,
         questionTypes,
         customQuestions,
-        followUpIntensity
+        followUpIntensity,
+        maxQuestions
       );
       const conversationMessages = [
         { role: 'system', content: systemPrompt },
@@ -185,20 +261,10 @@ function InterviewSessionContent() {
         { role: 'user', content: text },
       ];
 
-      const messagePromise = fetch('/api/interview/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: conversationMessages,
-          industry,
-          messageCount: questionCount,
-        }),
-      });
-
-      // Wait for both feedback and AI response
-      const [feedbackResponse, messageResponse] = await Promise.all([
+      // Start feedback and streaming response in parallel
+      const [feedbackResponse, streamingResult] = await Promise.all([
         feedbackPromise,
-        messagePromise,
+        fetchStreamingResponse(conversationMessages, questionCount),
       ]);
 
       // Process feedback
@@ -220,12 +286,7 @@ function InterviewSessionContent() {
       }
       setIsAnalyzing(false);
 
-      // Process AI response
-      if (!messageResponse.ok) {
-        throw new Error('Failed to generate response');
-      }
-
-      const { response: aiResponse, shouldEnd } = await messageResponse.json();
+      const { response: aiResponse, shouldEnd } = streamingResult;
 
       // Step 4: Generate TTS for AI response
       const ttsResponse = await fetch('/api/interview/tts', {
@@ -238,6 +299,7 @@ function InterviewSessionContent() {
       if (ttsResponse.ok) {
         const audioBlob = await ttsResponse.blob();
         audioUrl = URL.createObjectURL(audioBlob);
+        console.log('[handleRecordingComplete] Setting audio URL:', audioUrl.substring(0, 50));
         setCurrentAudioUrl(audioUrl);
       }
 
@@ -252,7 +314,7 @@ function InterviewSessionContent() {
       setQuestionCount((prev) => prev + 1);
 
       // Check if interview should end
-      if (shouldEnd || questionCount >= 10) {
+      if (shouldEnd || questionCount >= maxQuestions) {
         setTimeout(() => {
           handleEndInterview();
         }, 3000); // Give time for final message to play
@@ -294,6 +356,9 @@ function InterviewSessionContent() {
       }
       setCurrentAudioUrl(null);
 
+      // Store the question being skipped
+      const skippedQuestion = messages[messages.length - 1].content;
+
       setMessages((prev) => prev.slice(0, -1));
       setIsProcessing(true);
       setError(null);
@@ -308,7 +373,8 @@ function InterviewSessionContent() {
           jobDescription,
           questionTypes,
           customQuestions,
-          followUpIntensity
+          followUpIntensity,
+          maxQuestions
         );
 
         const conversationMessages = [
@@ -316,25 +382,14 @@ function InterviewSessionContent() {
           ...messages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
           {
             role: 'user',
-            content: 'The previous question was not relevant to my experience or the role. Please ask a different question that better aligns with the interview focus.'
+            content: `I'd like to skip the question you just asked: "${skippedQuestion}".
+
+Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephrase the same question or ask about the same subject area. Move on to a new area of questioning entirely.`
           },
         ];
 
-        const messageResponse = await fetch('/api/interview/message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: conversationMessages,
-            industry,
-            messageCount: questionCount,
-          }),
-        });
-
-        if (!messageResponse.ok) {
-          throw new Error('Failed to generate new question');
-        }
-
-        const { response: aiResponse } = await messageResponse.json();
+        // Get streaming response for new question
+        const { response: aiResponse } = await fetchStreamingResponse(conversationMessages, questionCount);
 
         // Generate TTS for new question
         const ttsResponse = await fetch('/api/interview/tts', {
@@ -347,6 +402,7 @@ function InterviewSessionContent() {
         if (ttsResponse.ok) {
           const audioBlob = await ttsResponse.blob();
           audioUrl = URL.createObjectURL(audioBlob);
+          console.log('[handleSkipQuestion] Setting audio URL:', audioUrl.substring(0, 50));
           setCurrentAudioUrl(audioUrl);
         }
 
@@ -372,6 +428,8 @@ function InterviewSessionContent() {
     setIsProcessing(true);
 
     try {
+      console.log('Ending interview with', messages.length, 'messages');
+
       // Generate evaluation
       const evaluationResponse = await fetch('/api/interview/evaluate', {
         method: 'POST',
@@ -383,10 +441,13 @@ function InterviewSessionContent() {
       });
 
       if (!evaluationResponse.ok) {
-        throw new Error('Failed to generate evaluation');
+        const errorData = await evaluationResponse.json().catch(() => ({}));
+        console.error('Evaluation API error:', evaluationResponse.status, errorData);
+        throw new Error(errorData.error || `Evaluation failed with status ${evaluationResponse.status}`);
       }
 
       const evaluation = await evaluationResponse.json();
+      console.log('Evaluation generated successfully');
 
       // Store evaluation in sessionStorage
       sessionStorage.setItem('interviewEvaluation', JSON.stringify(evaluation));
@@ -395,7 +456,8 @@ function InterviewSessionContent() {
       router.push('/interview/evaluation');
     } catch (err) {
       console.error('Error ending interview:', err);
-      setError('Failed to generate evaluation. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(`Failed to generate evaluation: ${errorMessage}`);
       setIsProcessing(false);
     }
   };
@@ -415,25 +477,185 @@ function InterviewSessionContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white">
-                {role} Interview
-              </h1>
-              <p className="text-sm text-gray-300">
-                {company} | Question {questionCount} of 10
-              </p>
+      {/* Header - Hidden in fullscreen mode */}
+      {!isFullscreen && (
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-white">
+                  {role} Interview
+                </h1>
+                <p className="text-sm text-gray-300">
+                  {company} | Question {questionCount} of {maxQuestions}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowWebcam(!showWebcam)}
+                  variant="outline"
+                  size="icon"
+                  title={showWebcam ? "Hide webcam" : "Show webcam"}
+                  className={showWebcam ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
+                >
+                  {showWebcam ? (
+                    <Camera className="h-4 w-4" />
+                  ) : (
+                    <CameraOff className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  variant="outline"
+                  size="icon"
+                  title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                  className={isFullscreen ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={handleEndInterview}
+                  variant="outline"
+                  disabled={isProcessing}
+                  className="border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
+                >
+                  End Interview & Get Results
+                </Button>
+              </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Mode: Webcam background with overlay panels */}
+      {isFullscreen ? (
+        <div className="flex-1 relative bg-black overflow-hidden">
+
+          {/* Fullscreen Webcam Background - Aligned with side panels */}
+          <div className="absolute top-4 left-0 right-0 bottom-24 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
+            {showWebcam ? (
+              <div className="w-full h-full rounded-lg overflow-hidden">
+                <WebcamMirror
+                  isVisible={showWebcam}
+                  onClose={() => setShowWebcam(false)}
+                  mode="embedded"
+                  size="large"
+                />
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-slate-900 rounded-lg border border-slate-700">
+                <div className="text-center">
+                  <CameraOff className="h-16 w-16 text-gray-600 mb-4 mx-auto" />
+                  <p className="text-gray-500 mb-4">Webcam is hidden</p>
+                  <Button
+                    onClick={() => setShowWebcam(true)}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-600 text-gray-300"
+                  >
+                    <Camera className="h-4 w-4 mr-2" />
+                    Enable Webcam
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Left Overlay: Conversation */}
+          <div className="absolute left-4 top-4 bottom-4 w-80 bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 overflow-y-auto">
+            <h3 className="text-sm font-semibold text-gray-300 mb-4 sticky top-0 bg-slate-900/90 pb-2 border-b border-slate-700">
+              Interview Conversation
+            </h3>
+            <div className="space-y-4">
+              {messages.map((message, idx) => (
+                <div
+                  key={idx}
+                  className={`flex gap-3 ${
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
+                >
+                  {message.role === 'assistant' && (
+                    <div className="flex-shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-pink-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    className={`max-w-[80%] rounded-lg p-3 ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white'
+                        : 'bg-slate-700/50 border border-slate-600 text-gray-200'
+                    }`}
+                  >
+                    <p className="text-xs whitespace-pre-wrap">{message.content}</p>
+                  </div>
+
+                  {message.role === 'user' && (
+                    <div className="flex-shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center">
+                        <User className="h-5 w-5 text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {streamingText && (
+                <div className="flex gap-3 justify-start">
+                  <div className="flex-shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
+                      <Bot className="h-5 w-5 text-pink-400" />
+                    </div>
+                  </div>
+                  <div className="max-w-[80%] rounded-lg p-3 bg-slate-700/50 border border-slate-600 text-gray-200">
+                    <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
+                    <span className="inline-block w-2 h-4 bg-pink-400 ml-1 animate-pulse"></span>
+                  </div>
+                </div>
+              )}
+
+              {isProcessing && !streamingText && (
+                <div className="flex items-center gap-2 text-gray-300 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin text-pink-400" />
+                  <span>{!isInitialized ? 'Preparing...' : 'AI is thinking...'}</span>
+                </div>
+              )}
+
+              {!isInitialized && isProcessing && (
+                <div className="text-center mt-4">
+                  <p className="text-sm text-pink-400 font-medium">Take a deep breath. You've got this.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Overlay: Feedback */}
+          <div className="absolute right-4 top-4 bottom-4 w-80 bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 overflow-y-auto">
+            <FeedbackPanel
+              feedbackHistory={feedbackHistory}
+              isAnalyzing={isAnalyzing}
+            />
+          </div>
+
+          {/* Center Bottom: All Controls */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3">
+            {/* Top Row: Interview Controls */}
             <div className="flex items-center gap-2">
+              <div className="text-xs text-white/80 bg-slate-900/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700">
+                Question {questionCount}/{maxQuestions}
+              </div>
               <Button
                 onClick={() => setShowWebcam(!showWebcam)}
                 variant="outline"
                 size="icon"
                 title={showWebcam ? "Hide webcam" : "Show webcam"}
-                className={showWebcam ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
+                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white"
               >
                 {showWebcam ? (
                   <Camera className="h-4 w-4" />
@@ -442,22 +664,81 @@ function InterviewSessionContent() {
                 )}
               </Button>
               <Button
+                onClick={() => setIsFullscreen(false)}
+                variant="outline"
+                size="icon"
+                title="Exit fullscreen"
+                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white"
+              >
+                <Minimize2 className="h-4 w-4" />
+              </Button>
+              <Button
                 onClick={handleEndInterview}
                 variant="outline"
                 disabled={isProcessing}
-                className="border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
+                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white text-xs px-3"
               >
-                End Interview & Get Results
+                End Interview
               </Button>
             </div>
+
+            {/* Error Messages */}
+            {error && (
+              <div className="bg-red-900/90 backdrop-blur-sm border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Audio Player */}
+            {currentAudioUrl && (
+              <div>
+                <AudioPlayer
+                  audioUrl={currentAudioUrl}
+                  onPlaybackEnd={handleAudioPlaybackEnd}
+                  audioRef={currentAudioRef}
+                />
+              </div>
+            )}
+
+            {/* Voice Recorder and Action Buttons */}
+            {!isProcessing && currentAudioUrl === null && (
+              <div className="space-y-3">
+                <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-slate-700">
+                  <VoiceRecorder
+                    onRecordingComplete={handleRecordingComplete}
+                    isProcessing={isProcessing}
+                  />
+                </div>
+
+                {messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSkipQuestion}
+                      variant="outline"
+                      className="border-purple-300 text-purple-300 hover:bg-purple-900/50 backdrop-blur-sm flex-1"
+                    >
+                      ⤭ Skip This Question
+                    </Button>
+                    {messages.length >= 2 && (
+                      <Button
+                        onClick={handleRedoAnswer}
+                        variant="outline"
+                        className="border-orange-300 text-orange-300 hover:bg-orange-900/50 backdrop-blur-sm flex-1"
+                      >
+                        ↻ Redo Answer
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </div>
-
-      {/* 3-Column Layout: Q&A (Left) | Webcam + Controls (Center) | Feedback (Right) */}
-      <div className="flex-1 bg-gradient-to-b from-slate-900 to-purple-900/50">
-        <div className="max-w-7xl mx-auto px-6 py-6 h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+      ) : (
+        /* Normal 3-Column Layout: Q&A (Left) | Webcam + Controls (Center) | Feedback (Right) */
+        <div className="flex-1 bg-gradient-to-b from-slate-900 to-purple-900/50">
+          <div className="max-w-7xl mx-auto px-6 py-6 h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Left Column: Conversation/Q&A */}
             <div className="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               <h3 className="text-sm font-semibold text-gray-300 mb-4 sticky top-0 bg-gradient-to-br from-slate-800 to-slate-900 pb-2 border-b border-slate-700">
@@ -499,10 +780,25 @@ function InterviewSessionContent() {
                   </div>
                 ))}
 
-                {isProcessing && (
+                {/* Show streaming text in real-time */}
+                {streamingText && (
+                  <div className="flex gap-3 justify-start">
+                    <div className="flex-shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-pink-400" />
+                      </div>
+                    </div>
+                    <div className="max-w-[80%] rounded-lg p-3 bg-slate-700/50 border border-slate-600 text-gray-200">
+                      <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
+                      <span className="inline-block w-2 h-4 bg-pink-400 ml-1 animate-pulse"></span>
+                    </div>
+                  </div>
+                )}
+
+                {isProcessing && !streamingText && (
                   <div className="flex items-center gap-2 text-gray-300 text-sm">
                     <Loader2 className="h-4 w-4 animate-spin text-pink-400" />
-                    <span>{!isInitialized ? 'Preparing...' : 'AI thinking...'}</span>
+                    <span>{!isInitialized ? 'Preparing...' : 'AI is thinking...'}</span>
                   </div>
                 )}
 
@@ -637,6 +933,7 @@ function InterviewSessionContent() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

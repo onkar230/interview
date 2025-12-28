@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateResponse } from '@/lib/openai';
+import { generateStreamingResponse } from '@/lib/openai';
 
 /**
  * POST /api/interview/message
- * Generates AI interview responses using GPT-4
+ * Generates AI interview responses using GPT-4 with streaming
  */
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { messages, industry, messageCount } = body;
+    const { messages, industry, messageCount, maxQuestions } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -32,24 +32,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate AI response
-    const response = await generateResponse(messages, industry);
+    // Generate streaming AI response
+    const stream = await generateStreamingResponse(messages, industry);
 
-    // Determine if interview should end (after ~10-12 questions)
-    const shouldEnd = messageCount >= 10;
+    // Determine if interview should end
+    const shouldEnd = messageCount >= (maxQuestions || 10);
 
-    // If approaching end, add a hint to wrap up
-    let finalResponse = response;
-    if (messageCount === 9) {
-      finalResponse += '\n\nWe\'re approaching the end of our interview. I have one final question for you.';
-    } else if (shouldEnd) {
-      finalResponse += '\n\nThank you for your responses. That concludes our interview today.';
-    }
-
-    return NextResponse.json({
-      response: finalResponse,
-      shouldEnd,
-      messageCount: messageCount + 1,
+    // Return streaming response with metadata
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'X-Should-End': shouldEnd.toString(),
+        'X-Message-Count': (messageCount + 1).toString(),
+      },
     });
   } catch (error) {
     console.error('Error generating message:', error);
