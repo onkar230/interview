@@ -413,20 +413,50 @@ export const INDUSTRY_PROMPTS: Record<
     ],
   },
   law: {
-    description: 'Legal, attorney, and law firm roles',
+    description: 'UK commercial law firm roles - training contracts, vacation schemes, and solicitor positions',
     focusAreas: [
-      'Legal analysis and reasoning',
-      'Case law knowledge',
-      'Client communication',
-      'Ethical judgment',
-      'Attention to detail',
+      'Commercial awareness',
+      'Time management and prioritisation',
+      'Client service and relationship building',
+      'Legal reasoning and analytical thinking',
+      'Teamwork and resilience',
     ],
     sampleQuestions: [
-      'Walk me through how you would approach a complex legal case.',
-      'Tell me about a time you had to deal with conflicting legal precedents.',
-      'How do you stay current with changes in legislation and case law?',
-      'Describe your experience with contract negotiation.',
-      'How do you balance client interests with ethical obligations?',
+      'How do you manage your time effectively?',
+      'What tasks do trainees typically handle, and why would you excel at them?',
+      'Why do you want to be a lawyer rather than a banker or consultant? How do these careers differ?',
+      'How have you demonstrated your commercial awareness in the past?',
+      'Describe a situation where you had to deal with difficult people.',
+      'How does a trainee\'s role differ from that of a partner?',
+      'Why are you interested in becoming a City lawyer?',
+      'How would you handle this situation: A partner asked you to attend a client dinner, but you had a friend\'s birthday that evening.',
+      'What qualities make you well-suited to a career in law?',
+      'In what ways is legal tech transforming the legal industry?',
+      'How do you stay motivated when working on tasks that aren\'t very exciting?',
+      'How do you keep up with current events?',
+      'What factors did you consider when deciding where to apply?',
+      'Can you share a situation where you had to make a difficult decision?',
+      'What attracts you to this firm?',
+      'Why do you want to be a solicitor instead of a barrister?',
+      'How would you handle this situation: Your opposing counsel accidentally sent you an email containing confidential information intended for someone at their firm.',
+      'Why are you applying for a training contract rather than a vacation scheme?',
+      'Which of your achievements are you most proud of?',
+      'Tell us about a recent news story and its potential impact on our firm.',
+      'Why are you drawn to commercial law?',
+      'How would you pitch our firm to a potential client?',
+      'Tell us about a time you worked in a team and the challenges you faced.',
+      'What are your core values? When were these values tested, and how did you respond?',
+      'If you couldn\'t become a commercial lawyer, what alternative career would you choose and why?',
+      'How do you handle multiple tasks with tight deadlines?',
+      'How would you handle this situation: A client wanted you to sign a deal, but the partner wasn\'t available.',
+      'How do you manage receiving critical feedback?',
+      'Tell us about a time you showed resilience.',
+      'Which other firms did you apply to?',
+      'Describe a time when you made a valuable contribution to a team.',
+      'When have you explained a complex idea to someone?',
+      'Do you think legal tech will lead to less skilled future lawyers?',
+      'What do you think a typical day looks like for a trainee solicitor?',
+      'Tell us about a time you made a mistake and how you handled it.',
     ],
     companies: [
       'Clifford Chance',
@@ -436,18 +466,19 @@ export const INDUSTRY_PROMPTS: Record<
       'Slaughter and May',
       'DLA Piper',
       'Herbert Smith Freehills',
-      'a boutique law firm',
-      'a corporate legal department',
-      'a legal aid organization',
-      'a government legal office',
+      'Hogan Lovells',
+      'Norton Rose Fulbright',
+      'a Magic Circle firm',
+      'a US law firm\'s London office',
+      'a boutique commercial law firm',
     ],
     pressureTactics: [
-      'Challenge legal reasoning: "How would you counter that argument in court?"',
-      'Probe ethical boundaries: "What would you do if your client asked you to do something questionable?"',
-      'Test case law knowledge: "What precedent would you cite to support that position?"',
-      'Ask about difficult clients: "Tell me about a time you had to deliver bad news to a client"',
-      'Dig into specific details: "Walk me through your exact research methodology for that case"',
-      'Request concrete examples: "Give me a specific example of when you found a creative legal solution"',
+      'Ask for specific commercial examples: "Which recent deal or case are you referring to?"',
+      'Test commercial awareness: "How would Brexit impact this type of transaction?"',
+      'Challenge firm knowledge: "What makes us different from our competitors in this practice area?"',
+      'Probe values and ethics: "Walk me through your thinking on that ethical dilemma step by step"',
+      'Request concrete examples: "Give me a specific time when you demonstrated that skill, not hypothetically"',
+      'Test legal tech understanding: "How would you use AI tools to improve efficiency in due diligence?"',
     ],
   },
 };
@@ -649,8 +680,44 @@ INTERVIEW LENGTH:
 - You will conduct approximately ${maxQuestions} questions total
 - If you've asked ${Math.max(1, maxQuestions - 2)}+ questions, begin wrapping up the interview naturally`;
 
+  // Law-specific interviewer style modification
+  let lawSpecificStyle = '';
+  if (industry === 'law') {
+    lawSpecificStyle = `
+
+LAW FIRM INTERVIEWER STYLE (Special Override):
+
+IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE than the standard interviewer approach:
+
+1. CONSTRUCTIVE FEEDBACK AFTER ANSWERS:
+   - After the candidate answers, provide brief constructive feedback (2-3 sentences max)
+   - Comment on BOTH content and delivery separately when relevant
+   - Be specific about what they did well and what could be improved
+   - Example: "Good commercial awareness there. Your point about Brexit's impact was solid. For delivery, try to structure your answer more clearly - maybe use a framework like STAR to organize your thoughts. Now, let's move on..."
+
+2. FRIENDLY BUT PROFESSIONAL TONE:
+   - Be warmer and more encouraging than the standard interviewer
+   - You can say "Good point", "I like that example", "That's a strong answer" when genuinely deserved
+   - Still maintain professionalism - you're evaluating, but also coaching
+   - Think of yourself as a senior lawyer helping a trainee improve
+
+3. PUSH FOR IMPROVEMENT:
+   - Your feedback should be constructive but challenging
+   - Point out specific areas for improvement: "You could strengthen that by adding metrics", "Try to be more concise next time"
+   - Encourage better structure: "Consider using the STAR method to organize that answer"
+   - Challenge vague answers: "Can you give me a more specific example?"
+
+4. BALANCED APPROACH:
+   - Don't praise everything - be honest about weaknesses
+   - Don't be harsh - frame criticism constructively
+   - Goal: Help them improve while assessing their capabilities
+
+This style is specific to law firm interviews where candidates benefit from coaching and detailed feedback during the practice interview.`;
+  }
+
   return `${BASE_INTERVIEWER_PROMPT}
 ${questionCountInstructions}
+${lawSpecificStyle}
 
 INTERVIEW CONTEXT:
 INDUSTRY: ${industry.charAt(0).toUpperCase() + industry.slice(1)}
