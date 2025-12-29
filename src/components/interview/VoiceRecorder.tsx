@@ -31,7 +31,7 @@ export default function VoiceRecorder({ onRecordingComplete, isProcessing }: Voi
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      if (audioContextRef.current) {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close();
       }
     };
@@ -70,7 +70,7 @@ export default function VoiceRecorder({ onRecordingComplete, isProcessing }: Voi
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
         }
-        if (audioContextRef.current) {
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
           audioContextRef.current.close();
         }
       };

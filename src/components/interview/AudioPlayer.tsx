@@ -38,10 +38,18 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
     console.log('Creating new audio for URL:', audioUrl.substring(0, 50));
     lastAudioUrlRef.current = audioUrl;
 
-    // Stop any existing audio before creating new one
+    // Stop and cleanup any existing audio before creating new one
     if (internalAudioRef.current) {
-      internalAudioRef.current.pause();
-      internalAudioRef.current.currentTime = 0;
+      const oldAudio = internalAudioRef.current;
+      oldAudio.pause();
+      oldAudio.currentTime = 0;
+      // Remove all event listeners to prevent stale callbacks
+      oldAudio.oncanplaythrough = null;
+      oldAudio.onplay = null;
+      oldAudio.onpause = null;
+      oldAudio.onended = null;
+      oldAudio.onerror = null;
+      oldAudio.src = ''; // Clear source to prevent loading
     }
 
     setIsLoading(true);
@@ -55,25 +63,35 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       externalAudioRef.current = audio;
     }
 
+    // Flag to track if this audio instance is still current
+    let isCurrent = true;
+
     audio.oncanplaythrough = () => {
+      if (!isCurrent) return; // Ignore if this audio was replaced
       setIsLoading(false);
       if (autoPlay) {
         audio.play().catch((err) => {
-          console.error('Error playing audio:', err);
-          setError('Unable to play audio');
+          // Only log non-abort errors (abort is expected when audio changes)
+          if (err.name !== 'AbortError') {
+            console.error('Error playing audio:', err);
+            setError('Unable to play audio');
+          }
         });
       }
     };
 
     audio.onplay = () => {
+      if (!isCurrent) return;
       setIsPlaying(true);
     };
 
     audio.onpause = () => {
+      if (!isCurrent) return;
       setIsPlaying(false);
     };
 
     audio.onended = () => {
+      if (!isCurrent) return;
       setIsPlaying(false);
       if (onPlaybackEndRef.current) {
         onPlaybackEndRef.current();
@@ -81,14 +99,22 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
     };
 
     audio.onerror = () => {
+      if (!isCurrent) return;
       setIsLoading(false);
       setError('Error loading audio');
     };
 
     return () => {
+      isCurrent = false; // Mark this audio instance as stale
       if (internalAudioRef.current) {
         internalAudioRef.current.pause();
         internalAudioRef.current.currentTime = 0;
+        // Remove event listeners
+        internalAudioRef.current.oncanplaythrough = null;
+        internalAudioRef.current.onplay = null;
+        internalAudioRef.current.onpause = null;
+        internalAudioRef.current.onended = null;
+        internalAudioRef.current.onerror = null;
         internalAudioRef.current = null;
       }
       if (externalAudioRef) {

@@ -480,7 +480,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
       <div className="flex-1 relative bg-black overflow-hidden">
 
           {/* Fullscreen Webcam Background - Aligned with side panels */}
-          <div className="absolute top-4 left-0 right-0 bottom-24 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
+          <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
             {showWebcam ? (
               <div className="w-full h-full rounded-lg overflow-hidden">
                 <WebcamMirror
