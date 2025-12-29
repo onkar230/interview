@@ -8,7 +8,7 @@ import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import { Industry, generateInterviewPrompt } from '@/lib/interview-prompts';
-import { Loader2, User, Bot, Camera, CameraOff, Maximize2, Minimize2 } from 'lucide-react';
+import { Loader2, User, Bot, Camera, CameraOff } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -48,7 +48,6 @@ function InterviewSessionContent() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
   const [streamingText, setStreamingText] = useState<string>('');
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
 
@@ -477,63 +476,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
-      {/* Header - Hidden in fullscreen mode */}
-      {!isFullscreen && (
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-white">
-                  {role} Interview
-                </h1>
-                <p className="text-sm text-gray-300">
-                  {company} | Question {questionCount} of {maxQuestions}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => setShowWebcam(!showWebcam)}
-                  variant="outline"
-                  size="icon"
-                  title={showWebcam ? "Hide webcam" : "Show webcam"}
-                  className={showWebcam ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
-                >
-                  {showWebcam ? (
-                    <Camera className="h-4 w-4" />
-                  ) : (
-                    <CameraOff className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  onClick={() => setIsFullscreen(!isFullscreen)}
-                  variant="outline"
-                  size="icon"
-                  title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-                  className={isFullscreen ? "bg-pink-500/20 border-pink-500 text-pink-400" : "border-slate-600 text-gray-400 hover:text-white"}
-                >
-                  {isFullscreen ? (
-                    <Minimize2 className="h-4 w-4" />
-                  ) : (
-                    <Maximize2 className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  onClick={handleEndInterview}
-                  variant="outline"
-                  disabled={isProcessing}
-                  className="border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
-                >
-                  End Interview & Get Results
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Fullscreen Mode: Webcam background with overlay panels */}
-      {isFullscreen ? (
-        <div className="flex-1 relative bg-black overflow-hidden">
+      <div className="flex-1 relative bg-black overflow-hidden">
 
           {/* Fullscreen Webcam Background - Aligned with side panels */}
           <div className="absolute top-4 left-0 right-0 bottom-24 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
@@ -664,15 +608,6 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 )}
               </Button>
               <Button
-                onClick={() => setIsFullscreen(false)}
-                variant="outline"
-                size="icon"
-                title="Exit fullscreen"
-                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white"
-              >
-                <Minimize2 className="h-4 w-4" />
-              </Button>
-              <Button
                 onClick={handleEndInterview}
                 variant="outline"
                 disabled={isProcessing}
@@ -734,206 +669,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             )}
           </div>
         </div>
-      ) : (
-        /* Normal 3-Column Layout: Q&A (Left) | Webcam + Controls (Center) | Feedback (Right) */
-        <div className="flex-1 bg-gradient-to-b from-slate-900 to-purple-900/50">
-          <div className="max-w-7xl mx-auto px-6 py-6 h-full">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-            {/* Left Column: Conversation/Q&A */}
-            <div className="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 sticky top-0 bg-gradient-to-br from-slate-800 to-slate-900 pb-2 border-b border-slate-700">
-                Interview Conversation
-              </h3>
-              <div className="space-y-4">
-                {messages.map((message, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex gap-3 ${
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    {message.role === 'assistant' && (
-                      <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
-                          <Bot className="h-5 w-5 text-pink-400" />
-                        </div>
-                      </div>
-                    )}
-
-                    <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.role === 'user'
-                          ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white'
-                          : 'bg-slate-700/50 border border-slate-600 text-gray-200'
-                      }`}
-                    >
-                      <p className="text-xs whitespace-pre-wrap">{message.content}</p>
-                    </div>
-
-                    {message.role === 'user' && (
-                      <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* Show streaming text in real-time */}
-                {streamingText && (
-                  <div className="flex gap-3 justify-start">
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
-                        <Bot className="h-5 w-5 text-pink-400" />
-                      </div>
-                    </div>
-                    <div className="max-w-[80%] rounded-lg p-3 bg-slate-700/50 border border-slate-600 text-gray-200">
-                      <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
-                      <span className="inline-block w-2 h-4 bg-pink-400 ml-1 animate-pulse"></span>
-                    </div>
-                  </div>
-                )}
-
-                {isProcessing && !streamingText && (
-                  <div className="flex items-center gap-2 text-gray-300 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin text-pink-400" />
-                    <span>{!isInitialized ? 'Preparing...' : 'AI is thinking...'}</span>
-                  </div>
-                )}
-
-                {!isInitialized && isProcessing && (
-                  <div className="text-center mt-4">
-                    <p className="text-sm text-pink-400 font-medium">Take a deep breath. You've got this.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Center Column: Webcam + Controls */}
-            <div className="lg:col-span-1 flex flex-col gap-4">
-              {/* Webcam */}
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg overflow-hidden">
-                {showWebcam ? (
-                  <WebcamMirror
-                    isVisible={showWebcam}
-                    onClose={() => setShowWebcam(false)}
-                    mode="embedded"
-                    size="large"
-                  />
-                ) : (
-                  <div className="p-8 text-center h-96 flex flex-col items-center justify-center">
-                    <CameraOff className="h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-sm font-medium text-gray-600 mb-2">Webcam is hidden</p>
-                    <p className="text-xs text-gray-500 mb-4">
-                      Enable your webcam to practise like a real video interview
-                    </p>
-                    <Button
-                      onClick={() => setShowWebcam(true)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Camera className="h-4 w-4 mr-2" />
-                      Enable Webcam
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Error display */}
-              {error && (
-                <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
-
-              {/* Voice Recorder */}
-              {!isProcessing && currentAudioUrl === null && (
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-                    <VoiceRecorder
-                      onRecordingComplete={handleRecordingComplete}
-                      isProcessing={isProcessing}
-                    />
-                  </div>
-
-                  {/* Skip Question Button - Show when AI just asked a question */}
-                  {messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-                    <div className="text-center">
-                      <Button
-                        onClick={handleSkipQuestion}
-                        variant="outline"
-                        className="border-purple-300 text-purple-600 hover:bg-purple-50 w-full"
-                      >
-                        ⤭ Skip This Question
-                      </Button>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Question not relevant? Get a different one
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Redo Answer Button - Show after user has answered */}
-                  {messages.length >= 2 && messages[messages.length - 1].role === 'assistant' && (
-                    <div className="text-center">
-                      <Button
-                        onClick={handleRedoAnswer}
-                        variant="outline"
-                        className="border-orange-300 text-orange-600 hover:bg-orange-50 w-full"
-                      >
-                        ↻ Redo Last Answer
-                      </Button>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Want to try a better answer?
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Current audio playing */}
-              {currentAudioUrl && (
-                <div className="space-y-3">
-                  <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg shadow-lg p-4">
-                    <AudioPlayer
-                      audioUrl={currentAudioUrl}
-                      onPlaybackEnd={handleAudioPlaybackEnd}
-                      audioRef={currentAudioRef}
-                    />
-                  </div>
-
-                  {/* Skip Question Button - Available during audio playback */}
-                  {messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-                    <div className="text-center">
-                      <Button
-                        onClick={handleSkipQuestion}
-                        variant="outline"
-                        className="border-purple-300 text-purple-600 hover:bg-purple-50 w-full"
-                      >
-                        ⤭ Skip This Question
-                      </Button>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Question not relevant? Get a different one
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Right Column: Feedback Panel */}
-            <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-lg overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-                <FeedbackPanel
-                  feedbackHistory={feedbackHistory}
-                  isAnalyzing={isAnalyzing}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-      )}
     </div>
   );
 }
