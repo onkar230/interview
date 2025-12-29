@@ -49,13 +49,14 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       oldAudio.onpause = null;
       oldAudio.onended = null;
       oldAudio.onerror = null;
-      oldAudio.src = ''; // Clear source to prevent loading
+      oldAudio.removeAttribute('src'); // Remove source
+      oldAudio.load(); // Reset the audio element
     }
 
     setIsLoading(true);
     setError(null);
 
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
     internalAudioRef.current = audio;
 
     // Also set external ref if provided so parent can control audio
@@ -65,20 +66,29 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
     // Flag to track if this audio instance is still current
     let isCurrent = true;
+    let playPromise: Promise<void> | null = null;
 
     audio.oncanplaythrough = () => {
       if (!isCurrent) return; // Ignore if this audio was replaced
       setIsLoading(false);
-      if (autoPlay) {
-        audio.play().catch((err) => {
-          // Only log non-abort errors (abort is expected when audio changes)
-          if (err.name !== 'AbortError') {
-            console.error('Error playing audio:', err);
-            setError('Unable to play audio');
-          }
-        });
+      if (autoPlay && isCurrent) {
+        // Store the promise so we can wait for it in cleanup
+        playPromise = audio.play();
+        if (playPromise) {
+          playPromise.catch((err) => {
+            // Only log non-abort errors (abort is expected when audio changes)
+            if (err.name !== 'AbortError') {
+              console.error('Error playing audio:', err);
+              setError('Unable to play audio');
+            }
+          });
+        }
       }
     };
+
+    // Set the source after event listeners are attached
+    audio.src = audioUrl;
+    audio.load();
 
     audio.onplay = () => {
       if (!isCurrent) return;
@@ -106,6 +116,16 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
     return () => {
       isCurrent = false; // Mark this audio instance as stale
+
+      // Wait for any pending play promise to resolve before cleaning up
+      if (playPromise) {
+        playPromise.then(() => {
+          if (audio) audio.pause();
+        }).catch(() => {
+          // Ignore errors from aborted play
+        });
+      }
+
       if (internalAudioRef.current) {
         internalAudioRef.current.pause();
         internalAudioRef.current.currentTime = 0;
