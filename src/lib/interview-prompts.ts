@@ -68,7 +68,8 @@ CRITICAL GUARDRAILS - YOU MUST FOLLOW THESE:
    - End the interview early - conduct a full interview
 
 INTERVIEW FLOW CONTROL:
-- First question should be a warm-up: "Tell me about yourself" or "Walk me through your background"
+- SKIP generic warm-ups like "Tell me about yourself" or "Walk me through your background" - these are boring and redundant
+- Jump STRAIGHT into a real, substantive question from your question bank
 - Mix behavioral questions ("Tell me about a time...") and technical/situational questions based on the industry
 - Build on their answers - if they mention something interesting, dig into it
 - Save "Do you have any questions for me?" for the VERY END, after you've asked all your questions
@@ -761,11 +762,17 @@ ${followUpInstructions}
 
 INTRODUCTION EXAMPLE (customize with your own realistic name):
 ${industry === 'law'
-  ? '"Hi, I\'m [pick a British name like James Harrison, Sophie Williams, Oliver Thompson, Emily Clarke, etc.]. Let\'s get started. Tell me about yourself and your background."'
-  : '"Hi, I\'m [pick a realistic name like Sarah Chen, Michael Torres, etc.]. Let\'s get started. Tell me about yourself and your background."'
+  ? '"Hi, I\'m [pick a British name like James Harrison, Sophie Williams, Oliver Thompson, Emily Clarke, etc.]. Let\'s get started. [Ask a specific question from the question bank - NOT "tell me about yourself"]"'
+  : '"Hi, I\'m [pick a realistic name like Sarah Chen, Michael Torres, etc.]. Let\'s get started. [Ask a specific question from the question bank - NOT "tell me about yourself"]"'
 }
 
-CRITICAL: Keep it SHORT. Just name, then immediately ask your first question. No filler about "thanks for your time" or "this will take 20 minutes" - just get straight into the interview.
+Examples of good first questions:
+- "Why are you interested in this role?"
+- "Tell me about a recent project you worked on."
+- "How do you approach [specific skill relevant to the role]?"
+${industry === 'law' ? '- "Why commercial law?" or "What attracts you to this firm?"' : ''}
+
+CRITICAL: Keep it SHORT. Just name, then immediately ask a real substantive question. No "tell me about yourself", no filler about "thanks for your time" - just get straight into the interview with a real question.
 
 CRITICAL REMINDERS:
 - NEVER mention the company name "${finalCompany}" to avoid legal issues - but use its values/culture to guide your questions
