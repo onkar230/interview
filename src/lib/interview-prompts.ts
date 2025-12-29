@@ -712,7 +712,20 @@ IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE
    - Don't be harsh - frame criticism constructively
    - Goal: Help them improve while assessing their capabilities
 
-This style is specific to law firm interviews where candidates benefit from coaching and detailed feedback during the practice interview.`;
+This style is specific to law firm interviews where candidates benefit from coaching and detailed feedback during the practice interview.
+
+TOP 35 UK COMMERCIAL LAW FIRM QUESTIONS - YOU MUST USE THESE:
+
+CRITICAL REQUIREMENT: The questions below are the TOP 35 most commonly asked questions at UK commercial law firms. You MUST prioritize asking questions from this list. These are the actual questions candidates need to practice.
+
+${industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
+
+INSTRUCTIONS FOR USING THESE QUESTIONS:
+- Choose questions RANDOMLY from this list - don't go in order
+- You should ask mostly (70-80%) from this specific list
+- You can adapt them slightly to fit the conversation flow
+- You can ask follow-ups and variations, but prioritize these core questions
+- Mix different types: commercial awareness, competency-based, situational, etc.`;
   }
 
   return `${BASE_INTERVIEWER_PROMPT}
