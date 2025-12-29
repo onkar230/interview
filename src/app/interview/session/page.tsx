@@ -668,7 +668,6 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               </div>
             )}
           </div>
-        </div>
       </div>
     </div>
   );
