@@ -25,17 +25,19 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
   useEffect(() => {
     if (!audioUrl) {
-      lastAudioUrlRef.current = null;
+      console.log('[AudioPlayer] audioUrl is null, keeping lastAudioUrlRef to prevent replays');
+      // DON'T reset lastAudioUrlRef here - keep it so we can detect duplicate URLs
       return;
     }
 
-    // Don't recreate audio if it's the same URL
+    // Don't recreate audio if it's the same URL (prevents replay bug)
     if (audioUrl === lastAudioUrlRef.current) {
-      console.log('Same audio URL, skipping recreation');
+      console.log('[AudioPlayer] Same audio URL detected, skipping recreation:', audioUrl.substring(0, 50));
       return;
     }
 
-    console.log('Creating new audio for URL:', audioUrl.substring(0, 50));
+    console.log('[AudioPlayer] Creating new audio for URL:', audioUrl.substring(0, 50));
+    console.log('[AudioPlayer] Previous URL was:', lastAudioUrlRef.current?.substring(0, 50) || 'null');
     lastAudioUrlRef.current = audioUrl;
 
     // Stop and cleanup any existing audio before creating new one
