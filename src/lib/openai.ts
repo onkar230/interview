@@ -216,9 +216,10 @@ Provide HONEST, CRITICAL feedback in SWOT format. Be specific to THIS answer, no
 CRITICAL ANALYSIS REQUIREMENTS:
 
 1. ANSWER STRUCTURE CHECK:
-   - Does the answer use a proper structure (STAR: Situation, Task, Action, Result | CAR: Context, Action, Result | PEEL: Point, Evidence, Explain, Link)?
-   - If NO structure is used or the answer is vague/rambling, YOU MUST flag this in WEAKNESSES or OPPORTUNITIES
-   - Specifically recommend using STAR, CAR, or PEEL method if the answer lacks structure
+   - ONLY mention STAR/CAR/PEEL if the answer is genuinely rambling, disorganized, or jumping between topics
+   - If the answer has a clear flow and makes sense, DO NOT mention structure frameworks
+   - Structure feedback should be RARE - only for truly confusing answers
+   - Many good answers don't explicitly use STAR and that's perfectly fine
 
 2. HONESTY OVER KINDNESS:
    - If the answer is terrible, vague, or one-sentence, DO NOT invent fake strengths
@@ -228,25 +229,28 @@ CRITICAL ANALYSIS REQUIREMENTS:
 3. RED FLAGS TO CATCH:
    - One-word or one-sentence answers (e.g., "I'm good enough") → FLAG IN THREATS
    - No concrete examples, metrics, or specifics → FLAG IN WEAKNESSES
-   - Rambling without clear point → FLAG IN WEAKNESSES
+   - Actually rambling without clear point → FLAG IN WEAKNESSES (but don't just say "use STAR")
    - Generic platitudes ("I work hard", "I'm a team player") → FLAG IN OPPORTUNITIES
 
 SWOT GUIDELINES:
 - Strengths: What they ACTUALLY did well (0-2 points). ONLY include if genuinely good. Empty array is fine.
-- Weaknesses: What's wrong with the answer (1-3 points, brutally honest). ALWAYS mention lack of structure if applicable.
-- Opportunities: What they should have done (1-3 points). Include "Use STAR/CAR/PEEL method" if needed.
+- Weaknesses: What's wrong with the answer (1-3 points, brutally honest). Focus on CONTENT issues, not structure.
+- Opportunities: What they should have done (1-3 points). Be specific about what was missing.
 - Threats: Critical red flags (0-2 points). Include for terrible/lazy answers.
+
+IMPORTANT: STOP mentioning STAR/CAR/PEEL method in every answer. Only mention it if the answer is genuinely confusing or disorganized.
 
 Each point should be:
 - One sentence maximum
 - Brutally honest and specific
 - Actionable (tell them HOW to fix it)
 - Based on what they ACTUALLY said, not what you wish they said
+- VARIED - don't repeat the same feedback every time
 
 Respond in JSON format:
 {
   "strengths": ["actual strength 1"] or [],
-  "weaknesses": ["specific weakness 1", "Answer lacks structure - use STAR method (Situation, Task, Action, Result)"],
+  "weaknesses": ["specific weakness 1", "specific weakness 2"],
   "opportunities": ["missed point 1", "Could have provided specific metrics or numbers"],
   "threats": ["Answer is too vague and lacks substance"] or []
 }`;
