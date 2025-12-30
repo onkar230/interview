@@ -42,18 +42,18 @@ function AnimatedScoreSection() {
   const problemSolving = Math.max(0, Math.floor((score / 100) * 35) - 2); // Mid-range
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-12 border border-slate-700 max-w-3xl mx-auto">
+    <div className="bg-card rounded-2xl p-12 border border-border max-w-3xl mx-auto">
       <div className="flex flex-col md:flex-row items-center justify-between gap-12">
         <div className="flex-1">
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300">Communication</span>
-                <span className="text-pink-400 font-semibold transition-all duration-200">{communication}/35</span>
+                <span className="text-muted-foreground">Communication</span>
+                <span className="text-accent font-semibold transition-all duration-200">{communication}/35</span>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-pink-500 to-purple-600 rounded-full transition-all duration-200"
+                  className="h-full bg-accent rounded-full transition-all duration-200"
                   style={{width: `${(communication / 35 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
@@ -61,12 +61,12 @@ function AnimatedScoreSection() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300">Technical Knowledge</span>
-                <span className="text-yellow-400 font-semibold transition-all duration-200">{technical}/35</span>
+                <span className="text-muted-foreground">Technical Knowledge</span>
+                <span className="text-secondary font-semibold transition-all duration-200">{technical}/35</span>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full transition-all duration-200"
+                  className="h-full bg-secondary rounded-full transition-all duration-200"
                   style={{width: `${(technical / 35 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
@@ -74,12 +74,12 @@ function AnimatedScoreSection() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300">Problem Solving</span>
-                <span className="text-green-400 font-semibold transition-all duration-200">{problemSolving}/35</span>
+                <span className="text-muted-foreground">Problem Solving</span>
+                <span className="text-primary font-semibold transition-all duration-200">{problemSolving}/35</span>
               </div>
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-green-500 to-emerald-600 rounded-full transition-all duration-200"
+                  className="h-full bg-primary rounded-full transition-all duration-200"
                   style={{width: `${(problemSolving / 35 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
@@ -88,12 +88,12 @@ function AnimatedScoreSection() {
         </div>
 
         <div className="text-center">
-          <div className="text-8xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent transition-all duration-200">
+          <div className="text-8xl font-bold text-primary transition-all duration-200">
             {score}
             <span className="text-5xl">/100</span>
           </div>
-          <div className="text-sm text-gray-400 mt-2">Your Interview Confidence Score</div>
-          <p className="text-sm text-gray-500 mt-4 italic">Score updates in real-time</p>
+          <div className="text-sm text-muted-foreground mt-2">Your Interview Confidence Score</div>
+          <p className="text-sm text-muted-foreground mt-4 italic">Score updates in real-time</p>
         </div>
       </div>
     </div>
@@ -197,21 +197,21 @@ function CompanyCarousel() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+        <div className="text-2xl font-bold text-primary">
           InterviewAI
         </div>
         <div className="hidden md:flex items-center gap-8">
-          <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="#features" className="text-foreground hover:text-primary transition-colors">
             Features
           </Link>
-          <Link href="#pricing" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="#pricing" className="text-foreground hover:text-primary transition-colors">
             Pricing
           </Link>
           <Link href="/interview/select">
-            <Button className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
+            <Button className="bg-primary hover:bg-secondary text-primary-foreground">
               Get Started Free
             </Button>
           </Link>
@@ -220,15 +220,15 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+        <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6">
           The Only Free{' '}
-          <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <span className="text-primary">
             AI Mock Interview Platform
           </span>{' '}
           You'll Ever Need
         </h1>
 
-        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
+        <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto">
           Practice with AI interviewers trained on real questions from top companies.
           Get instant feedback and walk into your interview with confidence.
         </p>
@@ -236,7 +236,7 @@ export default function Home() {
         <Link href="/interview/select">
           <Button
             size="lg"
-            className="px-10 py-7 text-lg bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 shadow-2xl shadow-pink-500/50"
+            className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl"
           >
             Get Started Free →
           </Button>
@@ -259,40 +259,40 @@ export default function Home() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700">
+          <div className="bg-card rounded-xl p-6 border border-border">
             <div className="flex items-center justify-center mb-3">
-              <div className="h-12 w-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-white" />
+              <div className="h-12 w-12 bg-primary rounded-lg flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-primary-foreground" />
               </div>
             </div>
-            <div className="text-3xl font-bold text-white mb-1">
-              AI <span className="text-purple-400">Powered</span>
+            <div className="text-3xl font-bold text-card-foreground mb-1">
+              AI <span className="text-accent">Powered</span>
             </div>
-            <div className="text-sm text-gray-400">Smart Optimization</div>
+            <div className="text-sm text-muted-foreground">Smart Optimization</div>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700">
+          <div className="bg-card rounded-xl p-6 border border-border">
             <div className="flex items-center justify-center mb-3">
-              <div className="h-12 w-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-white" />
+              <div className="h-12 w-12 bg-secondary rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-secondary-foreground" />
               </div>
             </div>
-            <div className="text-3xl font-bold text-white mb-1">
-              100<span className="text-green-400">%</span>
+            <div className="text-3xl font-bold text-card-foreground mb-1">
+              100<span className="text-accent">%</span>
             </div>
-            <div className="text-sm text-gray-400">Realistic Feedback</div>
+            <div className="text-sm text-muted-foreground">Realistic Feedback</div>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700">
+          <div className="bg-card rounded-xl p-6 border border-border">
             <div className="flex items-center justify-center mb-3">
-              <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-white" />
+              <div className="h-12 w-12 bg-accent rounded-lg flex items-center justify-center">
+                <TrendingUp className="h-6 w-6 text-accent-foreground" />
               </div>
             </div>
-            <div className="text-3xl font-bold text-white mb-1">
-              50<span className="text-orange-400">%+</span>
+            <div className="text-3xl font-bold text-card-foreground mb-1">
+              50<span className="text-primary">%+</span>
             </div>
-            <div className="text-sm text-gray-400">Confidence Boost</div>
+            <div className="text-sm text-muted-foreground">Confidence Boost</div>
           </div>
         </div>
       </div>
@@ -300,10 +300,10 @@ export default function Home() {
       {/* Animated Score Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             See Your Interview Performance In Real-Time
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Our AI analyses your responses just like a real recruiter would, giving you instant
             feedback on your strengths and areas for improvement.
           </p>
@@ -314,10 +314,10 @@ export default function Home() {
 
       {/* Company Carousel Section */}
       <div className="max-w-7xl mx-auto px-6 py-20">
-        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-4">
           Practice Interviews For Jobs At
         </h2>
-        <p className="text-xl text-gray-300 text-center mb-12">
+        <p className="text-xl text-muted-foreground text-center mb-12">
           Prepare for Tech, Finance, Law & Engineering roles at top companies
         </p>
 
@@ -341,72 +341,72 @@ export default function Home() {
 
       {/* Features Grid */}
       <div id="features" className="max-w-7xl mx-auto px-6 py-20">
-        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-16">
           Everything You Need To Ace Your Interview
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
-              <Mic className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center mb-6">
+              <Mic className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Voice-Based Interviews</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Voice-Based Interviews</h3>
+            <p className="text-muted-foreground">
               Speak naturally just like a real interview. Our AI understands your responses
               and provides instant feedback on your communication style.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-6">
-              <Target className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-secondary rounded-xl flex items-center justify-center mb-6">
+              <Target className="h-7 w-7 text-secondary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Industry-Specific AI</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Industry-Specific AI</h3>
+            <p className="text-muted-foreground">
               From Big Tech to Big Law, our AI interviewers are trained on real questions
               from top companies in 9 different industries.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-6">
-              <Award className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-accent rounded-xl flex items-center justify-center mb-6">
+              <Award className="h-7 w-7 text-accent-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Detailed Evaluations</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Detailed Evaluations</h3>
+            <p className="text-muted-foreground">
               Get brutally honest feedback with Pass/Borderline/Fail ratings, specific
               strengths, weaknesses, and actionable improvement tips.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
-              <Brain className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center mb-6">
+              <Brain className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Real-Time SWOT Analysis</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Real-Time SWOT Analysis</h3>
+            <p className="text-muted-foreground">
               See your Strengths, Weaknesses, Opportunities, and Threats in real-time
               as you answer each question.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-6">
-              <Sparkles className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-secondary rounded-xl flex items-center justify-center mb-6">
+              <Sparkles className="h-7 w-7 text-secondary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Custom Questions</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Custom Questions</h3>
+            <p className="text-muted-foreground">
               Add your own questions that you struggle with. Practice the exact scenarios
               that make you nervous.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 border border-slate-700">
-            <div className="h-14 w-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center mb-6">
-              <TrendingUp className="h-7 w-7 text-white" />
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="h-14 w-14 bg-accent rounded-xl flex items-center justify-center mb-6">
+              <TrendingUp className="h-7 w-7 text-accent-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-3">Adjustable Difficulty</h3>
-            <p className="text-gray-400">
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Adjustable Difficulty</h3>
+            <p className="text-muted-foreground">
               Control follow-up intensity from 'No follow-ups' to 'Intensive pressure'
               to match your preparation goals.
             </p>
@@ -416,120 +416,120 @@ export default function Home() {
 
       {/* Pricing Section (Placeholder) */}
       <div id="pricing" className="max-w-7xl mx-auto px-6 py-20">
-        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground text-center mb-4">
           Choose Your Plan
         </h2>
-        <p className="text-xl text-gray-300 text-center mb-16">
+        <p className="text-xl text-muted-foreground text-center mb-16">
           Start free and upgrade when you're ready to accelerate your interview prep
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Free Plan */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700">
-            <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
-            <div className="text-5xl font-bold text-white mb-6">
-              $0<span className="text-xl text-gray-400">/forever</span>
+          <div className="bg-card rounded-2xl p-8 border border-border">
+            <h3 className="text-2xl font-bold text-card-foreground mb-2">Free</h3>
+            <div className="text-5xl font-bold text-card-foreground mb-6">
+              $0<span className="text-xl text-muted-foreground">/forever</span>
             </div>
-            <p className="text-gray-400 mb-6">Perfect for getting started</p>
+            <p className="text-muted-foreground mb-6">Perfect for getting started</p>
 
             <ul className="space-y-3 mb-8">
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 5 mock interviews per month
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 All 9 industries available
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Real-time feedback
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Detailed evaluations
               </li>
             </ul>
 
             <Link href="/interview/select">
-              <Button className="w-full bg-slate-700 hover:bg-slate-600">
+              <Button className="w-full bg-muted hover:bg-muted/80">
                 Start Free
               </Button>
             </Link>
           </div>
 
           {/* Pro Plan */}
-          <div className="bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl p-8 border-2 border-pink-500 relative">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-1 rounded-full text-sm font-semibold text-white">
+          <div className="bg-primary rounded-2xl p-8 border-2 border-accent relative">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent px-4 py-1 rounded-full text-sm font-semibold text-accent-foreground">
               Most Popular
             </div>
 
-            <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-            <div className="text-5xl font-bold text-white mb-6">
-              $15<span className="text-xl text-gray-300">/month</span>
+            <h3 className="text-2xl font-bold text-primary-foreground mb-2">Pro</h3>
+            <div className="text-5xl font-bold text-primary-foreground mb-6">
+              $15<span className="text-xl text-primary-foreground/70">/month</span>
             </div>
-            <p className="text-gray-300 mb-6">Supercharge your interview prep</p>
+            <p className="text-primary-foreground/80 mb-6">Supercharge your interview prep</p>
 
             <ul className="space-y-3 mb-8">
-              <li className="flex items-center gap-3 text-white">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-primary-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Everything in Free, plus:
               </li>
-              <li className="flex items-center gap-3 text-white">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-primary-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Unlimited interviews
               </li>
-              <li className="flex items-center gap-3 text-white">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-primary-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Custom question practise
               </li>
-              <li className="flex items-center gap-3 text-white">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-primary-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Company-specific prep
               </li>
-              <li className="flex items-center gap-3 text-white">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-primary-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Priority support
               </li>
             </ul>
 
-            <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
+            <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
               Coming Soon
             </Button>
           </div>
 
           {/* Enterprise Plan */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700">
-            <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
-            <div className="text-5xl font-bold text-white mb-6">
-              $60<span className="text-xl text-gray-400">/6 months</span>
+          <div className="bg-card rounded-2xl p-8 border border-border">
+            <h3 className="text-2xl font-bold text-card-foreground mb-2">Enterprise</h3>
+            <div className="text-5xl font-bold text-card-foreground mb-6">
+              $60<span className="text-xl text-muted-foreground">/6 months</span>
             </div>
-            <p className="text-gray-400 mb-6">For your entire job search journey</p>
+            <p className="text-muted-foreground mb-6">For your entire job search journey</p>
 
             <ul className="space-y-3 mb-8">
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Everything in Pro, plus:
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 6 months unlimited access
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Interview history & analytics
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 Advanced AI feedback
               </li>
-              <li className="flex items-center gap-3 text-gray-300">
-                <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-card-foreground">
+                <Check className="h-5 w-5 text-accent flex-shrink-0" />
                 1-on-1 coaching session
               </li>
             </ul>
 
-            <Button className="w-full bg-slate-700 hover:bg-slate-600">
+            <Button className="w-full bg-muted hover:bg-muted/80">
               Coming Soon
             </Button>
           </div>
@@ -538,10 +538,10 @@ export default function Home() {
 
       {/* Final CTA */}
       <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
           Your career is your most valuable asset.
         </h2>
-        <p className="text-xl text-gray-300 mb-8">
+        <p className="text-xl text-muted-foreground mb-8">
           Start building it today with AI-powered interview practise.
         </p>
 
@@ -549,21 +549,21 @@ export default function Home() {
           <Link href="/interview/select">
             <Button
               size="lg"
-              className="px-10 py-7 text-lg bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+              className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground"
             >
               Start Your First Interview Free
             </Button>
           </Link>
         </div>
 
-        <p className="text-sm text-gray-500 mt-8">
+        <p className="text-sm text-muted-foreground mt-8">
           Built by someone who understands the interview struggle. No credit card required.
         </p>
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-800 py-8">
-        <div className="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
+      <div className="border-t border-border py-8">
+        <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
           <p>© 2024 InterviewAI. All rights reserved.</p>
         </div>
       </div>
