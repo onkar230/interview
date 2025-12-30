@@ -28,31 +28,31 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
   return (
     <div className="h-full flex flex-col">
       {/* Header - Collapsible on mobile */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-card border-b border-border p-4">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between lg:cursor-default"
         >
           <div className="text-left">
-            <h2 className="text-lg font-semibold text-gray-900">Live Feedback</h2>
-            <p className="text-sm text-gray-600">Real-time analysis of your answers</p>
+            <h2 className="text-sm font-semibold text-primary-foreground/80">Live Feedback</h2>
+            <p className="text-xs text-primary-foreground/60">Real-time analysis of your answers</p>
           </div>
           <div className="lg:hidden">
             {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-gray-600" />
+              <ChevronUp className="h-5 w-5 text-primary-foreground/80" />
             ) : (
-              <ChevronDown className="h-5 w-5 text-gray-600" />
+              <ChevronDown className="h-5 w-5 text-primary-foreground/80" />
             )}
           </div>
         </button>
       </div>
 
       {/* Content - Collapsible on mobile */}
-      <div className={`flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 ${!isExpanded ? 'hidden lg:block' : ''}`}>
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${!isExpanded ? 'hidden lg:block' : ''}`}>
         {isAnalyzing && (
-          <Card className="border-blue-200 bg-blue-50">
+          <Card className="border-accent/30 bg-accent/10">
             <CardContent className="py-4">
-              <div className="flex items-center gap-3 text-blue-700">
+              <div className="flex items-center gap-3 text-primary">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <span className="text-sm font-medium">Analyzing your answer...</span>
               </div>
@@ -62,13 +62,13 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
         {feedbackHistory.length === 0 && !isAnalyzing && (
           <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-              <Lightbulb className="h-8 w-8 text-gray-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+              <Lightbulb className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-primary-foreground/80 text-sm">
               Waiting for your first answer...
               <br />
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-primary-foreground/60">
                 You'll see feedback here after each response
               </span>
             </p>
@@ -76,13 +76,13 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
         )}
 
         {feedbackHistory.map((feedback, idx) => (
-          <Card key={idx} className="shadow-md">
+          <Card key={idx} className="shadow-md bg-card border-border">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-sm font-medium text-gray-700">
+                <CardTitle className="text-sm font-medium text-card-foreground">
                   Question {feedback.questionNumber}
                 </CardTitle>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs border-border">
                   {new Date(feedback.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -96,14 +96,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.strengths.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span className="text-xs font-semibold text-green-700 uppercase tracking-wide">
+                    <CheckCircle2 className="h-4 w-4 text-green-700" />
+                    <span className="text-xs font-semibold text-green-800 uppercase tracking-wide">
                       Strengths
                     </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {feedback.strengths.map((strength, i) => (
-                      <li key={i} className="text-sm text-gray-700 list-disc">
+                      <li key={i} className="text-sm text-card-foreground list-disc">
                         {strength}
                       </li>
                     ))}
@@ -115,14 +115,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.weaknesses.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <span className="text-xs font-semibold text-yellow-700 uppercase tracking-wide">
+                    <AlertTriangle className="h-4 w-4 text-amber-700" />
+                    <span className="text-xs font-semibold text-amber-800 uppercase tracking-wide">
                       Areas to Improve
                     </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {feedback.weaknesses.map((weakness, i) => (
-                      <li key={i} className="text-sm text-gray-700 list-disc">
+                      <li key={i} className="text-sm text-card-foreground list-disc">
                         {weakness}
                       </li>
                     ))}
@@ -134,14 +134,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.suggestedImprovements && feedback.suggestedImprovements.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-purple-600" />
-                    <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
+                    <Plus className="h-4 w-4 text-secondary" />
+                    <span className="text-xs font-semibold text-secondary uppercase tracking-wide">
                       What to Add Next Time
                     </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {feedback.suggestedImprovements.map((suggestion, i) => (
-                      <li key={i} className="text-sm text-gray-700 list-disc">
+                      <li key={i} className="text-sm text-card-foreground list-disc">
                         {suggestion}
                       </li>
                     ))}
@@ -153,14 +153,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.opportunities.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-blue-600" />
-                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+                    <Lightbulb className="h-4 w-4 text-primary" />
+                    <span className="text-xs font-semibold text-primary uppercase tracking-wide">
                       Missed Opportunities
                     </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {feedback.opportunities.map((opportunity, i) => (
-                      <li key={i} className="text-sm text-gray-700 list-disc">
+                      <li key={i} className="text-sm text-card-foreground list-disc">
                         {opportunity}
                       </li>
                     ))}
@@ -172,14 +172,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.threats.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                    <span className="text-xs font-semibold text-red-700 uppercase tracking-wide">
+                    <AlertCircle className="h-4 w-4 text-red-700" />
+                    <span className="text-xs font-semibold text-red-800 uppercase tracking-wide">
                       Red Flags
                     </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {feedback.threats.map((threat, i) => (
-                      <li key={i} className="text-sm text-red-700 list-disc font-medium">
+                      <li key={i} className="text-sm text-red-800 list-disc font-medium">
                         {threat}
                       </li>
                     ))}
