@@ -49,7 +49,7 @@ function AnimatedScoreSection() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted-foreground">Communication</span>
-                <span className="text-accent font-semibold transition-all duration-200">{communication}/35</span>
+                <span className="text-primary font-semibold transition-all duration-200">{communication}/35</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
@@ -62,7 +62,7 @@ function AnimatedScoreSection() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted-foreground">Technical Knowledge</span>
-                <span className="text-secondary font-semibold transition-all duration-200">{technical}/35</span>
+                <span className="text-primary font-semibold transition-all duration-200">{technical}/35</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
@@ -266,7 +266,7 @@ export default function Home() {
               </div>
             </div>
             <div className="text-3xl font-bold text-card-foreground mb-1">
-              AI <span className="text-accent">Powered</span>
+              AI <span className="text-primary">Powered</span>
             </div>
             <div className="text-sm text-muted-foreground">Smart Optimization</div>
           </div>
@@ -278,7 +278,7 @@ export default function Home() {
               </div>
             </div>
             <div className="text-3xl font-bold text-card-foreground mb-1">
-              100<span className="text-accent">%</span>
+              100<span className="text-primary">%</span>
             </div>
             <div className="text-sm text-muted-foreground">Realistic Feedback</div>
           </div>
