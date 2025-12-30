@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { EB_Garamond } from "next/font/google";
+import { Inter, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 
-const garamond = EB_Garamond({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-garamond",
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const crimsonPro = Crimson_Pro({
+  subsets: ["latin"],
+  variable: "--font-crimson",
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${garamond.variable} antialiased font-sans`}>
+      <body className={`${inter.variable} ${crimsonPro.variable} antialiased font-sans`}>
         {children}
       </body>
     </html>
