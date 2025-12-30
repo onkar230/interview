@@ -234,7 +234,7 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
       <div className="fixed bottom-4 right-4 z-50">
         <Button
           onClick={handleMinimizeToggle}
-          className="h-12 w-12 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+          className="h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-secondary text-white"
           size="icon"
           title="Expand webcam mirror"
         >
@@ -335,16 +335,16 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
       </div>
 
       {/* Footer Controls */}
-      <div className="bg-gray-50 px-3 py-2 flex items-center justify-between border-t border-gray-200">
+      <div className="bg-card px-3 py-2 flex items-center justify-between border-t border-border">
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-600">Size:</span>
+          <span className="text-xs text-muted-foreground">Size:</span>
           <div className="flex gap-1">
             <button
               onClick={() => handleSizeChange('small')}
               className={`text-xs px-2 py-1 rounded ${
                 size === 'small'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-primary text-white'
+                  : 'bg-muted text-foreground hover:bg-muted/80'
               }`}
             >
               S
@@ -353,8 +353,8 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
               onClick={() => handleSizeChange('medium')}
               className={`text-xs px-2 py-1 rounded ${
                 size === 'medium'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-primary text-white'
+                  : 'bg-muted text-foreground hover:bg-muted/80'
               }`}
             >
               M
@@ -363,8 +363,8 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
               onClick={() => handleSizeChange('large')}
               className={`text-xs px-2 py-1 rounded ${
                 size === 'large'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-primary text-white'
+                  : 'bg-muted text-foreground hover:bg-muted/80'
               }`}
             >
               L
@@ -372,7 +372,7 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
           </div>
         </div>
         <div className={`h-2 w-2 rounded-full ${
-          status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+          status === 'active' ? 'bg-green-600 animate-pulse' : 'bg-gray-400'
         }`} title={status === 'active' ? 'Camera active' : 'Camera inactive'} />
       </div>
     </div>
