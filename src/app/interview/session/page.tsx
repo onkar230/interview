@@ -277,6 +277,7 @@ function InterviewSessionContent() {
           weaknesses: feedbackData.weaknesses || [],
           opportunities: feedbackData.opportunities || [],
           threats: feedbackData.threats || [],
+          suggestedImprovements: feedbackData.suggestedImprovements || [],
           timestamp: new Date(),
         };
         setFeedbackHistory((prev) => [newFeedback, ...prev]); // Newest at top

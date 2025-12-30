@@ -189,6 +189,7 @@ export async function analyzeAnswer(params: {
   weaknesses: string[];
   opportunities: string[];
   threats: string[];
+  suggestedImprovements: string[];
 }> {
   const client = getOpenAIClient();
   const { question, answer, industry, conversationHistory } = params;
@@ -237,6 +238,7 @@ SWOT GUIDELINES:
 - Weaknesses: What's wrong with the answer (1-3 points, brutally honest). Focus on CONTENT issues, not structure.
 - Opportunities: What they should have done (1-3 points). Be specific about what was missing.
 - Threats: Critical red flags (0-2 points). Include for terrible/lazy answers.
+- Suggested Improvements: Specific points they could have added to strengthen their answer (2-4 points). Based on what they said, what else would make it stronger?
 
 IMPORTANT: STOP mentioning STAR/CAR/PEEL method in every answer. Only mention it if the answer is genuinely confusing or disorganized.
 
@@ -247,12 +249,20 @@ Each point should be:
 - Based on what they ACTUALLY said, not what you wish they said
 - VARIED - don't repeat the same feedback every time
 
+SUGGESTED IMPROVEMENTS EXAMPLES:
+- "Mention specific metrics or numbers (e.g., 'increased sales by 25%')"
+- "Include the outcome or result of your actions"
+- "Explain the specific challenges you faced in more detail"
+- "Add context about why this was important to the business"
+- "Describe what you learned from this experience"
+
 Respond in JSON format:
 {
   "strengths": ["actual strength 1"] or [],
   "weaknesses": ["specific weakness 1", "specific weakness 2"],
   "opportunities": ["missed point 1", "Could have provided specific metrics or numbers"],
-  "threats": ["Answer is too vague and lacks substance"] or []
+  "threats": ["Answer is too vague and lacks substance"] or [],
+  "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"]
 }`;
 
   const completion = await client.chat.completions.create({
@@ -272,6 +282,7 @@ Respond in JSON format:
     weaknesses: result.weaknesses || [],
     opportunities: result.opportunities || [],
     threats: result.threats || [],
+    suggestedImprovements: result.suggestedImprovements || [],
   };
 }
 

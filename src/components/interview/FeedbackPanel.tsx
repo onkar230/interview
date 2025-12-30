@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, Loader2, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 
 export interface FeedbackItem {
   questionNumber: number;
@@ -13,6 +13,7 @@ export interface FeedbackItem {
   weaknesses: string[];
   opportunities: string[];
   threats: string[];
+  suggestedImprovements: string[];
   timestamp: Date;
 }
 
@@ -123,6 +124,25 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
                     {feedback.weaknesses.map((weakness, i) => (
                       <li key={i} className="text-sm text-gray-700 list-disc">
                         {weakness}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Suggested Improvements */}
+              {feedback.suggestedImprovements && feedback.suggestedImprovements.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-4 w-4 text-purple-600" />
+                    <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
+                      What to Add Next Time
+                    </span>
+                  </div>
+                  <ul className="space-y-1 ml-6">
+                    {feedback.suggestedImprovements.map((suggestion, i) => (
+                      <li key={i} className="text-sm text-gray-700 list-disc">
+                        {suggestion}
                       </li>
                     ))}
                   </ul>
