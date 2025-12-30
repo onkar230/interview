@@ -534,8 +534,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.role === 'user'
-                        ? 'bg-gradient-to-br bg-accent text-white'
-                        : 'bg-slate-700/50 border border-slate-600 text-gray-200'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-primary/50 border border-primary/20 text-primary-foreground'
                     }`}
                   >
                     <p className="text-xs whitespace-pre-wrap">{message.content}</p>
@@ -543,8 +543,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
 
                   {message.role === 'user' && (
                     <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center">
-                        <User className="h-5 w-5 text-gray-400" />
+                      <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center">
+                        <User className="h-5 w-5 text-muted-foreground" />
                       </div>
                     </div>
                   )}
@@ -554,11 +554,11 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               {streamingText && (
                 <div className="flex gap-3 justify-start">
                   <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br bg-accent/20 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
                       <Bot className="h-5 w-5 text-accent" />
                     </div>
                   </div>
-                  <div className="max-w-[80%] rounded-lg p-3 bg-slate-700/50 border border-slate-600 text-gray-200">
+                  <div className="max-w-[80%] rounded-lg p-3 bg-primary/50 border border-primary/20 text-primary-foreground">
                     <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
                     <span className="inline-block w-2 h-4 bg-accent ml-1 animate-pulse"></span>
                   </div>
