@@ -39,16 +39,16 @@ export default function SelectIndustryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-6xl mx-auto">
         {/* Progress Steps */}
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Select Your Industry
           </h1>
-          <p className="text-lg text-gray-300">
+          <p className="text-lg text-muted-foreground">
             Choose the industry that matches your career goals. We'll tailor the interview accordingly.
           </p>
         </div>
@@ -62,23 +62,23 @@ export default function SelectIndustryPage() {
               <button
                 key={industry}
                 onClick={() => handleIndustrySelect(industry)}
-                className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-6 shadow-md hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-200 hover:scale-105 text-left group"
+                className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-xl hover:shadow-primary/10 transition-all duration-200 hover:scale-105 text-left group"
               >
                 <div className="flex items-start gap-4 mb-3">
-                  <div className="p-3 bg-gradient-to-br from-pink-500/20 to-purple-600/20 rounded-lg group-hover:from-pink-500/30 group-hover:to-purple-600/30 transition-colors">
-                    <Icon className="h-6 w-6 text-pink-400" />
+                  <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Icon className="h-6 w-6 text-primary" />
                   </div>
                 </div>
 
-                <h3 className="text-xl font-semibold text-white mb-2 capitalize">
+                <h3 className="text-xl font-semibold text-card-foreground mb-2 capitalize">
                   {industry}
                 </h3>
 
-                <p className="text-sm text-gray-300 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   {config.description}
                 </p>
 
-                <div className="text-xs text-gray-400 space-y-1">
+                <div className="text-xs text-muted-foreground space-y-1">
                   <p className="font-medium">Focus Areas:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {config.focusAreas.slice(0, 3).map((area, idx) => (
@@ -88,11 +88,11 @@ export default function SelectIndustryPage() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent group-hover:from-pink-400 group-hover:to-purple-500">
+                  <span className="text-sm font-medium text-primary group-hover:text-secondary">
                     Start Interview
                   </span>
                   <svg
-                    className="h-5 w-5 text-pink-400 group-hover:translate-x-1 transition-transform"
+                    className="h-5 w-5 text-primary group-hover:translate-x-1 transition-transform"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -114,7 +114,6 @@ export default function SelectIndustryPage() {
           <Button
             variant="outline"
             onClick={() => router.push('/')}
-            className="border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
           >
             Back to Home
           </Button>

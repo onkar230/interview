@@ -476,7 +476,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-primary flex flex-col">
       {/* Fullscreen Mode: Webcam background with overlay panels */}
       <div className="flex-1 relative bg-black overflow-hidden">
 
@@ -492,7 +492,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 />
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-slate-900 rounded-lg border border-slate-700">
+              <div className="w-full h-full flex items-center justify-center bg-primary rounded-lg border border-primary/20">
                 <div className="text-center">
                   <CameraOff className="h-16 w-16 text-gray-600 mb-4 mx-auto" />
                   <p className="text-gray-500 mb-4">Webcam is hidden</p>
@@ -500,7 +500,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     onClick={() => setShowWebcam(true)}
                     variant="outline"
                     size="sm"
-                    className="border-slate-600 text-gray-300"
+                    className="border-slate-600 text-primary-foreground/80"
                   >
                     <Camera className="h-4 w-4 mr-2" />
                     Enable Webcam
@@ -511,8 +511,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Left Overlay: Conversation */}
-          <div className="absolute left-4 top-4 bottom-4 w-80 bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-gray-300 mb-4 sticky top-0 bg-slate-900/90 pb-2 border-b border-slate-700">
+          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 overflow-y-auto">
+            <h3 className="text-sm font-semibold text-primary-foreground/80 mb-4 sticky top-0 bg-primary/90 pb-2 border-b border-primary/20">
               Interview Conversation
             </h3>
             <div className="space-y-4">
@@ -525,8 +525,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 >
                   {message.role === 'assistant' && (
                     <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
-                        <Bot className="h-5 w-5 text-pink-400" />
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br bg-accent/20 flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-accent" />
                       </div>
                     </div>
                   )}
@@ -534,7 +534,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.role === 'user'
-                        ? 'bg-gradient-to-br from-pink-500 to-purple-600 text-white'
+                        ? 'bg-gradient-to-br bg-accent text-white'
                         : 'bg-slate-700/50 border border-slate-600 text-gray-200'
                     }`}
                   >
@@ -554,34 +554,34 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               {streamingText && (
                 <div className="flex gap-3 justify-start">
                   <div className="flex-shrink-0">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-pink-500/20 to-purple-600/20 flex items-center justify-center">
-                      <Bot className="h-5 w-5 text-pink-400" />
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br bg-accent/20 flex items-center justify-center">
+                      <Bot className="h-5 w-5 text-accent" />
                     </div>
                   </div>
                   <div className="max-w-[80%] rounded-lg p-3 bg-slate-700/50 border border-slate-600 text-gray-200">
                     <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
-                    <span className="inline-block w-2 h-4 bg-pink-400 ml-1 animate-pulse"></span>
+                    <span className="inline-block w-2 h-4 bg-accent ml-1 animate-pulse"></span>
                   </div>
                 </div>
               )}
 
               {isProcessing && !streamingText && (
-                <div className="flex items-center gap-2 text-gray-300 text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin text-pink-400" />
+                <div className="flex items-center gap-2 text-primary-foreground/80 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin text-accent" />
                   <span>{!isInitialized ? 'Preparing...' : 'AI is thinking...'}</span>
                 </div>
               )}
 
               {!isInitialized && isProcessing && (
                 <div className="text-center mt-4">
-                  <p className="text-sm text-pink-400 font-medium">Take a deep breath. You've got this.</p>
+                  <p className="text-sm text-accent font-medium">Take a deep breath. You've got this.</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Right Overlay: Feedback */}
-          <div className="absolute right-4 top-4 bottom-4 w-80 bg-slate-900/90 backdrop-blur-sm border border-slate-700 rounded-lg p-4 overflow-y-auto">
+          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 overflow-y-auto">
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}
@@ -592,7 +592,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3">
             {/* Top Row: Interview Controls */}
             <div className="flex items-center gap-2">
-              <div className="text-xs text-white/80 bg-slate-900/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700">
+              <div className="text-xs text-primary-foreground/80 bg-primary/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-primary/20">
                 Question {questionCount}/{maxQuestions}
               </div>
               <Button
@@ -600,7 +600,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 variant="outline"
                 size="icon"
                 title={showWebcam ? "Hide webcam" : "Show webcam"}
-                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white"
+                className="bg-primary/90 backdrop-blur-sm border-primary/20 text-primary-foreground/80 hover:bg-secondary hover:text-primary-foreground"
               >
                 {showWebcam ? (
                   <Camera className="h-4 w-4" />
@@ -612,7 +612,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 onClick={handleEndInterview}
                 variant="outline"
                 disabled={isProcessing}
-                className="bg-slate-900/90 backdrop-blur-sm border-slate-700 text-gray-300 hover:bg-slate-800 hover:text-white text-xs px-3"
+                className="bg-primary/90 backdrop-blur-sm border-primary/20 text-primary-foreground/80 hover:bg-secondary hover:text-primary-foreground text-xs px-3"
               >
                 End Interview
               </Button>
@@ -639,7 +639,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             {/* Voice Recorder and Action Buttons */}
             {!isProcessing && currentAudioUrl === null && (
               <div className="space-y-3">
-                <div className="bg-slate-900/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-slate-700">
+                <div className="bg-primary/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-primary/20">
                   <VoiceRecorder
                     onRecordingComplete={handleRecordingComplete}
                     isProcessing={isProcessing}
@@ -651,7 +651,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     <Button
                       onClick={handleSkipQuestion}
                       variant="outline"
-                      className="border-purple-300 text-purple-300 hover:bg-purple-900/50 backdrop-blur-sm flex-1"
+                      className="border-accent text-accent hover:bg-accent/10 backdrop-blur-sm flex-1"
                     >
                       ⤭ Skip This Question
                     </Button>

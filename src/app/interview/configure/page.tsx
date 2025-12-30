@@ -145,10 +145,10 @@ function ConfigureInterviewContent() {
 
   if (!industry) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-400 mb-4">No industry selected</p>
-          <Button onClick={() => router.push('/interview/select')} className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
+          <p className="text-destructive mb-4">No industry selected</p>
+          <Button onClick={() => router.push('/interview/select')} className="bg-primary hover:bg-secondary text-primary-foreground">
             Select Industry
           </Button>
         </div>
@@ -157,30 +157,30 @@ function ConfigureInterviewContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-3xl mx-auto">
         {/* Progress Steps */}
         <ProgressSteps currentStep={2} />
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Customise Your Interview
           </h1>
-          <p className="text-lg text-gray-300">
+          <p className="text-lg text-muted-foreground">
             Tell us about your interview to get the most realistic experience
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl shadow-lg p-8">
+        <div className="bg-card border border-border rounded-xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Industry (Read-only) */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Industry
               </label>
-              <div className="px-4 py-3 bg-white rounded-lg border border-slate-600 text-gray-900 capitalize font-medium">
+              <div className="px-4 py-3 bg-white rounded-lg border border-border text-gray-900 capitalize font-medium">
                 {industry}
               </div>
             </div>
@@ -189,7 +189,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="company"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 What company are you interviewing for?{' '}
                 <span className="text-red-500">*</span>
@@ -200,7 +200,7 @@ function ConfigureInterviewContent() {
                 placeholder={suggestions ? `e.g., ${suggestions.companies.slice(0, 3).join(', ')}` : 'e.g., Google, Meta'}
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.company ? 'border-red-500' : 'border-slate-600'}`}
+                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.company ? 'border-red-500' : 'border-border'}`}
                 aria-invalid={!!errors.company}
               />
               {errors.company && (
@@ -208,14 +208,14 @@ function ConfigureInterviewContent() {
               )}
               {suggestions && (
                 <div className="mt-2">
-                  <p className="text-xs text-gray-400 mb-2">Popular companies for {industry}:</p>
+                  <p className="text-xs text-muted-foreground mb-2">Popular companies for {industry}:</p>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.companies.map((companyName) => (
                       <button
                         key={companyName}
                         type="button"
                         onClick={() => setCompany(companyName)}
-                        className="px-3 py-1 text-xs rounded-full border border-slate-600 bg-slate-700/50 text-gray-300 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-border bg-muted text-muted-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors"
                       >
                         {companyName}
                       </button>
@@ -229,7 +229,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="role"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 What role are you applying for?{' '}
                 <span className="text-red-500">*</span>
@@ -240,7 +240,7 @@ function ConfigureInterviewContent() {
                 placeholder={suggestions ? `e.g., ${suggestions.roles.slice(0, 2).join(', ')}` : 'e.g., Senior Software Engineer'}
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.role ? 'border-red-500' : 'border-slate-600'}`}
+                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.role ? 'border-red-500' : 'border-border'}`}
                 aria-invalid={!!errors.role}
               />
               {errors.role && (
@@ -248,14 +248,14 @@ function ConfigureInterviewContent() {
               )}
               {suggestions && (
                 <div className="mt-2">
-                  <p className="text-xs text-gray-400 mb-2">Common roles for {industry}:</p>
+                  <p className="text-xs text-muted-foreground mb-2">Common roles for {industry}:</p>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.roles.map((roleName) => (
                       <button
                         key={roleName}
                         type="button"
                         onClick={() => setRole(roleName)}
-                        className="px-3 py-1 text-xs rounded-full border border-slate-600 bg-slate-700/50 text-gray-300 hover:border-pink-500 hover:bg-pink-500/10 hover:text-pink-400 transition-colors"
+                        className="px-3 py-1 text-xs rounded-full border border-border bg-muted text-muted-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors"
                       >
                         {roleName}
                       </button>
@@ -269,25 +269,25 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="followUpIntensity"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Follow-up Question Intensity <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-gray-400 mb-3">
+              <p className="text-xs text-muted-foreground mb-3">
                 Control how much the interviewer probes your answers. Real interviewers follow up on vague responses.
               </p>
               <select
                 id="followUpIntensity"
                 value={followUpIntensity}
                 onChange={(e) => setFollowUpIntensity(e.target.value as 'none' | 'light' | 'moderate' | 'intensive')}
-                className="w-full px-4 py-2 border border-slate-600 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-colors bg-white text-gray-900"
+                className="w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors bg-white text-gray-900"
               >
                 <option value="none">No Follow-ups - Move to next question immediately</option>
                 <option value="light">Light - Only follow up if answer is very vague (max 1 follow-up)</option>
                 <option value="moderate">Moderate - Follow up on vague answers (1-2 follow-ups) [Recommended]</option>
                 <option value="intensive">Intensive - Deep probing like real interviews (2-3 follow-ups)</option>
               </select>
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {followUpIntensity === 'none' && '📝 Quick practise mode - cover more questions in less time'}
                 {followUpIntensity === 'light' && '🎯 Gentle practise - some follow-ups for very unclear answers'}
                 {followUpIntensity === 'moderate' && '⚖️ Balanced - realistic follow-ups without excessive pressure'}
@@ -297,13 +297,13 @@ function ConfigureInterviewContent() {
 
             {/* Question Count Slider */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Number of Questions
               </label>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-pink-400">{questionCount}</span>
-                  <span className="text-xs text-gray-400">questions</span>
+                  <span className="text-2xl font-bold text-primary">{questionCount}</span>
+                  <span className="text-xs text-muted-foreground">questions</span>
                 </div>
                 <Slider
                   value={[questionCount]}
@@ -313,12 +313,12 @@ function ConfigureInterviewContent() {
                   step={1}
                   className="w-full"
                 />
-                <div className="flex justify-between text-xs text-gray-400">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>1 (Quick)</span>
                   <span>10 (Full)</span>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {questionCount <= 3 && '⚡ Quick practise - focus on a few key areas'}
                 {questionCount > 3 && questionCount <= 6 && '🎯 Medium session - balanced coverage'}
                 {questionCount > 6 && '📋 Full interview - comprehensive practise'}
@@ -329,7 +329,7 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="jobDescription"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Job Description (Optional)
               </label>
@@ -340,19 +340,19 @@ function ConfigureInterviewContent() {
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={6}
                 maxLength={2000}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border"
               />
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {jobDescription.length}/2000 characters
               </p>
             </div>
 
             {/* Question Types */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 What types of questions do you want to practise? (Optional)
               </label>
-              <p className="text-xs text-gray-400 mb-3">
+              <p className="text-xs text-muted-foreground mb-3">
                 Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
               </p>
               <div className="space-y-2">
@@ -366,17 +366,17 @@ function ConfigureInterviewContent() {
                 ].map((type) => (
                   <label
                     key={type.id}
-                    className="flex items-start gap-3 p-3 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors bg-slate-800/30"
+                    className="flex items-start gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors bg-muted"
                   >
                     <input
                       type="checkbox"
                       checked={questionTypes.includes(type.id)}
                       onChange={() => handleQuestionTypeToggle(type.id)}
-                      className="mt-1 h-4 w-4 text-pink-500 border-slate-600 rounded focus:ring-2 focus:ring-pink-500 accent-pink-500"
+                      className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary"
                     />
                     <div className="flex-1">
-                      <div className="font-medium text-sm text-white">{type.label}</div>
-                      <div className="text-xs text-gray-400">{type.description}</div>
+                      <div className="font-medium text-sm text-card-foreground">{type.label}</div>
+                      <div className="text-xs text-muted-foreground">{type.description}</div>
                     </div>
                   </label>
                 ))}
@@ -387,11 +387,11 @@ function ConfigureInterviewContent() {
             <div>
               <label
                 htmlFor="customQuestions"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Add Your Own Questions (Optional)
               </label>
-              <p className="text-xs text-gray-400 mb-2">
+              <p className="text-xs text-muted-foreground mb-2">
                 Enter specific questions that you struggle with or want to practise. One question per line, max 5 questions.
               </p>
               <Textarea
@@ -400,23 +400,23 @@ function ConfigureInterviewContent() {
                 value={customQuestions}
                 onChange={(e) => setCustomQuestions(e.target.value)}
                 rows={5}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-slate-600"
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border"
               />
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
               </p>
             </div>
 
             {/* Privacy Notice */}
-            <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 flex gap-3">
+            <div className="bg-muted border border-border rounded-lg p-4 flex gap-3">
               <div className="flex-shrink-0">
-                <Shield className="h-5 w-5 text-pink-400 mt-0.5" />
+                <Shield className="h-5 w-5 text-primary mt-0.5" />
               </div>
               <div>
-                <h4 className="font-semibold text-white text-sm mb-1">
+                <h4 className="font-semibold text-card-foreground text-sm mb-1">
                   Your privacy is protected
                 </h4>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-muted-foreground">
                   Your webcam feed stays on your device only. We never record, store, or transmit your video or audio. The AI only receives your spoken text.
                 </p>
               </div>
@@ -428,12 +428,12 @@ function ConfigureInterviewContent() {
                 type="button"
                 variant="outline"
                 onClick={() => router.push('/interview/select')}
-                className="flex items-center gap-2 border-slate-600 text-gray-300 hover:bg-slate-800 hover:text-white"
+                className="flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-card-foreground"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
-              <Button type="submit" className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
+              <Button type="submit" className="flex-1 bg-primary hover:bg-secondary text-primary-foreground">
                 Start Interview
               </Button>
             </div>
@@ -441,7 +441,7 @@ function ConfigureInterviewContent() {
         </div>
 
         {/* Help Text */}
-        <div className="mt-6 text-center text-sm text-gray-400">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           <p>
             The more details you provide, the more realistic and tailored your
             interview will be.
@@ -456,8 +456,8 @@ export default function ConfigureInterviewPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-          <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }
     >
