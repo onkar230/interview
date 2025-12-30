@@ -17,6 +17,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
   const [error, setError] = useState<string | null>(null);
   const onPlaybackEndRef = useRef(onPlaybackEnd);
   const lastAudioUrlRef = useRef<string | null>(null);
+  const isInitializingRef = useRef(false); // Prevent double initialization in Strict Mode
 
   // Keep the callback ref updated
   useEffect(() => {
@@ -25,20 +26,26 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
   useEffect(() => {
     if (!audioUrl) {
-      console.log('[AudioPlayer] audioUrl is null, keeping lastAudioUrlRef to prevent replays');
-      // DON'T reset lastAudioUrlRef here - keep it so we can detect duplicate URLs
+      console.log('[AudioPlayer] audioUrl is null, skipping');
       return;
     }
 
-    // Don't recreate audio if it's the same URL (prevents replay bug)
-    if (audioUrl === lastAudioUrlRef.current) {
-      console.log('[AudioPlayer] Same audio URL detected, skipping recreation:', audioUrl.substring(0, 50));
+    // Don't recreate audio if it's the same URL AND we're already initializing
+    if (audioUrl === lastAudioUrlRef.current && isInitializingRef.current) {
+      console.log('[AudioPlayer] Same audio URL detected and already initializing, skipping recreation:', audioUrl.substring(0, 50));
+      return;
+    }
+
+    // Don't recreate audio if it's the same URL AND audio is currently playing
+    if (audioUrl === lastAudioUrlRef.current && internalAudioRef.current && !internalAudioRef.current.paused) {
+      console.log('[AudioPlayer] Same audio URL detected and audio is playing, skipping recreation:', audioUrl.substring(0, 50));
       return;
     }
 
     console.log('[AudioPlayer] Creating new audio for URL:', audioUrl.substring(0, 50));
     console.log('[AudioPlayer] Previous URL was:', lastAudioUrlRef.current?.substring(0, 50) || 'null');
-    lastAudioUrlRef.current = audioUrl;
+
+    isInitializingRef.current = true;
 
     // Stop and cleanup any existing audio before creating new one
     if (internalAudioRef.current) {
@@ -78,6 +85,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       }
       console.log('[AudioPlayer] Audio can play through');
       setIsLoading(false);
+      isInitializingRef.current = false; // Mark initialization as complete
       if (autoPlay && isCurrent && !hasStartedPlaying) {
         hasStartedPlaying = true;
         console.log('[AudioPlayer] Auto-playing audio');
@@ -110,6 +118,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
           hasStartedPlaying = true;
           console.log('[AudioPlayer] Forcing play after loadeddata (canplaythrough didnt fire)');
           setIsLoading(false);
+          isInitializingRef.current = false; // Mark initialization as complete
           audio.play().catch((err) => {
             if (err.name !== 'AbortError') {
               console.error('[AudioPlayer] Error force-playing audio:', err);
@@ -142,6 +151,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       if (!isCurrent) return;
       console.error('[AudioPlayer] Audio error:', e);
       setIsLoading(false);
+      isInitializingRef.current = false; // Reset on error
       setError('Error loading audio');
     };
 
@@ -150,8 +160,13 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
     audio.load();
     console.log('[AudioPlayer] Audio src set and load() called');
 
+    // Only update lastAudioUrlRef after we've started loading
+    // This prevents duplicate URL check from firing before audio loads
+    lastAudioUrlRef.current = audioUrl;
+
     return () => {
       isCurrent = false; // Mark this audio instance as stale
+      isInitializingRef.current = false; // Reset initialization flag
 
       if (internalAudioRef.current) {
         internalAudioRef.current.pause();
