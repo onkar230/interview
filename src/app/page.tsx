@@ -108,7 +108,7 @@ const CompanyLogo = ({ name }: { name: string }) => {
     // Tech/Software
     'Google': { Icon: SiGoogle, color: '#4285F4' },
     'Microsoft': { Icon: FaMicrosoft, color: '#00A4EF' },
-    'Apple': { Icon: SiApple, color: '#FFFFFF' },
+    'Apple': { Icon: SiApple, color: '#083d44' }, // Changed from white to dark teal for visibility
     'Amazon': { Icon: FaAmazon, color: '#FF9900' },
     'Netflix': { Icon: SiNetflix, color: '#E50914' },
     'Salesforce': { Icon: SiSalesforce, color: '#00A1E0' },
