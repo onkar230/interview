@@ -58,7 +58,7 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
     setIsLoading(true);
     setError(null);
 
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
     internalAudioRef.current = audio;
 
     // Also set external ref if provided so parent can control audio
@@ -68,19 +68,56 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
     // Flag to track if this audio instance is still current
     let isCurrent = true;
+    let hasStartedPlaying = false; // Track if we've already started playback
 
+    // Set up event handlers BEFORE setting src
     audio.oncanplaythrough = () => {
-      if (!isCurrent) return; // Ignore if this audio was replaced
+      if (!isCurrent) {
+        console.log('[AudioPlayer] oncanplaythrough fired but audio is stale, ignoring');
+        return;
+      }
+      console.log('[AudioPlayer] Audio can play through');
       setIsLoading(false);
-      if (autoPlay && isCurrent) {
+      if (autoPlay && isCurrent && !hasStartedPlaying) {
+        hasStartedPlaying = true;
+        console.log('[AudioPlayer] Auto-playing audio');
         audio.play().catch((err) => {
           // Silently ignore AbortError (expected when audio changes quickly)
           if (err.name !== 'AbortError') {
-            console.error('Error playing audio:', err);
+            console.error('[AudioPlayer] Error playing audio:', err);
             setError('Unable to play audio');
           }
         });
       }
+    };
+
+    audio.onloadstart = () => {
+      if (!isCurrent) return;
+      console.log('[AudioPlayer] Audio load started');
+    };
+
+    audio.onloadedmetadata = () => {
+      if (!isCurrent) return;
+      console.log('[AudioPlayer] Audio metadata loaded');
+    };
+
+    audio.onloadeddata = () => {
+      if (!isCurrent) return;
+      console.log('[AudioPlayer] Audio data loaded');
+      // If canplaythrough doesn't fire within 500ms, try to play anyway
+      setTimeout(() => {
+        if (isCurrent && !hasStartedPlaying && autoPlay) {
+          hasStartedPlaying = true;
+          console.log('[AudioPlayer] Forcing play after loadeddata (canplaythrough didnt fire)');
+          setIsLoading(false);
+          audio.play().catch((err) => {
+            if (err.name !== 'AbortError') {
+              console.error('[AudioPlayer] Error force-playing audio:', err);
+              setError('Unable to play audio');
+            }
+          });
+        }
+      }, 500);
     };
 
     audio.onplay = () => {
@@ -101,11 +138,17 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       }
     };
 
-    audio.onerror = () => {
+    audio.onerror = (e) => {
       if (!isCurrent) return;
+      console.error('[AudioPlayer] Audio error:', e);
       setIsLoading(false);
       setError('Error loading audio');
     };
+
+    // Set src and load AFTER all event handlers are attached
+    audio.src = audioUrl;
+    audio.load();
+    console.log('[AudioPlayer] Audio src set and load() called');
 
     return () => {
       isCurrent = false; // Mark this audio instance as stale
@@ -113,8 +156,11 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       if (internalAudioRef.current) {
         internalAudioRef.current.pause();
         internalAudioRef.current.currentTime = 0;
-        // Remove event listeners
+        // Remove all event listeners
         internalAudioRef.current.oncanplaythrough = null;
+        internalAudioRef.current.onloadstart = null;
+        internalAudioRef.current.onloadedmetadata = null;
+        internalAudioRef.current.onloadeddata = null;
         internalAudioRef.current.onplay = null;
         internalAudioRef.current.onpause = null;
         internalAudioRef.current.onended = null;
