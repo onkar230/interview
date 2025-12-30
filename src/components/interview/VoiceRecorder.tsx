@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Loader2 } from 'lucide-react';
+import { Play, Square, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VoiceRecorderProps {
@@ -147,7 +147,7 @@ export default function VoiceRecorder({ onRecordingComplete, isProcessing }: Voi
             {isProcessing ? (
               <Loader2 className="h-6 w-6 animate-spin" />
             ) : (
-              <Mic className="h-6 w-6" />
+              <Play className="h-6 w-6" />
             )}
           </Button>
         ) : (
