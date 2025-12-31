@@ -651,7 +651,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     <Button
                       onClick={handleSkipQuestion}
                       variant="outline"
-                      className="border-accent text-accent hover:bg-accent/10 backdrop-blur-sm flex-1"
+                      className="border-primary text-primary hover:bg-primary/10 backdrop-blur-sm flex-1"
                     >
                       ⤭ Skip This Question
                     </Button>
@@ -659,7 +659,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                       <Button
                         onClick={handleRedoAnswer}
                         variant="outline"
-                        className="border-orange-300 text-orange-300 hover:bg-orange-900/50 backdrop-blur-sm flex-1"
+                        className="border-amber-700 text-amber-700 hover:bg-amber-900/50 backdrop-blur-sm flex-1"
                       >
                         ↻ Redo Answer
                       </Button>
