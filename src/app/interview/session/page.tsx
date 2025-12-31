@@ -478,7 +478,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
   return (
     <div className="min-h-screen bg-primary flex flex-col">
       {/* Fullscreen Mode: Webcam background with overlay panels */}
-      <div className="flex-1 relative bg-black overflow-hidden">
+      <div className="flex-1 relative bg-primary overflow-hidden">
 
           {/* Fullscreen Webcam Background - Aligned with side panels */}
           <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
