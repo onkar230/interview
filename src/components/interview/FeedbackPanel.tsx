@@ -34,14 +34,14 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
           className="w-full flex items-center justify-between lg:cursor-default"
         >
           <div className="text-left">
-            <h2 className="text-sm font-semibold text-primary-foreground/80">Live Feedback</h2>
-            <p className="text-xs text-primary-foreground/60">Real-time analysis of your answers</p>
+            <h2 className="text-sm font-semibold text-card-foreground">Live Feedback</h2>
+            <p className="text-xs text-muted-foreground">Real-time analysis of your answers</p>
           </div>
           <div className="lg:hidden">
             {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-primary-foreground/80" />
+              <ChevronUp className="h-5 w-5 text-card-foreground" />
             ) : (
-              <ChevronDown className="h-5 w-5 text-primary-foreground/80" />
+              <ChevronDown className="h-5 w-5 text-card-foreground" />
             )}
           </div>
         </button>
@@ -65,10 +65,10 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
               <Lightbulb className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-primary-foreground/80 text-sm">
+            <p className="text-card-foreground text-sm">
               Waiting for your first answer...
               <br />
-              <span className="text-xs text-primary-foreground/60">
+              <span className="text-xs text-muted-foreground">
                 You'll see feedback here after each response
               </span>
             </p>
