@@ -26,9 +26,9 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Header - Collapsible on mobile */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border p-4">
+      <div className="flex-shrink-0 bg-card border-b border-border p-4">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between lg:cursor-default"

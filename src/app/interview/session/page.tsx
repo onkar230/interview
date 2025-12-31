@@ -581,7 +581,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Right Overlay: Feedback */}
-          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 overflow-y-auto">
+          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg overflow-hidden">
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}
