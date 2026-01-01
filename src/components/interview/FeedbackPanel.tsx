@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { marked } from 'marked';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, Loader2, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, Loader2, ChevronDown, ChevronUp, Plus, GraduationCap } from 'lucide-react';
 
 export interface FeedbackItem {
   questionNumber: number;
@@ -15,6 +16,7 @@ export interface FeedbackItem {
   threats: string[];
   suggestedImprovements: string[];
   timestamp: Date;
+  idealAnswer?: string;
 }
 
 interface FeedbackPanelProps {
@@ -24,6 +26,12 @@ interface FeedbackPanelProps {
 
 export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: FeedbackPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+
+  // Configure marked for safe rendering
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+  });
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -50,7 +58,7 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
       {/* Content - Collapsible on mobile */}
       <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${!isExpanded ? 'hidden lg:block' : ''}`}>
         {isAnalyzing && (
-          <Card className="border-accent/30 bg-accent/10">
+          <Card className="border-accent/30 bg-accent/10 shadow-lg">
             <CardContent className="py-4">
               <div className="flex items-center gap-3 text-primary">
                 <Loader2 className="h-5 w-5 animate-spin" />
@@ -76,7 +84,7 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
         )}
 
         {feedbackHistory.map((feedback, idx) => (
-          <Card key={idx} className="shadow-md bg-card border-border">
+          <Card key={idx} className="shadow-lg bg-card border-border">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-sm font-medium text-card-foreground">
@@ -184,6 +192,24 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Ideal Answer / Rubric */}
+              {feedback.idealAnswer && (
+                <div className="space-y-2 pt-3 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-blue-700" />
+                    <span className="text-xs font-semibold text-blue-800 uppercase tracking-wide">
+                      Ideal Answer & Rubric
+                    </span>
+                  </div>
+                  <div className="ml-6">
+                    <div
+                      className="prose prose-sm max-w-none text-sm text-card-foreground leading-relaxed [&>h1]:text-base [&>h1]:font-bold [&>h1]:mt-3 [&>h1]:mb-2 [&>h2]:text-sm [&>h2]:font-semibold [&>h2]:mt-2 [&>h2]:mb-1 [&>h3]:text-sm [&>h3]:font-medium [&>h3]:mt-2 [&>h3]:mb-1 [&>ul]:list-disc [&>ul]:ml-4 [&>ul]:space-y-1 [&>ol]:list-decimal [&>ol]:ml-4 [&>ol]:space-y-1 [&>p]:my-2 [&>strong]:font-semibold [&>em]:italic"
+                      dangerouslySetInnerHTML={{ __html: marked(feedback.idealAnswer) as string }}
+                    />
+                  </div>
                 </div>
               )}
             </CardContent>

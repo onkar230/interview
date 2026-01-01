@@ -533,7 +533,8 @@ export function generateInterviewPrompt(
   questionTypes?: string[],
   customQuestions?: string[],
   followUpIntensity?: 'none' | 'light' | 'moderate' | 'intensive',
-  questionCount?: number
+  questionCount?: number,
+  cvText?: string
 ): string {
   const industryConfig = INDUSTRY_PROMPTS[industry];
   const difficultyAdjustment = DIFFICULTY_ADJUSTMENTS[difficulty];
@@ -617,11 +618,46 @@ IMPORTANT: Prioritize these question types throughout the interview. While you c
   if (customQuestions && customQuestions.length > 0) {
     customQuestionsSection = `
 
-CANDIDATE'S CUSTOM QUESTIONS:
-The candidate has specifically requested to practice these questions:
-${customQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
+CANDIDATE'S CUSTOM QUESTIONS - MANDATORY TO ASK VERBATIM:
+The candidate has specifically requested to practice these EXACT questions. You MUST ask them WORD-FOR-WORD, exactly as written below:
 
-CRITICAL REQUIREMENT: You MUST ask ALL of these questions at some point during the interview. Integrate them naturally into the conversation flow. Don't ask them all at once - space them out throughout the interview. These are questions the candidate struggles with, so this is their chance to practice.`;
+${customQuestions.map((q, idx) => `${idx + 1}. "${q}"`).join('\n')}
+
+CRITICAL REQUIREMENTS:
+- You MUST ask ALL ${customQuestions.length} of these questions during the interview
+- Ask them EXACTLY as written - DO NOT rephrase, paraphrase, or modify the wording
+- Space them throughout the interview naturally - don't ask them all at once
+- You can ask follow-up questions after they answer, but the initial question MUST be verbatim
+- These are questions the candidate specifically wants to practice, so this is non-negotiable
+- Treat these as your PRIMARY questions - they take priority over any other questions you might generate
+
+EXAMPLE OF CORRECT USAGE:
+✓ CORRECT: Ask exactly: "${customQuestions[0]}"
+✗ WRONG: Paraphrasing to "Can you tell me about..." or "I'd like to hear about..."
+
+If you've asked all custom questions and still have interview time remaining, you can ask additional questions from your question bank.`;
+  }
+
+  // CV/Resume context section
+  let cvSection = '';
+  if (cvText && cvText.trim()) {
+    cvSection = `
+
+CANDIDATE'S CV/RESUME:
+The candidate has provided their CV. Here is the extracted text:
+
+${cvText.trim()}
+
+CRITICAL INSTRUCTIONS FOR USING THE CV:
+- Use this CV to ask highly personalized questions about their specific experience
+- Reference specific companies, roles, projects, and achievements mentioned in their CV
+- Probe claims on their CV: "I see you worked at [Company X] - tell me about your biggest project there"
+- Ask about gaps, job changes, or career progression: "Why did you move from X to Y?"
+- Challenge specific accomplishments: "You mentioned leading a team of 5 - describe a difficult leadership situation"
+- Test technical skills they claim: "Your CV says you're proficient in [Technology X] - how have you used it?"
+- This CV is YOUR GOLDMINE for personalized questions - use it extensively throughout the interview
+- Make the candidate defend and elaborate on everything they've written
+- IMPORTANT: Don't accept generic answers about things on their CV - dig deep with follow-ups`;
   }
 
   // Follow-up intensity configuration
@@ -756,6 +792,7 @@ PRESSURE TACTICS TO USE (apply naturally throughout):
 ${industryConfig.pressureTactics.map((tactic, idx) => `${idx + 1}. ${tactic}`).join('\n')}
 ${companySpecificSection}
 ${jobDescriptionSection}
+${cvSection}
 ${questionTypesSection}
 ${customQuestionsSection}
 ${followUpInstructions}

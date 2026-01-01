@@ -3,12 +3,18 @@
 import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import VoiceRecorder from '@/components/interview/VoiceRecorder';
 import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import { Industry, generateInterviewPrompt } from '@/lib/interview-prompts';
-import { Loader2, User, Bot, Camera, CameraOff } from 'lucide-react';
+import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -29,6 +35,7 @@ function InterviewSessionContent() {
   const customQuestionsParam = searchParams.get('customQuestions') || '';
   const followUpIntensity = (searchParams.get('followUpIntensity') as 'none' | 'light' | 'moderate' | 'intensive') || 'moderate';
   const maxQuestions = parseInt(searchParams.get('questionCount') || '10', 10);
+  const cvText = searchParams.get('cv') || '';
 
   // Parse question types from comma-separated string
   const questionTypes = questionTypesParam ? questionTypesParam.split(',') : [];
@@ -47,6 +54,7 @@ function InterviewSessionContent() {
   const [feedbackHistory, setFeedbackHistory] = useState<FeedbackItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
+  const [showIdealAnswers, setShowIdealAnswers] = useState(false); // Toggle for ideal answers
   const [streamingText, setStreamingText] = useState<string>('');
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
@@ -149,7 +157,8 @@ function InterviewSessionContent() {
           questionTypes,
           customQuestions,
           followUpIntensity,
-          maxQuestions
+          maxQuestions,
+          cvText
         );
 
         // Get streaming response
@@ -252,7 +261,8 @@ function InterviewSessionContent() {
         questionTypes,
         customQuestions,
         followUpIntensity,
-        maxQuestions
+        maxQuestions,
+        cvText
       );
       const conversationMessages = [
         { role: 'system', content: systemPrompt },
@@ -280,6 +290,31 @@ function InterviewSessionContent() {
           suggestedImprovements: feedbackData.suggestedImprovements || [],
           timestamp: new Date(),
         };
+
+        // Generate ideal answer if enabled
+        if (showIdealAnswers) {
+          try {
+            const idealAnswerResponse = await fetch('/api/interview/ideal-answer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                question: lastQuestion,
+                industry,
+                role,
+                difficulty,
+                company,
+              }),
+            });
+
+            if (idealAnswerResponse.ok) {
+              const { idealAnswer } = await idealAnswerResponse.json();
+              newFeedback.idealAnswer = idealAnswer;
+            }
+          } catch (error) {
+            console.error('Failed to generate ideal answer:', error);
+          }
+        }
+
         setFeedbackHistory((prev) => [newFeedback, ...prev]); // Newest at top
       } else {
         console.error('Failed to generate feedback');
@@ -374,7 +409,8 @@ function InterviewSessionContent() {
           questionTypes,
           customQuestions,
           followUpIntensity,
-          maxQuestions
+          maxQuestions,
+          cvText
         );
 
         const conversationMessages = [
@@ -462,6 +498,15 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
     }
   };
 
+  const handleGoHome = () => {
+    const confirmLeave = window.confirm(
+      'Are you sure you want to leave? Your interview progress will be lost.'
+    );
+    if (confirmLeave) {
+      router.push('/');
+    }
+  };
+
   if (!industry) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -483,7 +528,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           {/* Fullscreen Webcam Background - Aligned with side panels */}
           <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
             {showWebcam ? (
-              <div className="w-full h-full rounded-lg overflow-hidden">
+              <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30">
                 <WebcamMirror
                   isVisible={showWebcam}
                   onClose={() => setShowWebcam(false)}
@@ -492,27 +537,18 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 />
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-primary rounded-lg border border-primary/20">
+              <div className="w-full h-full flex items-center justify-center bg-primary rounded-lg border border-primary/30">
                 <div className="text-center">
-                  <CameraOff className="h-16 w-16 text-gray-600 mb-4 mx-auto" />
-                  <p className="text-gray-500 mb-4">Webcam is hidden</p>
-                  <Button
-                    onClick={() => setShowWebcam(true)}
-                    variant="outline"
-                    size="sm"
-                    className="border-slate-600 text-primary-foreground/80"
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Enable Webcam
-                  </Button>
+                  <CameraOff className="h-16 w-16 text-primary-foreground/40 mb-4 mx-auto" />
+                  <p className="text-primary-foreground/60">Webcam is hidden</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Left Overlay: Conversation */}
-          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 overflow-y-auto">
-            <h3 className="text-sm font-semibold text-primary-foreground/80 mb-4 sticky top-0 bg-primary/90 pb-2 border-b border-primary/20">
+          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg p-4 overflow-y-auto shadow-2xl">
+            <h3 className="text-sm font-semibold text-primary-foreground/90 mb-4 sticky top-0 bg-primary/95 pb-2 border-b border-primary/30">
               Interview Conversation
             </h3>
             <div className="space-y-4">
@@ -534,8 +570,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.role === 'user'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-primary/50 border border-primary/20 text-primary-foreground'
+                        ? 'bg-accent text-accent-foreground shadow-md'
+                        : 'bg-primary/50 border border-primary/20 text-primary-foreground shadow-md'
                     }`}
                   >
                     <p className="text-xs whitespace-pre-wrap">{message.content}</p>
@@ -558,7 +594,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                       <Bot className="h-5 w-5 text-accent" />
                     </div>
                   </div>
-                  <div className="max-w-[80%] rounded-lg p-3 bg-primary/50 border border-primary/20 text-primary-foreground">
+                  <div className="max-w-[80%] rounded-lg p-3 bg-primary/50 border border-primary/20 text-primary-foreground shadow-md">
                     <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
                     <span className="inline-block w-2 h-4 bg-accent ml-1 animate-pulse"></span>
                   </div>
@@ -581,7 +617,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Right Overlay: Feedback */}
-          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/90 backdrop-blur-sm border border-primary/20 rounded-lg overflow-hidden">
+          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg overflow-hidden shadow-2xl">
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}
@@ -591,36 +627,89 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           {/* Center Bottom: All Controls */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-3">
             {/* Top Row: Interview Controls */}
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-primary-foreground/80 bg-primary/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-primary/20">
-                Question {questionCount}/{maxQuestions}
+            <TooltipProvider>
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleGoHome}
+                      variant="outline"
+                      size="icon"
+                      className="bg-primary/95 backdrop-blur-md border-primary/30 text-primary-foreground/90 hover:bg-secondary hover:text-primary-foreground shadow-lg"
+                    >
+                      <Home className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Back to home</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <div className="text-xs text-primary-foreground/90 bg-primary/95 backdrop-blur-md px-3 py-2 rounded-lg border border-primary/30 shadow-lg">
+                  Question {questionCount}/{maxQuestions}
+                </div>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => setShowWebcam(!showWebcam)}
+                      variant="outline"
+                      size="icon"
+                      className="bg-primary/95 backdrop-blur-md border-primary/30 text-primary-foreground/90 hover:bg-secondary hover:text-primary-foreground shadow-lg"
+                    >
+                      {showWebcam ? (
+                        <Camera className="h-4 w-4" />
+                      ) : (
+                        <CameraOff className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{showWebcam ? 'Hide webcam' : 'Show webcam'}</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => setShowIdealAnswers(!showIdealAnswers)}
+                      variant="outline"
+                      size="icon"
+                      className={`backdrop-blur-md border-primary/30 hover:bg-secondary hover:text-primary-foreground shadow-lg ${
+                        showIdealAnswers
+                          ? 'bg-blue-600/90 text-white'
+                          : 'bg-primary/95 text-primary-foreground/90'
+                      }`}
+                    >
+                      <GraduationCap className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{showIdealAnswers ? 'Hide ideal answers' : 'Show ideal answers & rubric after each question'}</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleEndInterview}
+                      variant="outline"
+                      disabled={isProcessing}
+                      className="bg-primary/95 backdrop-blur-md border-primary/30 text-primary-foreground/90 hover:bg-secondary hover:text-primary-foreground text-xs px-3 shadow-lg"
+                    >
+                      End Interview
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Finish interview and get evaluation report</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
-              <Button
-                onClick={() => setShowWebcam(!showWebcam)}
-                variant="outline"
-                size="icon"
-                title={showWebcam ? "Hide webcam" : "Show webcam"}
-                className="bg-primary/90 backdrop-blur-sm border-primary/20 text-primary-foreground/80 hover:bg-secondary hover:text-primary-foreground"
-              >
-                {showWebcam ? (
-                  <Camera className="h-4 w-4" />
-                ) : (
-                  <CameraOff className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                onClick={handleEndInterview}
-                variant="outline"
-                disabled={isProcessing}
-                className="bg-primary/90 backdrop-blur-sm border-primary/20 text-primary-foreground/80 hover:bg-secondary hover:text-primary-foreground text-xs px-3"
-              >
-                End Interview
-              </Button>
-            </div>
+            </TooltipProvider>
 
             {/* Error Messages */}
             {error && (
-              <div className="bg-red-900/90 backdrop-blur-sm border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+              <div className="bg-red-900/90 backdrop-blur-md border border-red-500/50 rounded-lg p-3 text-red-400 text-sm shadow-lg">
                 {error}
               </div>
             )}
@@ -639,7 +728,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             {/* Voice Recorder and Action Buttons */}
             {!isProcessing && currentAudioUrl === null && (
               <div className="space-y-3">
-                <div className="bg-primary/90 backdrop-blur-sm rounded-lg shadow-lg p-4 border border-primary/20">
+                <div className="bg-card backdrop-blur-md rounded-lg shadow-xl p-4 border border-border">
                   <VoiceRecorder
                     onRecordingComplete={handleRecordingComplete}
                     isProcessing={isProcessing}
@@ -651,7 +740,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     <Button
                       onClick={handleSkipQuestion}
                       variant="outline"
-                      className="border-primary text-primary hover:bg-primary/10 backdrop-blur-sm flex-1"
+                      className="border-primary text-primary hover:bg-primary/10 backdrop-blur-md flex-1 shadow-md bg-background/80"
                     >
                       ⤭ Skip This Question
                     </Button>
@@ -659,7 +748,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                       <Button
                         onClick={handleRedoAnswer}
                         variant="outline"
-                        className="border-amber-700 text-amber-700 hover:bg-amber-900/50 backdrop-blur-sm flex-1"
+                        className="border-amber-700 text-amber-700 hover:bg-amber-900/50 backdrop-blur-md flex-1 shadow-md bg-background/80"
                       >
                         ↻ Redo Answer
                       </Button>

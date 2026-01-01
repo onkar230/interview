@@ -16,6 +16,7 @@ type WebcamSize = 'small' | 'medium' | 'large';
 
 export default function WebcamMirror({ isVisible, onClose, mode = 'floating', size: initialSize = 'medium' }: WebcamMirrorProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [status, setStatus] = useState<WebcamStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -49,8 +50,13 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
   useEffect(() => {
     if (!isVisible) {
       // Clean up stream when hidden
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        console.log('Stopping camera - webcam hidden');
+        streamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log('Track stopped:', track.kind, track.label);
+        });
+        streamRef.current = null;
         setStream(null);
       }
       setStatus('loading');
@@ -70,8 +76,16 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
         }
       })
       .then(mediaStream => {
-        setStream(mediaStream);
-        setStatus('active');
+        // Only set stream if still visible (avoid race condition)
+        if (isVisible) {
+          streamRef.current = mediaStream;
+          console.log('Camera started:', mediaStream.getVideoTracks()[0]?.label);
+          setStream(mediaStream);
+          setStatus('active');
+        } else {
+          // If became invisible while waiting for camera, stop it immediately
+          mediaStream.getTracks().forEach(track => track.stop());
+        }
       })
       .catch(err => {
         console.error('Camera error:', err);
@@ -92,10 +106,15 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
         }
       });
 
-    // Cleanup on unmount
+    // Cleanup on unmount or when isVisible changes
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        console.log('Cleanup: Stopping camera tracks');
+        streamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log('Cleanup: Track stopped:', track.kind);
+        });
+        streamRef.current = null;
       }
     };
   }, [isVisible]);
@@ -123,7 +142,20 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
             console.error('Error playing video:', err);
           });
       }
+    } else if (!stream && videoRef.current) {
+      // Clear video source when stream is null
+      console.log('Clearing video srcObject');
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
     }
+
+    return () => {
+      // Cleanup video element on unmount
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.srcObject = null;
+      }
+    };
   }, [stream, status]);
 
   const handleSizeChange = (newSize: WebcamSize) => {
@@ -189,14 +221,6 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
               </div>
             )}
 
-            {/* Privacy Notice Overlay */}
-            {status === 'active' && (
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white py-3 px-4">
-                <p className="text-sm text-center font-medium">
-                  Your video is never recorded or transmitted - This is for practice only
-                </p>
-              </div>
-            )}
 
             {/* Status Indicator */}
             <div className="absolute top-3 right-3">
@@ -324,14 +348,6 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
           </div>
         )}
 
-        {/* Privacy Notice Overlay */}
-        {status === 'active' && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
-            <p className="text-xs text-center">
-              Your video is never recorded or transmitted
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Footer Controls */}

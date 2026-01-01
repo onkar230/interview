@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Loader2, Shield } from 'lucide-react';
+import { ArrowLeft, Loader2, Shield, Upload, FileText, X } from 'lucide-react';
 import { Industry, Difficulty } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
 
@@ -71,6 +71,10 @@ function ConfigureInterviewContent() {
     company?: string;
     role?: string;
   }>({});
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvText, setCvText] = useState('');
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
+  const [cvError, setCvError] = useState('');
 
   const suggestions = industry ? INDUSTRY_SUGGESTIONS[industry] : null;
 
@@ -80,6 +84,52 @@ function ConfigureInterviewContent() {
         ? prev.filter((t) => t !== type)
         : [...prev, type]
     );
+  };
+
+  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setCvError('File size must be less than 10MB');
+      return;
+    }
+
+    setCvFile(file);
+    setCvError('');
+    setIsUploadingCv(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/interview/parse-cv', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to parse CV');
+      }
+
+      setCvText(data.text);
+      setIsUploadingCv(false);
+    } catch (error) {
+      console.error('CV upload error:', error);
+      setCvError(error instanceof Error ? error.message : 'Failed to parse CV');
+      setCvFile(null);
+      setCvText('');
+      setIsUploadingCv(false);
+    }
+  };
+
+  const handleRemoveCv = () => {
+    setCvFile(null);
+    setCvText('');
+    setCvError('');
   };
 
   const validateForm = (): boolean => {
@@ -139,6 +189,11 @@ function ConfigureInterviewContent() {
 
     // Add question count
     params.append('questionCount', questionCount.toString());
+
+    // Add CV text if available
+    if (cvText.trim()) {
+      params.append('cv', cvText.trim().slice(0, 8000)); // Limit to 8000 chars
+    }
 
     router.push(`/interview/session?${params.toString()}`);
   };
@@ -206,23 +261,6 @@ function ConfigureInterviewContent() {
               {errors.company && (
                 <p className="mt-1 text-sm text-red-600">{errors.company}</p>
               )}
-              {suggestions && (
-                <div className="mt-2">
-                  <p className="text-xs text-muted-foreground mb-2">Popular companies for {industry}:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestions.companies.map((companyName) => (
-                      <button
-                        key={companyName}
-                        type="button"
-                        onClick={() => setCompany(companyName)}
-                        className="px-3 py-1 text-xs rounded-full border border-border bg-muted text-muted-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors"
-                      >
-                        {companyName}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Role/Position */}
@@ -245,23 +283,6 @@ function ConfigureInterviewContent() {
               />
               {errors.role && (
                 <p className="mt-1 text-sm text-red-600">{errors.role}</p>
-              )}
-              {suggestions && (
-                <div className="mt-2">
-                  <p className="text-xs text-muted-foreground mb-2">Common roles for {industry}:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestions.roles.map((roleName) => (
-                      <button
-                        key={roleName}
-                        type="button"
-                        onClick={() => setRole(roleName)}
-                        className="px-3 py-1 text-xs rounded-full border border-border bg-muted text-muted-foreground hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors"
-                      >
-                        {roleName}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               )}
             </div>
 
@@ -345,6 +366,84 @@ function ConfigureInterviewContent() {
               <p className="mt-1 text-sm text-muted-foreground">
                 {jobDescription.length}/2000 characters
               </p>
+            </div>
+
+            {/* CV Upload (Optional) */}
+            <div>
+              <label
+                htmlFor="cvUpload"
+                className="block text-sm font-medium text-muted-foreground mb-2"
+              >
+                Upload Your CV/Resume (Optional)
+              </label>
+              <p className="text-xs text-muted-foreground mb-3">
+                Upload your CV to get more personalized questions based on your experience. Supports PDF, DOCX, and images.
+              </p>
+
+              {!cvFile ? (
+                <div className="relative">
+                  <input
+                    id="cvUpload"
+                    type="file"
+                    accept=".pdf,.doc,.docx,image/*"
+                    onChange={handleCvUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="cvUpload"
+                    className="flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors bg-muted"
+                  >
+                    <Upload className="h-6 w-6 text-muted-foreground" />
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-card-foreground">
+                        Click to upload your CV
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        PDF, DOCX, or image (max 10MB)
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              ) : (
+                <div className="p-4 border border-border rounded-lg bg-primary/5">
+                  {isUploadingCv ? (
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-card-foreground">
+                          Analyzing your CV...
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          This may take a few seconds
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-3">
+                      <FileText className="h-5 w-5 text-primary mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-card-foreground">
+                          {cvFile.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {(cvFile.size / 1024).toFixed(1)} KB • {cvText.length} characters extracted
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveCv}
+                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                      >
+                        <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {cvError && (
+                <p className="mt-2 text-sm text-red-600">{cvError}</p>
+              )}
             </div>
 
             {/* Question Types */}

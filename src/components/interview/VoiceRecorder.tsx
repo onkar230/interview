@@ -166,7 +166,7 @@ export default function VoiceRecorder({ onRecordingComplete, isProcessing }: Voi
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-red-600 animate-pulse" />
-            <span className="text-sm font-medium text-primary-foreground">Recording: {formatTime(recordingTime)}</span>
+            <span className="text-sm font-medium text-foreground">Recording: {formatTime(recordingTime)}</span>
           </div>
 
           {/* Audio level visualization */}
@@ -180,13 +180,13 @@ export default function VoiceRecorder({ onRecordingComplete, isProcessing }: Voi
       )}
 
       {isProcessing && (
-        <p className="text-sm text-primary-foreground/80">Processing your response...</p>
+        <p className="text-sm text-muted-foreground">Processing your response...</p>
       )}
 
       {!isRecording && !isProcessing && (
         <div className="text-center">
-          <p className="text-sm font-medium text-primary-foreground mb-1">Click to record your answer</p>
-          <p className="text-xs text-primary-foreground/70">Aim for 30-90 seconds. Click the stop button when finished.</p>
+          <p className="text-sm font-medium text-foreground mb-1">Click to record your answer</p>
+          <p className="text-xs text-muted-foreground">Aim for 30-90 seconds. Click the stop button when finished.</p>
         </div>
       )}
     </div>
