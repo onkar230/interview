@@ -31,8 +31,10 @@ const INDUSTRY_ICONS = {
 export default function SelectIndustryPage() {
   const router = useRouter();
 
-  // Focus on high-ROI industries for students/entry-level candidates
-  const AVAILABLE_INDUSTRIES: Industry[] = ['technology', 'engineering', 'finance', 'law'];
+  // Currently showing only Technology and Law (other industries hidden for now)
+  const AVAILABLE_INDUSTRIES: Industry[] = ['technology', 'law'];
+
+  // Hidden industries (can be re-enabled later): 'engineering', 'finance', 'healthcare', 'marketing', 'sales', 'consulting', 'education'
 
   const handleIndustrySelect = (industry: Industry) => {
     router.push(`/interview/configure?industry=${industry}`);
@@ -53,7 +55,7 @@ export default function SelectIndustryPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {AVAILABLE_INDUSTRIES.map((industry) => {
             const config = INDUSTRY_PROMPTS[industry];
             const Icon = INDUSTRY_ICONS[industry];

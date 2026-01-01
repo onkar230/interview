@@ -13,6 +13,7 @@ import VoiceRecorder from '@/components/interview/VoiceRecorder';
 import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
+import PerformanceScore from '@/components/interview/PerformanceScore';
 import { Industry, generateInterviewPrompt } from '@/lib/interview-prompts';
 import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap } from 'lucide-react';
 
@@ -59,16 +60,45 @@ function InterviewSessionContent() {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
 
+  // Performance scoring state
+  const [cumulativeScores, setCumulativeScores] = useState({
+    communication: [] as number[],
+    technicalKnowledge: [] as number[],
+    problemSolving: [] as number[],
+    relevantExperience: [] as number[],
+  });
+
+  // Calculate average scores
+  const calculateAverage = (scores: number[]) => {
+    if (scores.length === 0) return 0;
+    return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+  };
+
+  const currentScores = {
+    communication: calculateAverage(cumulativeScores.communication),
+    technicalKnowledge: calculateAverage(cumulativeScores.technicalKnowledge),
+    problemSolving: calculateAverage(cumulativeScores.problemSolving),
+    relevantExperience: calculateAverage(cumulativeScores.relevantExperience),
+  };
+
+  const overallScore = (
+    currentScores.communication +
+    currentScores.technicalKnowledge +
+    currentScores.problemSolving +
+    currentScores.relevantExperience
+  ) / 4;
+
   // Memoized callback to prevent AudioPlayer from re-playing on every render
   const handleAudioPlaybackEnd = useCallback(() => {
     console.log('Audio playback ended, clearing audio URL');
     setCurrentAudioUrl(null);
   }, []);
 
-  // Helper function to handle streaming responses from GPT-4
+  // Helper function to handle streaming responses from GPT-4 with optimistic UI
   const fetchStreamingResponse = async (
     conversationMessages: Array<{ role: string; content: string }>,
-    currentQuestionCount: number
+    currentQuestionCount: number,
+    onStreamUpdate?: (text: string) => void
   ): Promise<{ response: string; shouldEnd: boolean }> => {
     const response = await fetch('/api/interview/message', {
       method: 'POST',
@@ -111,7 +141,10 @@ function InterviewSessionContent() {
             const parsed = JSON.parse(data);
             if (parsed.content) {
               fullResponse += parsed.content;
-              setStreamingText(fullResponse); // Update UI in real-time
+              // Call callback to update UI optimistically
+              if (onStreamUpdate) {
+                onStreamUpdate(fullResponse);
+              }
             }
           } catch (e) {
             // Skip invalid JSON
@@ -119,9 +152,6 @@ function InterviewSessionContent() {
         }
       }
     }
-
-    // Clear streaming text once done
-    setStreamingText('');
 
     // Get metadata from headers
     const shouldEnd = response.headers.get('X-Should-End') === 'true';
@@ -161,37 +191,59 @@ function InterviewSessionContent() {
           cvText
         );
 
-        // Get streaming response
+        // Add optimistic message immediately
+        const optimisticMessage: Message = {
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+        };
+        setMessages([optimisticMessage]);
+
+        // Get streaming response with optimistic UI
         const { response: aiResponse } = await fetchStreamingResponse(
           [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: 'Start the interview with an introduction and your first question.' }
           ],
-          0
+          0,
+          (streamingText) => {
+            // Update message as text streams in
+            setMessages([{
+              role: 'assistant',
+              content: streamingText,
+              timestamp: new Date(),
+            }]);
+          }
         );
 
-        console.log('Got AI response, generating TTS...');
-        // Get TTS for opening question
-        const ttsResponse = await fetch('/api/interview/tts', {
+        console.log('Got AI response, generating TTS in background...');
+
+        // Generate TTS in background (non-blocking)
+        fetch('/api/interview/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: aiResponse }),
+        }).then(async (ttsResponse) => {
+          if (ttsResponse.ok) {
+            const audioBlob = await ttsResponse.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            console.log('Initial TTS ready, auto-playing...');
+
+            // Update message with audio
+            setMessages([{
+              role: 'assistant',
+              content: aiResponse,
+              audioUrl,
+              timestamp: new Date(),
+            }]);
+
+            // Auto-play
+            setCurrentAudioUrl(audioUrl);
+          }
+        }).catch((err) => {
+          console.error('Initial TTS failed:', err);
         });
 
-        if (ttsResponse.ok) {
-          const audioBlob = await ttsResponse.blob();
-          const audioUrl = URL.createObjectURL(audioBlob);
-          console.log('Setting initial audio URL');
-          setCurrentAudioUrl(audioUrl);
-        }
-
-        setMessages([
-          {
-            role: 'assistant',
-            content: aiResponse,
-            timestamp: new Date(),
-          },
-        ]);
         setQuestionCount(1);
         setIsInitialized(true);
         console.log('Interview initialized successfully');
@@ -210,6 +262,14 @@ function InterviewSessionContent() {
     setIsProcessing(true);
     setError(null);
     setCurrentAudioUrl(null);
+
+    // LATENCY MASKING: Show immediate "thinking" response
+    const thinkingMessage: Message = {
+      role: 'assistant',
+      content: '...',
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, thinkingMessage]);
 
     try {
       // Step 1: Transcribe audio
@@ -251,7 +311,7 @@ function InterviewSessionContent() {
         }),
       });
 
-      // Step 3: Generate AI response (in parallel)
+      // Step 3: Generate AI response with optimistic UI
       const systemPrompt = generateInterviewPrompt(
         industry,
         role,
@@ -270,10 +330,26 @@ function InterviewSessionContent() {
         { role: 'user', content: text },
       ];
 
+      // Replace thinking indicator with streaming content
+      // (thinking message was already added at the start of handleRecordingComplete)
+
       // Start feedback and streaming response in parallel
       const [feedbackResponse, streamingResult] = await Promise.all([
         feedbackPromise,
-        fetchStreamingResponse(conversationMessages, questionCount),
+        fetchStreamingResponse(conversationMessages, questionCount, (streamingText) => {
+          // Update the optimistic message as text streams in
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastIndex = updated.length - 1;
+            if (updated[lastIndex]?.role === 'assistant') {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                content: streamingText,
+              };
+            }
+            return updated;
+          });
+        }),
       ]);
 
       // Process feedback
@@ -290,6 +366,16 @@ function InterviewSessionContent() {
           suggestedImprovements: feedbackData.suggestedImprovements || [],
           timestamp: new Date(),
         };
+
+        // Update cumulative scores
+        if (feedbackData.scores) {
+          setCumulativeScores(prev => ({
+            communication: [...prev.communication, feedbackData.scores.communication],
+            technicalKnowledge: [...prev.technicalKnowledge, feedbackData.scores.technicalKnowledge],
+            problemSolving: [...prev.problemSolving, feedbackData.scores.problemSolving],
+            relevantExperience: [...prev.relevantExperience, feedbackData.scores.relevantExperience],
+          }));
+        }
 
         // Generate ideal answer if enabled
         if (showIdealAnswers) {
@@ -323,29 +409,39 @@ function InterviewSessionContent() {
 
       const { response: aiResponse, shouldEnd } = streamingResult;
 
-      // Step 4: Generate TTS for AI response
-      const ttsResponse = await fetch('/api/interview/tts', {
+      // Step 4: Generate TTS for AI response (in background while user reads text)
+      // Don't await - let TTS generate while user reads the text
+      const ttsPromise = fetch('/api/interview/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: aiResponse }),
+      }).then(async (ttsResponse) => {
+        if (ttsResponse.ok) {
+          const audioBlob = await ttsResponse.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          console.log('[handleRecordingComplete] TTS ready, setting audio URL');
+
+          // Update the message with audio URL
+          setMessages((prev) => {
+            const updated = [...prev];
+            const lastIndex = updated.length - 1;
+            if (updated[lastIndex]?.role === 'assistant') {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                audioUrl,
+              };
+            }
+            return updated;
+          });
+
+          // Auto-play the audio
+          setCurrentAudioUrl(audioUrl);
+        }
+      }).catch((err) => {
+        console.error('TTS generation failed:', err);
+        // Text is already showing, so this is non-critical
       });
 
-      let audioUrl = null;
-      if (ttsResponse.ok) {
-        const audioBlob = await ttsResponse.blob();
-        audioUrl = URL.createObjectURL(audioBlob);
-        console.log('[handleRecordingComplete] Setting audio URL:', audioUrl.substring(0, 50));
-        setCurrentAudioUrl(audioUrl);
-      }
-
-      // Add assistant message to conversation
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: aiResponse,
-        audioUrl: audioUrl || undefined,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
       setQuestionCount((prev) => prev + 1);
 
       // Check if interview should end
@@ -372,6 +468,13 @@ function InterviewSessionContent() {
       setQuestionCount((prev) => Math.max(1, prev - 1));
       // Remove the latest feedback item
       setFeedbackHistory((prev) => prev.slice(1));
+      // Remove the latest scores
+      setCumulativeScores((prev) => ({
+        communication: prev.communication.slice(0, -1),
+        technicalKnowledge: prev.technicalKnowledge.slice(0, -1),
+        problemSolving: prev.problemSolving.slice(0, -1),
+        relevantExperience: prev.relevantExperience.slice(0, -1),
+      }));
       // Clear any errors
       setError(null);
     }
@@ -424,32 +527,64 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           },
         ];
 
-        // Get streaming response for new question
-        const { response: aiResponse } = await fetchStreamingResponse(conversationMessages, questionCount);
+        // Add optimistic message for new question
+        const optimisticMessage: Message = {
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, optimisticMessage]);
 
-        // Generate TTS for new question
-        const ttsResponse = await fetch('/api/interview/tts', {
+        // Get streaming response for new question with optimistic UI
+        const { response: aiResponse } = await fetchStreamingResponse(
+          conversationMessages,
+          questionCount,
+          (streamingText) => {
+            // Update message as text streams in
+            setMessages((prev) => {
+              const updated = [...prev];
+              const lastIndex = updated.length - 1;
+              if (updated[lastIndex]?.role === 'assistant') {
+                updated[lastIndex] = {
+                  ...updated[lastIndex],
+                  content: streamingText,
+                };
+              }
+              return updated;
+            });
+          }
+        );
+
+        // Generate TTS in background (non-blocking)
+        fetch('/api/interview/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: aiResponse }),
+        }).then(async (ttsResponse) => {
+          if (ttsResponse.ok) {
+            const audioBlob = await ttsResponse.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            console.log('[handleSkipQuestion] TTS ready');
+
+            // Update message with audio
+            setMessages((prev) => {
+              const updated = [...prev];
+              const lastIndex = updated.length - 1;
+              if (updated[lastIndex]?.role === 'assistant') {
+                updated[lastIndex] = {
+                  ...updated[lastIndex],
+                  audioUrl,
+                };
+              }
+              return updated;
+            });
+
+            // Auto-play
+            setCurrentAudioUrl(audioUrl);
+          }
+        }).catch((err) => {
+          console.error('Skip question TTS failed:', err);
         });
-
-        let audioUrl = null;
-        if (ttsResponse.ok) {
-          const audioBlob = await ttsResponse.blob();
-          audioUrl = URL.createObjectURL(audioBlob);
-          console.log('[handleSkipQuestion] Setting audio URL:', audioUrl.substring(0, 50));
-          setCurrentAudioUrl(audioUrl);
-        }
-
-        // Add new assistant message
-        const newMessage: Message = {
-          role: 'assistant',
-          content: aiResponse,
-          audioUrl: audioUrl || undefined,
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, newMessage]);
 
       } catch (err) {
         console.error('Error skipping question:', err);
@@ -706,6 +841,15 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 </Tooltip>
               </div>
             </TooltipProvider>
+
+            {/* Performance Score Display */}
+            {cumulativeScores.communication.length > 0 && (
+              <PerformanceScore
+                overallScore={overallScore}
+                categoryScores={currentScores}
+                answersCount={cumulativeScores.communication.length}
+              />
+            )}
 
             {/* Error Messages */}
             {error && (

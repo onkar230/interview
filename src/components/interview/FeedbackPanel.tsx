@@ -70,13 +70,13 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
         {feedbackHistory.length === 0 && !isAnalyzing && (
           <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-              <Lightbulb className="h-8 w-8 text-muted-foreground" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-foreground/10 mb-4">
+              <Lightbulb className="h-8 w-8 text-primary-foreground/60" />
             </div>
-            <p className="text-card-foreground text-sm">
+            <p className="text-primary-foreground/90 text-sm">
               Waiting for your first answer...
               <br />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-primary-foreground/60">
                 You'll see feedback here after each response
               </span>
             </p>
@@ -99,19 +99,19 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-5">
               {/* Strengths */}
               {feedback.strengths.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-700" />
-                    <span className="text-xs font-semibold text-green-800 uppercase tracking-wide">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-5 w-5 text-green-900 dark:text-green-400" />
+                    <span className="text-sm font-bold text-green-900 dark:text-green-300 uppercase tracking-wide">
                       Strengths
                     </span>
                   </div>
-                  <ul className="space-y-1 ml-6">
+                  <ul className="space-y-2 ml-7">
                     {feedback.strengths.map((strength, i) => (
-                      <li key={i} className="text-sm text-card-foreground list-disc">
+                      <li key={i} className="text-sm text-foreground list-disc leading-relaxed">
                         {strength}
                       </li>
                     ))}
@@ -121,16 +121,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Weaknesses */}
               {feedback.weaknesses.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-700" />
-                    <span className="text-xs font-semibold text-amber-800 uppercase tracking-wide">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <AlertTriangle className="h-5 w-5 text-amber-900 dark:text-amber-400" />
+                    <span className="text-sm font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wide">
                       Areas to Improve
                     </span>
                   </div>
-                  <ul className="space-y-1 ml-6">
+                  <ul className="space-y-2 ml-7">
                     {feedback.weaknesses.map((weakness, i) => (
-                      <li key={i} className="text-sm text-card-foreground list-disc">
+                      <li key={i} className="text-sm text-foreground list-disc leading-relaxed">
                         {weakness}
                       </li>
                     ))}
@@ -140,16 +140,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Suggested Improvements */}
               {feedback.suggestedImprovements && feedback.suggestedImprovements.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-secondary" />
-                    <span className="text-xs font-semibold text-secondary uppercase tracking-wide">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <Plus className="h-5 w-5 text-blue-900 dark:text-blue-400" />
+                    <span className="text-sm font-bold text-blue-900 dark:text-blue-300 uppercase tracking-wide">
                       What to Add Next Time
                     </span>
                   </div>
-                  <ul className="space-y-1 ml-6">
+                  <ul className="space-y-2 ml-7">
                     {feedback.suggestedImprovements.map((suggestion, i) => (
-                      <li key={i} className="text-sm text-card-foreground list-disc">
+                      <li key={i} className="text-sm text-foreground list-disc leading-relaxed">
                         {suggestion}
                       </li>
                     ))}
@@ -159,16 +159,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Opportunities */}
               {feedback.opportunities.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <Lightbulb className="h-5 w-5 text-purple-900 dark:text-purple-400" />
+                    <span className="text-sm font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wide">
                       Missed Opportunities
                     </span>
                   </div>
-                  <ul className="space-y-1 ml-6">
+                  <ul className="space-y-2 ml-7">
                     {feedback.opportunities.map((opportunity, i) => (
-                      <li key={i} className="text-sm text-card-foreground list-disc">
+                      <li key={i} className="text-sm text-foreground list-disc leading-relaxed">
                         {opportunity}
                       </li>
                     ))}
@@ -178,16 +178,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Threats */}
               {feedback.threats.length > 0 && (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-700" />
-                    <span className="text-xs font-semibold text-red-800 uppercase tracking-wide">
+                <div className="space-y-2.5 p-3 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-900 dark:border-red-400 rounded-r">
+                  <div className="flex items-center gap-2.5">
+                    <AlertCircle className="h-5 w-5 text-red-900 dark:text-red-400" />
+                    <span className="text-sm font-bold text-red-900 dark:text-red-300 uppercase tracking-wide">
                       Red Flags
                     </span>
                   </div>
-                  <ul className="space-y-1 ml-6">
+                  <ul className="space-y-2 ml-7">
                     {feedback.threats.map((threat, i) => (
-                      <li key={i} className="text-sm text-red-800 list-disc font-medium">
+                      <li key={i} className="text-sm text-red-950 dark:text-red-200 list-disc font-semibold leading-relaxed">
                         {threat}
                       </li>
                     ))}
@@ -197,16 +197,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Ideal Answer / Rubric */}
               {feedback.idealAnswer && (
-                <div className="space-y-2 pt-3 border-t border-border/50">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-blue-700" />
-                    <span className="text-xs font-semibold text-blue-800 uppercase tracking-wide">
+                <div className="space-y-2.5 pt-4 border-t-2 border-border">
+                  <div className="flex items-center gap-2.5">
+                    <GraduationCap className="h-5 w-5 text-indigo-900 dark:text-indigo-400" />
+                    <span className="text-sm font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wide">
                       Ideal Answer & Rubric
                     </span>
                   </div>
-                  <div className="ml-6">
+                  <div className="ml-7">
                     <div
-                      className="prose prose-sm max-w-none text-sm text-card-foreground leading-relaxed [&>h1]:text-base [&>h1]:font-bold [&>h1]:mt-3 [&>h1]:mb-2 [&>h2]:text-sm [&>h2]:font-semibold [&>h2]:mt-2 [&>h2]:mb-1 [&>h3]:text-sm [&>h3]:font-medium [&>h3]:mt-2 [&>h3]:mb-1 [&>ul]:list-disc [&>ul]:ml-4 [&>ul]:space-y-1 [&>ol]:list-decimal [&>ol]:ml-4 [&>ol]:space-y-1 [&>p]:my-2 [&>strong]:font-semibold [&>em]:italic"
+                      className="prose prose-sm max-w-none text-sm text-foreground leading-relaxed [&>h1]:text-base [&>h1]:font-bold [&>h1]:mt-4 [&>h1]:mb-2 [&>h1]:text-foreground [&>h2]:text-sm [&>h2]:font-bold [&>h2]:mt-3 [&>h2]:mb-2 [&>h2]:text-foreground [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mt-2 [&>h3]:mb-1.5 [&>h3]:text-foreground [&>ul]:list-disc [&>ul]:ml-4 [&>ul]:space-y-2 [&>ul]:text-foreground [&>ol]:list-decimal [&>ol]:ml-4 [&>ol]:space-y-2 [&>ol]:text-foreground [&>p]:my-2.5 [&>p]:text-foreground [&>strong]:font-bold [&>strong]:text-foreground [&>em]:italic [&>li]:text-foreground"
                       dangerouslySetInnerHTML={{ __html: marked(feedback.idealAnswer) as string }}
                     />
                   </div>

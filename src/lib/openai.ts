@@ -190,6 +190,12 @@ export async function analyzeAnswer(params: {
   opportunities: string[];
   threats: string[];
   suggestedImprovements: string[];
+  scores: {
+    communication: number;
+    technicalKnowledge: number;
+    problemSolving: number;
+    relevantExperience: number;
+  };
 }> {
   const client = getOpenAIClient();
   const { question, answer, industry, conversationHistory } = params;
@@ -204,6 +210,42 @@ export async function analyzeAnswer(params: {
     ? `\n\nPrevious conversation context:\n${conversationHistory.slice(-4).map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}`
     : '';
 
+  // Industry-specific analysis instructions
+  const industrySpecificInstructions = industry === 'law'
+    ? `
+CRITICAL - LAW FIRM SPECIFIC ANALYSIS:
+- Focus on: Commercial awareness, structured thinking (STAR method), professional communication
+- Assess whether they demonstrated knowledge of the legal market, firms, or deals
+- Check for ethical awareness and professional standards (SRA Code of Conduct)
+- Evaluate use of structure: "Firstly... Secondly... Finally..."
+- DO NOT assess technical coding accuracy - this is a law interview
+- British English and legal terminology expected
+
+FATAL ERRORS TO FLAG IN THREATS:
+✗ Generic firm praise without specifics ("You're prestigious")
+✗ Unethical suggestions (hiding evidence, lying to clients, following unethical instructions)
+✗ Purely prestige-based motivation without genuine interest in law
+✗ No commercial understanding (can't connect news to legal services)
+`
+    : industry === 'technology'
+    ? `
+CRITICAL - TECH INTERVIEW SPECIFIC ANALYSIS:
+- Focus on: Technical accuracy, algorithmic thinking, system design principles, communication clarity
+- If they described an algorithm/data structure, assess Big O complexity understanding
+- For entry-level: Focus on OOP, data structures, NOT distributed systems
+- For senior: Assess scalability, architecture decisions, distributed systems knowledge
+- Evaluate their ability to EXPLAIN technical concepts verbally (this is voice-based)
+- DO NOT assess commercial awareness or legal knowledge - this is a tech interview
+
+FATAL ERRORS TO FLAG IN THREATS:
+✗ Cannot explain their own code/solution in plain English
+✗ Gave answer without explaining thought process ("silent coder")
+✗ Wrong Big O complexity or no consideration of efficiency
+✗ Entry-level describing distributed systems they clearly don't understand
+✗ Used jargon without being able to explain what it means
+`
+    : '';
+
   const analysisPrompt = `You are an expert interviewer analyzing a candidate's answer in real-time during a ${industry} industry interview.
 
 Question asked: "${question}"
@@ -211,6 +253,8 @@ Question asked: "${question}"
 Candidate's answer: "${answer}"
 ${contextInfo}
 ${fillerWordInfo}
+
+${industrySpecificInstructions}
 
 Provide HONEST, CRITICAL feedback in SWOT format. Be specific to THIS answer, not generic.
 
@@ -256,13 +300,33 @@ SUGGESTED IMPROVEMENTS EXAMPLES:
 - "Add context about why this was important to the business"
 - "Describe what you learned from this experience"
 
+SCORING (0-100 for each category):
+Also provide numerical scores for this answer in these categories:
+- communication: How clearly they articulated their answer (0-100)
+- technicalKnowledge: Demonstration of role-specific expertise (0-100)
+- problemSolving: Analytical thinking and approach (0-100)
+- relevantExperience: Quality and relevance of examples (0-100)
+
+SCORING GUIDELINES:
+- 0-30: Poor (major issues, one-word answers, no substance)
+- 30-50: Below average (vague, lacks detail, minimal examples)
+- 50-70: Average (decent answer but room for improvement)
+- 70-85: Good (strong answer with specifics and examples)
+- 85-100: Excellent (exceptional answer, detailed, compelling)
+
 Respond in JSON format:
 {
   "strengths": ["actual strength 1"] or [],
   "weaknesses": ["specific weakness 1", "specific weakness 2"],
   "opportunities": ["missed point 1", "Could have provided specific metrics or numbers"],
   "threats": ["Answer is too vague and lacks substance"] or [],
-  "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"]
+  "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"],
+  "scores": {
+    "communication": 65,
+    "technicalKnowledge": 70,
+    "problemSolving": 55,
+    "relevantExperience": 60
+  }
 }`;
 
   const completion = await client.chat.completions.create({
@@ -283,6 +347,12 @@ Respond in JSON format:
     opportunities: result.opportunities || [],
     threats: result.threats || [],
     suggestedImprovements: result.suggestedImprovements || [],
+    scores: {
+      communication: result.scores?.communication || 50,
+      technicalKnowledge: result.scores?.technicalKnowledge || 50,
+      problemSolving: result.scores?.problemSolving || 50,
+      relevantExperience: result.scores?.relevantExperience || 50,
+    },
   };
 }
 
@@ -303,9 +373,90 @@ export async function evaluateInterview(
 
   console.log(`Evaluating interview with ${transcript.length} messages for ${industry} industry`);
 
-  const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyze the following interview conversation and provide a comprehensive evaluation.
+  // Industry-specific fatal error checks
+  const industryFatalErrorChecks = industry === 'law'
+    ? `
 
-Industry: ${industry}
+CRITICAL - LAW FIRM FATAL ERROR CHECKS:
+
+Before assigning verdict, scan the entire transcript for these INSTANT FAIL scenarios:
+
+1. ETHICS VIOLATIONS (AUTOMATIC FAIL):
+   - Suggested hiding evidence, lying to clients, or other unethical conduct
+   - No understanding of SRA Code of Conduct or professional obligations
+   - Would follow unethical partner instructions without question
+   → If found: verdict = "fail", add to dealBreakers
+
+2. GENERIC FIRM ANSWERS (STRONG NEGATIVE):
+   - "Why this firm?" answered with only "You're prestigious/global/award-winning"
+   - No specific deals, partners, practice areas, or research demonstrated
+   → If found: Major weakness, likely "fail" or "borderline"
+
+3. PRESTIGE CHASING (NEGATIVE):
+   - Only wants law for prestige/salary, no genuine interest in legal work
+   - Can't distinguish law from banking/consulting
+   → If found: Add to weaknesses
+
+4. NO COMMERCIAL AWARENESS:
+   - Mentioned news stories but can't explain commercial implications for law firms
+   - No understanding of how law firms make money or serve clients
+   → If found: Major weakness
+
+5. UNSTRUCTURED RAMBLING:
+   - Consistently gave long, unstructured answers without STAR or clear points
+   - No improvement even when prompted to structure
+   → If found: Add to weaknesses
+
+Focus evaluation on:
+- Commercial awareness (critical for Magic Circle)
+- Structured communication (lawyers must be clear)
+- Ethical judgment (non-negotiable)
+- Genuine motivation for law career
+- Knowledge of legal market/firms
+`
+    : industry === 'technology'
+    ? `
+
+CRITICAL - TECH INTERVIEW FATAL ERROR CHECKS:
+
+Before assigning verdict, scan the entire transcript for these INSTANT FAIL scenarios:
+
+1. CANNOT EXPLAIN CODE VERBALLY (AUTOMATIC FAIL):
+   - Could not explain technical concepts in plain English
+   - Repeatedly said "I would just write the code" without verbal explanation
+   - Used jargon but couldn't define it when asked
+   → If found: verdict = "fail", add to dealBreakers: "Cannot communicate technical concepts verbally - critical failure for collaborative engineering"
+
+2. NO ALGORITHMIC THINKING:
+   - Never considered Big O complexity when asked
+   - Gave incorrect complexity analysis and didn't correct when probed
+   - Proposed inefficient solutions with no optimization awareness
+   → If found: Major weakness, likely "fail" for mid/senior roles
+
+3. SILENT CODER SYNDROME:
+   - Gave instant answers without explaining thought process
+   - No "thinking out loud" even when explicitly asked
+   - Didn't walk through tradeoffs or alternatives
+   → If found: Add to dealBreakers: "Silent problem-solving approach - unsuitable for collaborative whiteboard interviews"
+
+4. LEVEL MISMATCH (WRONG KNOWLEDGE FOR EXPERIENCE):
+   - Entry-level claiming distributed systems expertise but clearly doesn't understand
+   - Senior describing only basic OOP without scalability/architecture thinking
+   → If found: Add to weaknesses
+
+5. LACK OF OWNERSHIP:
+   - Always said "we" but couldn't explain their specific contribution
+   - No concrete examples of individual technical decisions
+   → If found: Major weakness
+
+Focus evaluation on:
+- Verbal communication of technical concepts (CRITICAL for remote/collaborative work)
+- Algorithmic thinking and complexity analysis
+- System design appropriate to level
+- Individual contribution clarity
+- Problem-solving process (not just solutions)
+`
+    : `
 
 Evaluate based on:
 1. Technical knowledge and competence
@@ -313,6 +464,13 @@ Evaluate based on:
 3. Problem-solving ability
 4. Relevant experience
 5. Cultural fit and professionalism
+`;
+
+  const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyze the following interview conversation and provide a comprehensive evaluation.
+
+Industry: ${industry}
+
+${industryFatalErrorChecks}
 
 Provide your evaluation in the following JSON format:
 {
