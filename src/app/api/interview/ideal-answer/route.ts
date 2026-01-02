@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
-    const { question, industry, role, difficulty, company } = await request.json();
+    const { question, answer, industry, role, difficulty, company } = await request.json();
 
     if (!question) {
       return NextResponse.json(
@@ -16,9 +16,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = `You are an expert interviewer and career coach. Generate an ideal/model answer for the following interview question.
+    if (!answer) {
+      return NextResponse.json(
+        { error: 'Answer is required' },
+        { status: 400 }
+      );
+    }
 
-QUESTION: "${question}"
+    const prompt = `You are an expert interviewer and career coach. The candidate just answered an interview question. Your job is to show them how to IMPROVE their specific answer, not give a generic template.
+
+QUESTION ASKED: "${question}"
+
+CANDIDATE'S ACTUAL ANSWER: "${answer}"
 
 CONTEXT:
 - Industry: ${industry || 'General'}
@@ -26,14 +35,35 @@ CONTEXT:
 - Level: ${difficulty || 'mid-level'}
 ${company ? `- Company: ${company}` : ''}
 
-Provide:
-1. **Ideal Answer Structure** - An outline or framework for how to answer (e.g., STAR method, key points to cover)
-2. **Model Answer** - A concrete example of a strong answer (2-3 paragraphs max)
-3. **Key Points to Include** - Bullet list of must-have elements
-4. **Common Mistakes** - What to avoid in this answer
-5. **Evaluation Rubric** - What interviewers are looking for
+CRITICAL INSTRUCTIONS:
+- START with what they actually said - acknowledge their answer
+- BUILD on their answer, don't replace it
+- Show how to enhance THEIR specific points, not generic advice
+- Keep their voice and examples, just make them stronger
 
-Keep it concise and actionable. Format in markdown.`;
+Provide in this format (markdown):
+
+## What You Said
+[1-2 sentence summary of their key points]
+
+## How to Strengthen This Answer
+[2-3 specific, actionable improvements based on what they said]
+
+## Enhanced Version of YOUR Answer
+[Rewrite THEIR answer with improvements - keep their examples/stories but add:
+- More specific metrics/numbers
+- Clearer structure (if needed)
+- Stronger action verbs
+- Concrete outcomes
+- Business impact]
+
+## Missing Elements
+[Bullet list of 2-3 things they could have added to make it even better]
+
+## Why This Works
+[1-2 sentences explaining what makes the enhanced version stronger]
+
+IMPORTANT: This should feel like "your answer, but better" - NOT a completely different answer. Use their specific examples and experiences.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',

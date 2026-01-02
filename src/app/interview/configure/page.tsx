@@ -377,7 +377,7 @@ function ConfigureInterviewContent() {
                 Upload Your CV/Resume (Optional)
               </label>
               <p className="text-xs text-muted-foreground mb-3">
-                Upload your CV to get more personalized questions based on your experience. Supports PDF, DOCX, and images.
+                Upload your CV to get more personalised questions based on your experience. Supports PDF, DOCX, and images.
               </p>
 
               {!cvFile ? (
@@ -411,7 +411,7 @@ function ConfigureInterviewContent() {
                       <Loader2 className="h-5 w-5 animate-spin text-primary" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-card-foreground">
-                          Analyzing your CV...
+                          Analysing your CV...
                         </p>
                         <p className="text-xs text-muted-foreground">
                           This may take a few seconds

@@ -62,7 +62,7 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
             <CardContent className="py-4">
               <div className="flex items-center gap-3 text-primary">
                 <Loader2 className="h-5 w-5 animate-spin" />
-                <span className="text-sm font-medium">Analyzing your answer...</span>
+                <span className="text-sm font-medium">Analysing your answer...</span>
               </div>
             </CardContent>
           </Card>
@@ -195,13 +195,13 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
                 </div>
               )}
 
-              {/* Ideal Answer / Rubric */}
+              {/* How to Improve Your Answer */}
               {feedback.idealAnswer && (
                 <div className="space-y-2.5 pt-4 border-t-2 border-border">
                   <div className="flex items-center gap-2.5">
                     <GraduationCap className="h-5 w-5 text-indigo-900 dark:text-indigo-400" />
                     <span className="text-sm font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wide">
-                      Ideal Answer & Rubric
+                      How to Improve Your Answer
                     </span>
                   </div>
                   <div className="ml-7">

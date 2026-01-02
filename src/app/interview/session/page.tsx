@@ -385,6 +385,7 @@ function InterviewSessionContent() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 question: lastQuestion,
+                answer: text, // Pass the candidate's actual answer
                 industry,
                 role,
                 difficulty,
@@ -444,12 +445,9 @@ function InterviewSessionContent() {
 
       setQuestionCount((prev) => prev + 1);
 
-      // Check if interview should end
-      if (shouldEnd || questionCount >= maxQuestions) {
-        setTimeout(() => {
-          handleEndInterview();
-        }, 3000); // Give time for final message to play
-      }
+      // Don't auto-end the interview - let the user review their feedback and manually click "End Interview"
+      // The AI will naturally wrap up by asking "Do you have any questions for me?" after maxQuestions
+      // but the user controls when to actually end the session
     } catch (err) {
       console.error('Error processing response:', err);
       setError('An error occurred. Please try again.');
@@ -682,11 +680,11 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Left Overlay: Conversation */}
-          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg p-4 overflow-y-auto shadow-2xl">
-            <h3 className="text-sm font-semibold text-primary-foreground/90 mb-4 sticky top-0 bg-primary/95 pb-2 border-b border-primary/30">
+          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col">
+            <h3 className="text-sm font-semibold text-primary-foreground/90 p-4 pb-3 border-b border-primary/30 flex-shrink-0">
               Interview Conversation
             </h3>
-            <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 pt-3 space-y-4">
               {messages.map((message, idx) => (
                 <div
                   key={idx}
@@ -820,7 +818,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{showIdealAnswers ? 'Hide ideal answers' : 'Show ideal answers & rubric after each question'}</p>
+                    <p>{showIdealAnswers ? 'Hide answer improvements' : 'Show how to improve your answers after each question'}</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -855,6 +853,21 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             {error && (
               <div className="bg-red-900/90 backdrop-blur-md border border-red-500/50 rounded-lg p-3 text-red-400 text-sm shadow-lg">
                 {error}
+              </div>
+            )}
+
+            {/* Interview Complete Notice */}
+            {questionCount >= maxQuestions && !error && (
+              <div className="bg-indigo-900/90 backdrop-blur-md border border-indigo-500/50 rounded-lg p-4 text-indigo-200 shadow-lg animate-in fade-in slide-in-from-top duration-500">
+                <div className="flex items-start gap-3">
+                  <GraduationCap className="h-5 w-5 text-indigo-300 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-indigo-100 mb-1">Interview Questions Complete</p>
+                    <p className="text-sm text-indigo-300">
+                      You've answered all {maxQuestions} questions. Take time to review your feedback on the right, then click <span className="font-semibold">"End Interview"</span> when you're ready to see your final evaluation report.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 

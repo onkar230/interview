@@ -221,11 +221,19 @@ CRITICAL - LAW FIRM SPECIFIC ANALYSIS:
 - DO NOT assess technical coding accuracy - this is a law interview
 - British English and legal terminology expected
 
-FATAL ERRORS TO FLAG IN THREATS:
-✗ Generic firm praise without specifics ("You're prestigious")
-✗ Unethical suggestions (hiding evidence, lying to clients, following unethical instructions)
-✗ Purely prestige-based motivation without genuine interest in law
-✗ No commercial understanding (can't connect news to legal services)
+FATAL ERRORS TO FLAG IN THREATS (Score 0-10):
+✗ Purely money-motivated ("I love money", "high salary", "prestige only") → Score: 0-10
+✗ Unethical suggestions (hiding evidence, lying to clients, following unethical instructions) → Score: 0-5
+✗ Generic firm praise without specifics ("You're prestigious") → Score: 10-20
+✗ No commercial understanding (can't connect news to legal services) → Score: 15-25
+✗ Can't distinguish law from banking/consulting → Score: 10-20
+
+LAW INTERVIEW SCORING SPECIFICS:
+- "I love money" / "high salary" motivation → 5/100 for relevantExperience, 5/100 for technicalKnowledge
+- Generic firm answer with no research → 15-25/100 maximum
+- No commercial awareness → Deduct 30-40 points from technicalKnowledge
+- Unethical response → 0-10/100 across all categories
+- Strong commercial awareness + genuine interest + structured → 70-85/100
 `
     : industry === 'technology'
     ? `
@@ -237,16 +245,24 @@ CRITICAL - TECH INTERVIEW SPECIFIC ANALYSIS:
 - Evaluate their ability to EXPLAIN technical concepts verbally (this is voice-based)
 - DO NOT assess commercial awareness or legal knowledge - this is a tech interview
 
-FATAL ERRORS TO FLAG IN THREATS:
-✗ Cannot explain their own code/solution in plain English
-✗ Gave answer without explaining thought process ("silent coder")
-✗ Wrong Big O complexity or no consideration of efficiency
-✗ Entry-level describing distributed systems they clearly don't understand
-✗ Used jargon without being able to explain what it means
+FATAL ERRORS TO FLAG IN THREATS (Score 0-10):
+✗ Cannot explain code/solution in plain English → Score: 5-15
+✗ Silent coder (no thought process explained) → Score: 10-20
+✗ Wrong Big O complexity with no correction → Score: 10-25
+✗ Entry-level claiming distributed systems expertise they don't have → Score: 15-25
+✗ Uses jargon but can't define it → Score: 5-15
+
+TECH INTERVIEW SCORING SPECIFICS:
+- Cannot verbally explain technical concepts → 10/100 for communication
+- Wrong algorithmic complexity → 15-25/100 for problemSolving
+- No code explanation / "I would just write it" → 15/100 for communication
+- Silent problem-solving → 20/100 for problemSolving
+- Generic "I'm passionate about tech" → 20-30/100
+- Strong technical explanation with complexity analysis → 70-85/100
 `
     : '';
 
-  const analysisPrompt = `You are an expert interviewer analyzing a candidate's answer in real-time during a ${industry} industry interview.
+  const analysisPrompt = `You are an expert interviewer analysing a candidate's answer in real-time during a ${industry} industry interview.
 
 Question asked: "${question}"
 
@@ -307,12 +323,39 @@ Also provide numerical scores for this answer in these categories:
 - problemSolving: Analytical thinking and approach (0-100)
 - relevantExperience: Quality and relevance of examples (0-100)
 
-SCORING GUIDELINES:
-- 0-30: Poor (major issues, one-word answers, no substance)
-- 30-50: Below average (vague, lacks detail, minimal examples)
-- 50-70: Average (decent answer but room for improvement)
-- 70-85: Good (strong answer with specifics and examples)
-- 85-100: Excellent (exceptional answer, detailed, compelling)
+CRITICAL SCORING GUIDELINES - BE BRUTALLY HONEST:
+
+0-10: TERRIBLE (Red flags, one-word answers, completely inappropriate, unethical, "I love money" type answers)
+  Examples: "I don't know", "I love money", "Because it's easy", unethical suggestions
+
+10-25: VERY POOR (No substance, extremely vague, shows zero preparation or understanding)
+  Examples: "I work hard", "I'm a team player" (no examples), generic platitudes
+
+25-40: POOR (Weak answer, lacks specifics, minimal effort, vague examples)
+  Examples: Generic answers with no concrete details, no metrics, surface-level thinking
+
+40-55: BELOW AVERAGE (Some substance but needs major improvement, lacks depth)
+  Examples: Provides examples but vague, no outcomes mentioned, limited detail
+
+55-70: AVERAGE (Decent answer, some specifics, could be stronger)
+  Examples: Has structure, mentions outcomes, but could add more metrics/depth
+
+70-85: GOOD (Strong answer with specifics, clear examples, demonstrates competence)
+  Examples: Uses STAR naturally, provides metrics, shows impact, demonstrates expertise
+
+85-95: VERY GOOD (Exceptional answer, detailed, compelling, shows deep understanding)
+  Examples: Detailed examples with metrics, clear business impact, insightful analysis
+
+95-100: OUTSTANDING (Textbook perfect answer, interviewer would be impressed)
+  Examples: Everything above + unique insights, demonstrates exceptional expertise
+
+DO NOT BE GENEROUS:
+- If they gave a one-word answer, score 5-15 maximum
+- If they said something unethical or showed red flags, score 0-10
+- If they were vague with no examples, score 20-35
+- Average scores should be 40-60 for most candidates, NOT 60-80
+- Reserve 70+ for genuinely strong answers only
+- Reserve 85+ for truly exceptional answers that would impress senior interviewers
 
 Respond in JSON format:
 {
@@ -333,7 +376,7 @@ Respond in JSON format:
     model: OPENAI_CONFIG.FEEDBACK_MODEL,
     messages: [
       { role: 'system', content: analysisPrompt },
-      { role: 'user', content: 'Analyze this answer now.' }
+      { role: 'user', content: 'Analyse this answer now.' }
     ],
     temperature: OPENAI_CONFIG.TEMPERATURE.DETERMINISTIC,
     response_format: { type: 'json_object' },
@@ -466,7 +509,7 @@ Evaluate based on:
 5. Cultural fit and professionalism
 `;
 
-  const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyze the following interview conversation and provide a comprehensive evaluation.
+  const evaluationPrompt = `You are an expert interviewer evaluating a job interview transcript. Analyse the following interview conversation and provide a comprehensive evaluation.
 
 Industry: ${industry}
 
