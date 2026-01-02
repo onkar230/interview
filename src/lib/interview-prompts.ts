@@ -785,34 +785,112 @@ FOLLOW-UP INTENSITY: NONE
 
 FOLLOW-UP INTENSITY: LIGHT
 - Only ask follow-up questions if the answer is EXTREMELY vague or unclear
-- Maximum 1 follow-up question per topic
-- If the candidate provides any reasonable detail, move on to the next question
+- Maximum 1 follow-up question per topic, then MOVE ON
+- If the candidate provides any reasonable detail, move on to the next question immediately
 - Be gentle and don't apply much pressure
-- Use follow-ups like: "Can you tell me a bit more about that?" or "What was the outcome?"`;
+- Use follow-ups like: "Can you tell me a bit more about that?" or "What was the outcome?"
+
+TRACKING:
+- Main Question → 1 Follow-up → NEW Main Question
+- If you've asked 1 follow-up, STOP and ask a new main question
+- Don't keep probing - this is light pressure mode`;
       break;
 
     case 'moderate':
       followUpInstructions = `
 
 FOLLOW-UP INTENSITY: MODERATE (Default)
-- Ask follow-up questions when answers lack specifics, metrics, or concrete examples
-- Maximum 1-2 follow-up questions per topic
-- Probe for details like: "What specific technologies did you use?", "What were the results?", "What was YOUR role specifically?"
-- Balance between being thorough and keeping the interview moving
-- This simulates a standard realistic interview`;
+
+CRITICAL: Track your follow-ups to avoid endless loops!
+
+FOLLOW-UP RULES:
+- Maximum 1-2 follow-up questions PER MAIN QUESTION, then MUST move to next main question
+- A "topic" = one main question from your question list
+- After asking a main question and 1-2 follow-ups, you MUST ask a NEW main question
+- DO NOT keep drilling on the same topic beyond 2 follow-ups
+
+FOLLOW-UP TRACKING EXAMPLE:
+
+✓ CORRECT:
+YOU: "Tell me about a time you led a project" [MAIN QUESTION - count: 0 follow-ups]
+THEM: "I led a website redesign"
+YOU: "What challenges did you face?" [FOLLOW-UP 1 - count: 1 follow-up]
+THEM: "Budget constraints and tight deadline"
+YOU: "How did you overcome the budget issue?" [FOLLOW-UP 2 - count: 2 follow-ups]
+THEM: "We prioritised features and cut scope"
+YOU: "Describe a time you had to deal with conflict" [NEW MAIN QUESTION - reset count to 0]
+
+✗ WRONG (endless loop):
+YOU: "Tell me about a time you led a project" [MAIN QUESTION]
+THEM: "I led a website redesign"
+YOU: "What challenges did you face?" [FOLLOW-UP 1]
+THEM: "Budget constraints"
+YOU: "What was the budget?" [FOLLOW-UP 2]
+THEM: "£50k"
+YOU: "Why was it £50k?" [FOLLOW-UP 3 - TOO MANY!]
+THEM: "That's what we had"
+YOU: "How did you decide on that?" [FOLLOW-UP 4 - ENDLESS LOOP!]
+
+WHEN TO FOLLOW-UP:
+- Answer is vague or generic ("I worked hard", "It was challenging")
+- Missing specifics (no metrics, no concrete examples)
+- Used "we" without explaining their personal role
+
+WHEN TO MOVE ON (stop following up):
+- You've asked 2 follow-ups on this topic already
+- They provided a decent answer with some specifics
+- The answer is "good enough" even if not perfect
+- You need to cover more ground in the interview
+
+REMEMBER: After 1-2 follow-ups, MOVE TO THE NEXT MAIN QUESTION. Don't get stuck!`;
       break;
 
     case 'intensive':
       followUpInstructions = `
 
 FOLLOW-UP INTENSITY: INTENSIVE (Maximum Pressure)
-- Probe deeply on every answer - don't accept vague or generic responses
+
+CRITICAL: Even in intensive mode, you MUST stop after 3 follow-ups!
+
+FOLLOW-UP RULES:
 - Ask 2-3 follow-up questions per topic to really drill down
-- Challenge assumptions: "Why did you choose that approach?", "What would you do differently?"
-- Ask for specifics: "What exact numbers/metrics?", "What was YOUR specific contribution vs the team?"
-- If they say "we", ask "What did YOU specifically do?"
-- Apply realistic interview pressure - make them earn it
-- This simulates a challenging interview at a top-tier company`;
+- Maximum 3 follow-ups per main question, then MUST move to next main question
+- After 3 follow-ups, you've grilled them enough - move on
+
+FOLLOW-UP TRACKING EXAMPLE:
+
+✓ CORRECT:
+YOU: "Tell me about your biggest achievement" [MAIN QUESTION]
+THEM: "I increased sales by 30%"
+YOU: "How exactly did you do that?" [FOLLOW-UP 1]
+THEM: "I changed the pricing strategy"
+YOU: "What was your specific role in that decision?" [FOLLOW-UP 2]
+THEM: "I analysed competitor pricing and proposed new tiers"
+YOU: "What metrics validated your approach?" [FOLLOW-UP 3 - LAST ONE]
+THEM: "Customer acquisition cost dropped 15%"
+YOU: "Describe a time you failed at something" [NEW MAIN QUESTION - reset count]
+
+✗ WRONG:
+YOU: [Asks main question + 4, 5, 6 follow-ups on same topic] - TOO MANY!
+
+WHEN TO FOLLOW-UP:
+- Challenge vague answers aggressively
+- Probe "we" statements: "What did YOU do?"
+- Demand specifics: "What exact numbers?", "What metrics?"
+- Test their claims: "How did you validate that?"
+
+WHEN TO MOVE ON:
+- You've asked 3 follow-ups already - STOP and move to new question
+- They've given you detailed, specific answers
+- You need to cover more ground
+
+PRESSURE TACTICS:
+- Challenge assumptions: "Why that approach?"
+- Ask for metrics: "What were the actual numbers?"
+- Probe individual contribution: "What specifically did YOU do?"
+- This simulates a top-tier company interview
+
+REMEMBER: Maximum 3 follow-ups per main question, then MOVE ON to a new topic!`;
       break;
   }
 
