@@ -5,7 +5,7 @@
  * The AI interviewer will use these to conduct realistic, industry-appropriate interviews.
  */
 
-import { getCompanyStyle } from './company-styles';
+import { getCompanyStyle, hasCompanyStyle } from './company-styles';
 
 export type Industry =
   | 'technology'
@@ -543,7 +543,8 @@ export function generateInterviewPrompt(
   followUpIntensity?: 'none' | 'light' | 'moderate' | 'intensive',
   questionCount?: number,
   cvText?: string,
-  questionPriority?: QuestionSourceType[]
+  questionPriority?: QuestionSourceType[],
+  companyResearch?: string
 ): string {
   const industryConfig = INDUSTRY_PROMPTS[industry];
   const difficultyAdjustment = DIFFICULTY_ADJUSTMENTS[difficulty];
@@ -561,11 +562,12 @@ export function generateInterviewPrompt(
   const titleOptions = getTitleForIndustryAndLevel(industry, difficulty);
   const randomTitle = titleOptions[Math.floor(Math.random() * titleOptions.length)];
 
-  // Check if we have company-specific styles
+  // Check if we have company-specific styles (hardcoded or web-searched)
   const companyStyle = getCompanyStyle(finalCompany);
   let companySpecificSection = '';
 
   if (companyStyle) {
+    // Use hardcoded company information
     companySpecificSection = `
 
 COMPANY-SPECIFIC CONTEXT (Use this to tailor questions, but NEVER mention the company name):
@@ -583,6 +585,22 @@ Typical Questions (Style your questions like these):
 ${companyStyle.typicalQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
 
 IMPORTANT: Incorporate these values and culture naturally into your questions. Make the candidate feel like they're in a real interview for this type of company, but NEVER mention the company name for legal reasons.`;
+  } else if (companyResearch && companyResearch.trim()) {
+    // Use web-searched company information for companies not in our database
+    companySpecificSection = `
+
+COMPANY-SPECIFIC CONTEXT (Use this to tailor questions, but NEVER mention the company name):
+
+We researched "${finalCompany}" and found the following information. Use this to tailor your questions and make the interview feel authentic to this specific company:
+
+${companyResearch}
+
+IMPORTANT:
+- Incorporate this company's values, culture, and focus areas naturally into your questions
+- Make the candidate feel like they're in a real interview for THIS SPECIFIC COMPANY
+- NEVER mention the company name "${finalCompany}" for legal reasons
+- Ask questions that would be typical for this type of company and industry
+- If the research mentions recent news or developments, you can reference them indirectly (e.g., "How would you handle rapid growth?" if the company is expanding)`;
   }
 
   // Job description section if provided

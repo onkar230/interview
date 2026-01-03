@@ -15,6 +15,7 @@ import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPane
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import PerformanceScore from '@/components/interview/PerformanceScore';
 import { Industry, QuestionSourceType, generateInterviewPrompt } from '@/lib/interview-prompts';
+import { hasCompanyStyle } from '@/lib/company-styles';
 import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap } from 'lucide-react';
 
 interface Message {
@@ -61,6 +62,7 @@ function InterviewSessionContent() {
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
   const [showIdealAnswers, setShowIdealAnswers] = useState(false); // Toggle for ideal answers
   const [streamingText, setStreamingText] = useState<string>('');
+  const [companyResearch, setCompanyResearch] = useState<string>('');
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
 
@@ -185,6 +187,38 @@ function InterviewSessionContent() {
 
       try {
         console.log('Initializing interview...');
+
+        // Research company if it's not in our hardcoded list
+        let companyInfo = '';
+        if (company && !hasCompanyStyle(company)) {
+          console.log(`[initializeInterview] Company "${company}" not in database, searching web...`);
+          try {
+            const searchResponse = await fetch('/api/interview/research-company', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                company,
+                industry,
+                role
+              }),
+            });
+
+            if (searchResponse.ok) {
+              const data = await searchResponse.json();
+              companyInfo = data.research || '';
+              setCompanyResearch(companyInfo);
+              console.log(`[initializeInterview] Company research found:`, companyInfo.substring(0, 100) + '...');
+            } else {
+              console.warn('[initializeInterview] Company research failed, continuing with generic interview');
+            }
+          } catch (err) {
+            console.error('[initializeInterview] Error researching company:', err);
+            // Continue without company research if it fails
+          }
+        } else if (company) {
+          console.log(`[initializeInterview] Using hardcoded info for "${company}"`);
+        }
+
         const systemPrompt = generateInterviewPrompt(
           industry,
           role,
@@ -196,7 +230,8 @@ function InterviewSessionContent() {
           followUpIntensity,
           maxQuestions,
           cvText,
-          questionPriority
+          questionPriority,
+          companyInfo
         );
 
         // Add optimistic message immediately
@@ -337,7 +372,8 @@ function InterviewSessionContent() {
         followUpIntensity,
         maxQuestions,
         cvText,
-        questionPriority
+        questionPriority,
+        companyResearch
       );
       const conversationMessages = [
         { role: 'system', content: systemPrompt },
@@ -550,7 +586,8 @@ function InterviewSessionContent() {
           followUpIntensity,
           maxQuestions,
           cvText,
-          questionPriority
+          questionPriority,
+          companyResearch
         );
 
         const conversationMessages = [
