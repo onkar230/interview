@@ -15,6 +15,19 @@ interface PerformanceScoreProps {
 export default function PerformanceScore({ overallScore, categoryScores, answersCount, industry }: PerformanceScoreProps) {
   // Get industry-specific label for second category
   const secondCategoryLabel = industry === 'law' ? 'Commercial Awareness' : 'Technical Skills';
+
+  // Auto-convert old 0-100 scores to 0-10 scale
+  const normalizeScore = (score: number) => score > 10 ? score / 10 : score;
+
+  const normalizedScores = {
+    communication: normalizeScore(categoryScores.communication),
+    technicalKnowledge: normalizeScore(categoryScores.technicalKnowledge),
+    problemSolving: normalizeScore(categoryScores.problemSolving),
+    relevantExperience: normalizeScore(categoryScores.relevantExperience),
+  };
+
+  const normalizedOverall = normalizeScore(overallScore);
+
   // Calculate color based on score (0-10 scale)
   const getScoreColor = (score: number) => {
     if (score >= 7) return 'text-green-600';
@@ -42,12 +55,12 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="w-32 text-xs font-medium text-card-foreground">Communication</div>
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
-                className={`h-full transition-all duration-500 ${getBarColor(categoryScores.communication)}`}
-                style={{ width: `${(categoryScores.communication / 10) * 100}%` }}
+                className={`h-full transition-all duration-500 ${getBarColor(normalizedScores.communication)}`}
+                style={{ width: `${(normalizedScores.communication / 10) * 100}%` }}
               />
             </div>
             <div className="w-10 text-xs text-right text-muted-foreground">
-              {categoryScores.communication.toFixed(1)}/10
+              {normalizedScores.communication.toFixed(1)}/10
             </div>
           </div>
 
@@ -56,12 +69,12 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="w-32 text-xs font-medium text-card-foreground">{secondCategoryLabel}</div>
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
-                className={`h-full transition-all duration-500 ${getBarColor(categoryScores.technicalKnowledge)}`}
-                style={{ width: `${(categoryScores.technicalKnowledge / 10) * 100}%` }}
+                className={`h-full transition-all duration-500 ${getBarColor(normalizedScores.technicalKnowledge)}`}
+                style={{ width: `${(normalizedScores.technicalKnowledge / 10) * 100}%` }}
               />
             </div>
             <div className="w-10 text-xs text-right text-muted-foreground">
-              {categoryScores.technicalKnowledge.toFixed(1)}/10
+              {normalizedScores.technicalKnowledge.toFixed(1)}/10
             </div>
           </div>
 
@@ -70,20 +83,20 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="w-32 text-xs font-medium text-card-foreground">Problem Solving</div>
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
-                className={`h-full transition-all duration-500 ${getBarColor(categoryScores.problemSolving)}`}
-                style={{ width: `${(categoryScores.problemSolving / 10) * 100}%` }}
+                className={`h-full transition-all duration-500 ${getBarColor(normalizedScores.problemSolving)}`}
+                style={{ width: `${(normalizedScores.problemSolving / 10) * 100}%` }}
               />
             </div>
             <div className="w-10 text-xs text-right text-muted-foreground">
-              {categoryScores.problemSolving.toFixed(1)}/10
+              {normalizedScores.problemSolving.toFixed(1)}/10
             </div>
           </div>
         </div>
 
         {/* Right side: Overall score */}
         <div className="flex flex-col items-center justify-center px-6 border-l border-border">
-          <div className={`text-5xl font-bold ${getScoreColor(overallScore)} transition-all duration-500`}>
-            {overallScore.toFixed(1)}
+          <div className={`text-5xl font-bold ${getScoreColor(normalizedOverall)} transition-all duration-500`}>
+            {normalizedOverall.toFixed(1)}
           </div>
           <div className="text-lg text-muted-foreground font-medium">/10</div>
           <div className="text-xs text-card-foreground font-medium mt-2">Interview Score</div>

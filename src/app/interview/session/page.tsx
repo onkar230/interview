@@ -71,7 +71,10 @@ function InterviewSessionContent() {
   // Calculate average scores
   const calculateAverage = (scores: number[]) => {
     if (scores.length === 0) return 0;
-    return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    const avg = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    // Convert old 0-100 scores to 0-10 scale (auto-detect and fix)
+    // If average is > 10, it's from old scoring system
+    return avg > 10 ? avg / 10 : avg;
   };
 
   const currentScores = {
