@@ -87,13 +87,13 @@ function ConfigureInterviewContent() {
   const QUESTION_SOURCE_LABELS: Record<QuestionSourceType, string> = {
     custom: 'Your Custom Questions',
     cv: 'CV-Based Questions',
-    generic: 'Generic Question Bank'
+    generic: 'Selected Question Types'
   };
 
   const QUESTION_SOURCE_DESCRIPTIONS: Record<QuestionSourceType, string> = {
     custom: 'Questions you specifically want to be asked',
     cv: 'Questions tailored to your CV/resume',
-    generic: 'Standard industry-specific questions'
+    generic: 'Question types you selected (behavioral, technical, etc.)'
   };
 
   // Functions to reorder question priorities

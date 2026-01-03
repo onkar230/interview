@@ -996,7 +996,7 @@ INSTRUCTIONS FOR USING THESE QUESTIONS:
   const priorityLabels: Record<QuestionSourceType, string> = {
     custom: 'Custom Questions - If provided, ask ALL of them verbatim',
     cv: 'CV-Based Questions - If CV uploaded, ask questions about their CV',
-    generic: 'Generic Question Bank - Default questions for the industry/role'
+    generic: 'Selected Question Types - Question types chosen by the candidate (behavioral, technical, etc.)'
   };
 
   const priorityHeader = `
