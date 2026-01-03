@@ -9,9 +9,12 @@ interface PerformanceScoreProps {
     relevantExperience: number;
   };
   answersCount: number;
+  industry?: string;
 }
 
-export default function PerformanceScore({ overallScore, categoryScores, answersCount }: PerformanceScoreProps) {
+export default function PerformanceScore({ overallScore, categoryScores, answersCount, industry }: PerformanceScoreProps) {
+  // Get industry-specific label for second category
+  const secondCategoryLabel = industry === 'law' ? 'Commercial Awareness' : 'Technical Skills';
   // Calculate color based on score (0-10 scale)
   const getScoreColor = (score: number) => {
     if (score >= 7) return 'text-green-600';
@@ -48,9 +51,9 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             </div>
           </div>
 
-          {/* Technical Knowledge */}
+          {/* Technical Knowledge / Commercial Awareness */}
           <div className="flex items-center gap-3">
-            <div className="w-32 text-xs font-medium text-card-foreground">Technical Skills</div>
+            <div className="w-32 text-xs font-medium text-card-foreground">{secondCategoryLabel}</div>
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${getBarColor(categoryScores.technicalKnowledge)}`}

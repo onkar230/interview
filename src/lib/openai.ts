@@ -210,6 +210,17 @@ export async function analyzeAnswer(params: {
     ? `\n\nPrevious conversation context:\n${conversationHistory.slice(-4).map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}`
     : '';
 
+  // Industry-specific scoring categories
+  const scoringCategories = industry === 'law'
+    ? `- communication: How clearly they articulated their answer (0-10)
+- commercialAwareness: Understanding of business, legal market, and commercial issues (0-10)
+- problemSolving: Analytical thinking and approach (0-10)
+- relevantExperience: Quality and relevance of examples (0-10)`
+    : `- communication: How clearly they articulated their answer (0-10)
+- technicalKnowledge: Demonstration of role-specific expertise (0-10)
+- problemSolving: Analytical thinking and approach (0-10)
+- relevantExperience: Quality and relevance of examples (0-10)`;
+
   // Industry-specific analysis instructions
   const industrySpecificInstructions = industry === 'law'
     ? `
@@ -229,9 +240,9 @@ FATAL ERRORS TO FLAG IN THREATS (Score 0-1):
 ✗ Can't distinguish law from banking/consulting → Score: 1-2/10
 
 LAW INTERVIEW SCORING SPECIFICS:
-- "I love money" / "high salary" motivation → 0-1/10 for relevantExperience, 0-1/10 for technicalKnowledge
-- Generic firm answer with no research → 2-3/10 maximum
-- No commercial awareness → Deduct 3-4 points from technicalKnowledge
+- "I love money" / "high salary" motivation → 0-1/10 for relevantExperience, 0-1/10 for commercialAwareness
+- Generic firm answer with no research → 2-3/10 maximum for commercialAwareness
+- No commercial awareness → 2-3/10 for commercialAwareness
 - Unethical response → 0-1/10 across all categories
 - Strong commercial awareness + genuine interest + structured → 8-9/10
 `
@@ -318,10 +329,7 @@ SUGGESTED IMPROVEMENTS EXAMPLES:
 
 SCORING (0-10 for each category):
 Also provide numerical scores for this answer in these categories:
-- communication: How clearly they articulated their answer (0-10)
-- technicalKnowledge: Demonstration of role-specific expertise (0-10)
-- problemSolving: Analytical thinking and approach (0-10)
-- relevantExperience: Quality and relevance of examples (0-10)
+${scoringCategories}
 
 CRITICAL SCORING GUIDELINES - BE BRUTALLY HONEST (0-10 SCALE):
 
@@ -366,7 +374,7 @@ Respond in JSON format:
   "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"],
   "scores": {
     "communication": 7,
-    "technicalKnowledge": 6,
+    ${industry === 'law' ? '"commercialAwareness": 6' : '"technicalKnowledge": 6'},
     "problemSolving": 5,
     "relevantExperience": 6
   }
@@ -392,7 +400,7 @@ Respond in JSON format:
     suggestedImprovements: result.suggestedImprovements || [],
     scores: {
       communication: result.scores?.communication || 5,
-      technicalKnowledge: result.scores?.technicalKnowledge || 5,
+      technicalKnowledge: result.scores?.technicalKnowledge || result.scores?.commercialAwareness || 5,
       problemSolving: result.scores?.problemSolving || 5,
       relevantExperience: result.scores?.relevantExperience || 5,
     },
