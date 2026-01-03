@@ -346,12 +346,16 @@ function InterviewSessionContent() {
           // Update the optimistic message as text streams in
           setMessages((prev) => {
             const updated = [...prev];
-            const lastIndex = updated.length - 1;
-            if (updated[lastIndex]?.role === 'assistant') {
-              updated[lastIndex] = {
-                ...updated[lastIndex],
-                content: streamingText,
-              };
+            // Find the LAST assistant message (the "..." thinking indicator)
+            // Don't just use lastIndex because user message was added after thinking message
+            for (let i = updated.length - 1; i >= 0; i--) {
+              if (updated[i].role === 'assistant') {
+                updated[i] = {
+                  ...updated[i],
+                  content: streamingText,
+                };
+                break;
+              }
             }
             return updated;
           });
