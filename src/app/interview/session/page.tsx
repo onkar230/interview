@@ -273,19 +273,25 @@ function InterviewSessionContent() {
 
     try {
       // Step 1: Transcribe audio
+      console.log(`[handleRecordingComplete] Audio blob size: ${(audioBlob.size / 1024 / 1024).toFixed(2)} MB`);
+
       const formData = new FormData();
       formData.append('audio', audioBlob);
 
+      console.log('[handleRecordingComplete] Sending audio for transcription...');
       const transcriptResponse = await fetch('/api/interview/audio', {
         method: 'POST',
         body: formData,
       });
 
       if (!transcriptResponse.ok) {
-        throw new Error('Failed to transcribe audio');
+        const errorData = await transcriptResponse.json().catch(() => ({}));
+        console.error('[handleRecordingComplete] Transcription failed:', transcriptResponse.status, errorData);
+        throw new Error(errorData.error || `Failed to transcribe audio (${transcriptResponse.status})`);
       }
 
       const { text } = await transcriptResponse.json();
+      console.log(`[handleRecordingComplete] Transcription successful: ${text.substring(0, 50)}...`);
 
       // Add user message to conversation
       const userMessage: Message = {
@@ -450,7 +456,26 @@ function InterviewSessionContent() {
       // but the user controls when to actually end the session
     } catch (err) {
       console.error('Error processing response:', err);
-      setError('An error occurred. Please try again.');
+
+      // Provide more specific error messages
+      let errorMessage = 'An error occurred. Please try again.';
+
+      if (err instanceof Error) {
+        // Check for common error types
+        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.';
+        } else if (err.message.includes('413') || err.message.includes('too large')) {
+          errorMessage = 'Recording too long. Please keep answers under 60 seconds and try again.';
+        } else if (err.message.includes('No speech detected')) {
+          errorMessage = 'No speech detected. Please ensure your microphone is working and try again.';
+        } else if (err.message.includes('timeout')) {
+          errorMessage = 'Request timed out. Please try a shorter answer or check your connection.';
+        } else {
+          errorMessage = `Error: ${err.message}`;
+        }
+      }
+
+      setError(errorMessage);
       setIsAnalyzing(false);
     } finally {
       setIsProcessing(false);
