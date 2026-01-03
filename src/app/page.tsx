@@ -23,11 +23,11 @@ function AnimatedScoreSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setScore((prevScore) => {
-        // Progressive animation: 0 → 100 → reset to 0 → repeat
-        const randomIncrement = Math.floor(Math.random() * 6) + 3; // Random jump between 3-8
+        // Progressive animation: 0 → 10 → reset to 0 → repeat
+        const randomIncrement = (Math.random() * 0.6) + 0.3; // Random jump between 0.3-0.9
         const newScore = prevScore + randomIncrement;
-        if (newScore >= 100) {
-          return 0; // Jump back to 0 when reaching 100
+        if (newScore >= 10) {
+          return 0; // Jump back to 0 when reaching 10
         }
         return newScore;
       });
@@ -37,9 +37,9 @@ function AnimatedScoreSection() {
   }, []);
 
   // Calculate skill scores based on main score (synchronized)
-  const communication = Math.floor((score / 100) * 35); // 0-35 based on main score
-  const technical = Math.max(0, Math.floor((score / 100) * 35) - 3); // Slightly lower
-  const problemSolving = Math.max(0, Math.floor((score / 100) * 35) - 2); // Mid-range
+  const communication = (score / 10) * 10; // 0-10 based on main score
+  const technical = Math.max(0, (score / 10) * 10 - 0.3); // Slightly lower
+  const problemSolving = Math.max(0, (score / 10) * 10 - 0.2); // Mid-range
 
   return (
     <div className="bg-card rounded-2xl p-12 border border-border max-w-3xl mx-auto">
@@ -49,12 +49,12 @@ function AnimatedScoreSection() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted-foreground">Communication</span>
-                <span className="text-primary font-semibold transition-all duration-200">{communication}/35</span>
+                <span className="text-primary font-semibold transition-all duration-200">{communication.toFixed(1)}/10</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-accent rounded-full transition-all duration-200"
-                  style={{width: `${(communication / 35 * 100).toFixed(0)}%`}}
+                  style={{width: `${(communication / 10 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
             </div>
@@ -62,12 +62,12 @@ function AnimatedScoreSection() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted-foreground">Technical Knowledge</span>
-                <span className="text-primary font-semibold transition-all duration-200">{technical}/35</span>
+                <span className="text-primary font-semibold transition-all duration-200">{technical.toFixed(1)}/10</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-secondary rounded-full transition-all duration-200"
-                  style={{width: `${(technical / 35 * 100).toFixed(0)}%`}}
+                  style={{width: `${(technical / 10 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
             </div>
@@ -75,12 +75,12 @@ function AnimatedScoreSection() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted-foreground">Problem Solving</span>
-                <span className="text-primary font-semibold transition-all duration-200">{problemSolving}/35</span>
+                <span className="text-primary font-semibold transition-all duration-200">{problemSolving.toFixed(1)}/10</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-200"
-                  style={{width: `${(problemSolving / 35 * 100).toFixed(0)}%`}}
+                  style={{width: `${(problemSolving / 10 * 100).toFixed(0)}%`}}
                 ></div>
               </div>
             </div>
@@ -89,8 +89,8 @@ function AnimatedScoreSection() {
 
         <div className="text-center">
           <div className="text-8xl font-bold text-primary transition-all duration-200">
-            {score}
-            <span className="text-5xl">/100</span>
+            {score.toFixed(1)}
+            <span className="text-5xl">/10</span>
           </div>
           <div className="text-sm text-muted-foreground mt-2">Your Interview Confidence Score</div>
           <p className="text-sm text-muted-foreground mt-4 italic">Score updates in real-time</p>
