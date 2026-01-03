@@ -118,11 +118,14 @@ export const INDUSTRY_PROMPTS: Record<
       'Learning and adaptability',
     ],
     sampleQuestions: [
-      'Tell me about a challenging technical problem you solved recently.',
-      'How do you approach system design for scalable applications?',
-      'Describe your experience with [specific technology stack].',
-      'How do you stay updated with the latest technology trends?',
-      'Tell me about a time you had to debug a complex issue.',
+      'Tell me about a time you had to debug a production issue under time pressure. Walk me through your exact process.',
+      'Describe a technical decision you made that you later regretted. What would you do differently?',
+      'Your code review gets 30 comments pointing out issues. How do you handle feedback that contradicts your technical approach?',
+      'Tell me about a time you had to choose between shipping quickly and refactoring for better code quality. What did you decide and why?',
+      'Walk me through a situation where you had to explain a complex technical concept to a non-technical stakeholder.',
+      'Describe a time when you disagreed with a senior engineer\'s technical approach. How did you handle it?',
+      'Tell me about the most challenging bug you\'ve ever encountered. How long did it take to find? What was the root cause?',
+      'Give me an example of when you had to make a trade-off between performance and maintainability. What factors did you consider?',
     ],
     companies: [
       'Google',
@@ -431,41 +434,62 @@ export const INDUSTRY_PROMPTS: Record<
       'Teamwork and resilience',
     ],
     sampleQuestions: [
-      'How do you manage your time effectively?',
-      'What tasks do trainees typically handle, and why would you excel at them?',
-      'Why do you want to be a lawyer rather than a banker or consultant? How do these careers differ?',
-      'How have you demonstrated your commercial awareness in the past?',
-      'Describe a situation where you had to deal with difficult people.',
-      'How does a trainee\'s role differ from that of a partner?',
-      'Why are you interested in becoming a City lawyer?',
-      'How would you handle this situation: A partner asked you to attend a client dinner, but you had a friend\'s birthday that evening.',
-      'What qualities make you well-suited to a career in law?',
-      'In what ways is legal tech transforming the legal industry?',
-      'How do you stay motivated when working on tasks that aren\'t very exciting?',
-      'How do you keep up with current events?',
-      'What factors did you consider when deciding where to apply?',
-      'Can you share a situation where you had to make a difficult decision?',
-      'What attracts you to this firm?',
-      'Why do you want to be a solicitor instead of a barrister?',
-      'How would you handle this situation: Your opposing counsel accidentally sent you an email containing confidential information intended for someone at their firm.',
-      'Why are you applying for a training contract rather than a vacation scheme?',
-      'Which of your achievements are you most proud of?',
-      'Tell us about a recent news story and its potential impact on our firm.',
-      'Why are you drawn to commercial law?',
-      'How would you pitch our firm to a potential client?',
-      'Tell us about a time you worked in a team and the challenges you faced.',
-      'What are your core values? When were these values tested, and how did you respond?',
-      'If you couldn\'t become a commercial lawyer, what alternative career would you choose and why?',
-      'How do you handle multiple tasks with tight deadlines?',
-      'How would you handle this situation: A client wanted you to sign a deal, but the partner wasn\'t available.',
-      'How do you manage receiving critical feedback?',
-      'Tell us about a time you showed resilience.',
-      'Which other firms did you apply to?',
-      'Describe a time when you made a valuable contribution to a team.',
-      'When have you explained a complex idea to someone?',
-      'Do you think legal tech will lead to less skilled future lawyers?',
-      'What do you think a typical day looks like for a trainee solicitor?',
-      'Tell us about a time you made a mistake and how you handled it.',
+      // BEHAVIORAL - Tell me about a time when... (Use STAR method)
+      '[BEHAVIORAL] Describe a situation where you had to deal with difficult people',
+      '[BEHAVIORAL] Can you share a situation where you had to make a difficult decision?',
+      '[BEHAVIORAL] Which of your achievements are you most proud of?',
+      '[BEHAVIORAL] Tell us about a time you worked in a team and the challenges you faced',
+      '[BEHAVIORAL] Tell us about a time you showed resilience',
+      '[BEHAVIORAL] Describe a time when you made a valuable contribution to a team',
+      '[BEHAVIORAL] When have you explained a complex idea to someone?',
+      '[BEHAVIORAL] Tell us about a time you made a mistake and how you handled it',
+
+      // TECHNICAL / ROLE-SPECIFIC - Industry knowledge and trainee role understanding
+      '[TECHNICAL] What tasks do trainees typically handle, and why would you excel at them?',
+      '[TECHNICAL] How does a trainee\'s role differ from that of a partner?',
+      '[TECHNICAL] In what ways is legal tech transforming the legal industry?',
+      '[TECHNICAL] Tell us about a recent news story and its potential impact on our firm',
+      '[TECHNICAL] Do you think legal tech will lead to less skilled future lawyers?',
+      '[TECHNICAL] What do you think a typical day looks like for a trainee solicitor?',
+
+      // COMPETENCY-BASED - How would you handle / demonstrate key skills
+      '[COMPETENCY] How do you manage your time effectively?',
+      '[COMPETENCY] How have you demonstrated your commercial awareness in the past?',
+      '[COMPETENCY] How do you stay motivated when working on tasks that aren\'t very exciting?',
+      '[COMPETENCY] How do you keep up with current events?',
+      '[COMPETENCY] How do you handle multiple tasks with tight deadlines?',
+      '[COMPETENCY] How do you manage receiving critical feedback?',
+
+      // SITUATIONAL - What would you do if...
+      '[SITUATIONAL] A partner asks you to attend a client dinner, but you already have a personal commitment',
+      '[SITUATIONAL] Opposing counsel accidentally sends you confidential information',
+      '[SITUATIONAL] A client wants to sign a deal, but the supervising partner isn\'t available',
+      '[SITUATIONAL] A partner asks you to prioritise urgent work, but you are already at capacity with another partner\'s deadline',
+      '[SITUATIONAL] A client asks for advice that you believe may be legally permissible but ethically questionable',
+
+      // STRENGTHS & WEAKNESSES - Self-assessment
+      '[STRENGTHS] What qualities make you well-suited to a career in law?',
+      '[STRENGTHS] What do you think you do better than most people at your level?',
+      '[STRENGTHS] What feedback do you receive most often from supervisors or peers?',
+      '[STRENGTHS] Which skill has most contributed to your academic or professional success?',
+      '[STRENGTHS] What personal quality would your colleagues say you bring to a team?',
+      '[STRENGTHS] What strength would you rely on most during a demanding transaction or trial?',
+      '[WEAKNESSES] What is a professional weakness you are actively working to improve?',
+      '[WEAKNESSES] What type of task do you find most challenging, and why?',
+      '[WEAKNESSES] What feedback initially surprised you, and how did you respond to it?',
+      '[WEAKNESSES] When have you struggled under pressure, and what did you learn?',
+
+      // COMPANY / CULTURE FIT - Values, motivation, and alignment
+      '[CULTURE FIT] Why do you want to be a lawyer rather than a banker or consultant?',
+      '[CULTURE FIT] Why are you interested in becoming a City lawyer?',
+      '[CULTURE FIT] What factors did you consider when deciding where to apply?',
+      '[CULTURE FIT] What attracts you to this firm?',
+      '[CULTURE FIT] Why do you want to be a solicitor instead of a barrister?',
+      '[CULTURE FIT] Why are you applying for a training contract rather than a vacation scheme?',
+      '[CULTURE FIT] Why are you drawn to commercial law?',
+      '[CULTURE FIT] How would you pitch our firm to a potential client?',
+      '[CULTURE FIT] What are your core values, and when were they tested?',
+      '[CULTURE FIT] If you couldn\'t become a commercial lawyer, what alternative career would you choose and why?',
     ],
     companies: [
       'Clifford Chance',
@@ -698,21 +722,48 @@ ${selectedTypes}
 3. EXAMPLE QUESTIONS FOR SELECTED TYPES:
 ${selectedExamples}
 
-4. HOW TO TRACK:
+4. HOW TO DISTRIBUTE WHEN YOU HAVE MORE TYPES THAN QUESTIONS:
+   - If you have MORE selected types than questions to ask, SPREAD them evenly
+   - Try to cover as many DIFFERENT types as possible
+   - Example: 3 questions, 6 types selected → Pick 3 DIFFERENT types randomly (1 question each)
+   - Example: 5 questions, 6 types selected → Pick 5 DIFFERENT types randomly (1 question each)
+   - Example: 8 questions, 3 types selected → Distribute roughly equally (3-3-2 or 3-2-3)
+   - NEVER ask all questions from just 1 type when the user selected multiple types
+
+5. HOW TO TRACK:
    - Before asking each question, mentally check: "Is this one of the selected types?"
    - Count your questions: "Have I asked 80%+ from the selected types?"
+   - Check distribution: "Have I covered different types, or am I only asking one type?"
    - If you catch yourself asking an unselected type, apologize and ask a different question
 
-✓ CORRECT EXAMPLE (if they selected ONLY "situational" and "technical"):
-  Question 1: "What would you do if you discovered a security vulnerability in production?" [situational ✓]
-  Question 2: "Explain your experience with cloud infrastructure" [technical ✓]
-  Question 3: "What would you do if a client demanded an unrealistic deadline?" [situational ✓]
-  Question 4: "Tell me about a time you failed" [behavioral ✗ WRONG - they didn't select this!]
+✓ CORRECT EXAMPLE #1 (3 questions, ALL 6 types selected):
+  - You should ask 3 DIFFERENT types, not 3 behavioral questions
+  Question 1: "Tell me about a time you overcame a challenge" [behavioral ✓]
+  Question 2: "What would you do if a client asked for something unethical?" [situational ✓]
+  Question 3: "What technical skills make you suited for this role?" [technical ✓]
 
-✗ WRONG EXAMPLE (if they selected ONLY "behavioral"):
+✓ CORRECT EXAMPLE #2 (8 questions, 3 types selected: behavioral, technical, competency):
+  - Distribute roughly equally: 3 behavioral, 3 technical, 2 competency
+  Question 1: "Tell me about a time..." [behavioral ✓]
+  Question 2: "How do you approach..." [competency ✓]
+  Question 3: "Explain your experience with..." [technical ✓]
+  Question 4: "Describe a situation where..." [behavioral ✓]
+  Question 5: "How would you handle..." [competency ✓]
+  Question 6: "Walk me through your knowledge of..." [technical ✓]
+  Question 7: "Tell me about..." [behavioral ✓]
+  Question 8: "What's your understanding of..." [technical ✓]
+
+✗ WRONG EXAMPLE #1 (3 questions, 6 types selected, but only asking behavioral):
+  Question 1: "Tell me about a time..." [behavioral ✓]
+  Question 2: "Describe a situation..." [behavioral ✓]
+  Question 3: "Give me an example..." [behavioral ✓]
+  ← WRONG! User selected 6 types but you only asked 1 type. Should have mixed them.
+
+✗ WRONG EXAMPLE #2 (if they selected ONLY "behavioral"):
   Question 1: "What are your strengths?" [strengths ✗ NOT selected]
   Question 2: "What would you do if..." [situational ✗ NOT selected]
   Question 3: "Tell me about a time when..." [behavioral ✓ CORRECT]
+  ← WRONG! Only 1 out of 3 was from selected types. Should be 80%+ (at least 2-3 out of 3).
 
 REMEMBER: The candidate specifically chose these question types because they want to practice THESE SPECIFIC TYPES. If you ignore their selection and ask other types, you are FAILING the interview. Respect their choice and stick to the selected types.`;
   }
@@ -901,6 +952,18 @@ FOLLOW-UP INTENSITY: MODERATE (Default)
 
 CRITICAL: Track your follow-ups to avoid endless loops!
 
+MENTAL COUNTING MECHANISM (MANDATORY):
+Before asking each question, mentally count:
+- Main question = "This is main question #X, follow-up count: 0"
+- First follow-up = "This is follow-up 1 of maximum 2"
+- Second follow-up = "This is follow-up 2 of maximum 2 - MUST move to new main question after this"
+- If you've asked 2 follow-ups, you MUST ask a NEW main question next, even if their answer is weak
+
+HARD ENFORCEMENT:
+- After 2 follow-ups on one topic, your ONLY option is to ask a NEW main question
+- Do NOT ask a 3rd follow-up under any circumstances
+- Better to move on than get stuck in a loop
+
 FOLLOW-UP RULES:
 - Maximum 1-2 follow-up questions PER MAIN QUESTION, then MUST move to next main question
 - A "topic" = one main question from your question list
@@ -949,6 +1012,19 @@ REMEMBER: After 1-2 follow-ups, MOVE TO THE NEXT MAIN QUESTION. Don't get stuck!
 FOLLOW-UP INTENSITY: INTENSIVE (Maximum Pressure)
 
 CRITICAL: Even in intensive mode, you MUST stop after 3 follow-ups!
+
+MENTAL COUNTING MECHANISM (MANDATORY):
+Before asking each question, mentally count:
+- Main question = "This is main question #X, follow-up count: 0"
+- First follow-up = "This is follow-up 1 of maximum 3"
+- Second follow-up = "This is follow-up 2 of maximum 3"
+- Third follow-up = "This is follow-up 3 of maximum 3 - MUST move to new main question after this"
+- If you've asked 3 follow-ups, you MUST ask a NEW main question next
+
+HARD ENFORCEMENT:
+- After 3 follow-ups on one topic, your ONLY option is to ask a NEW main question
+- Do NOT ask a 4th follow-up under any circumstances
+- Better to move on than drill endlessly
 
 FOLLOW-UP RULES:
 - Ask 2-3 follow-up questions per topic to really drill down
@@ -1036,6 +1112,16 @@ BRITISH PHRASES (MANDATORY):
 - "white-collar crime" NOT "corporate crime"
 - Speak like a British legal professional, not American
 
+SELF-CHECK MECHANISM (CRITICAL FOR LAW):
+Before sending EVERY response, mentally verify:
+1. Did I use "organisation" not "organization"?
+2. Did I use "analyse" not "analyze"?
+3. Did I use "practise" (verb) vs "practice" (noun) correctly?
+4. Did I say "solicitor" not "lawyer" when referring to UK legal professionals?
+5. Did I avoid American spellings and phrases?
+
+If you catch American English, STOP and correct it BEFORE responding. This is non-negotiable for UK law firm interviews.
+
 IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE than the standard interviewer approach:
 
 1. CONSTRUCTIVE FEEDBACK AFTER ANSWERS:
@@ -1074,7 +1160,48 @@ INSTRUCTIONS FOR USING THESE QUESTIONS:
 - You should ask mostly (70-80%) from this specific list
 - You can adapt them slightly to fit the conversation flow
 - You can ask follow-ups and variations, but prioritize these core questions
-- Mix different types: commercial awareness, competency-based, situational, etc.`;
+- Mix different types: behavioral, technical, competency, situational, strengths/weaknesses, culture fit
+
+CRITICAL - SIGNAL THE QUESTION CATEGORY:
+Each question above is tagged with a category like [BEHAVIORAL], [TECHNICAL], [COMPETENCY], [SITUATIONAL], [STRENGTHS], [WEAKNESSES], or [CULTURE FIT].
+
+When you ask a question, you MUST signal which category it belongs to. This helps the candidate understand what you're testing and how to frame their answer.
+
+HOW TO SIGNAL THE CATEGORY:
+- Natural lead-in that mentions what you're testing
+- Don't say the tag literally (don't say "[BEHAVIORAL]")
+- Make it conversational like a real interviewer would
+
+EXAMPLES:
+
+✓ CORRECT:
+"I want to test your commercial awareness. How do you keep up with current events?"
+"Let me understand your self-awareness. What is a professional weakness you are actively working to improve?"
+"I'd like to explore a situational scenario. What would you do if opposing counsel accidentally sends you confidential information?"
+"Tell me about a past experience using the STAR method. Describe a time when you made a valuable contribution to a team."
+"I want to understand your motivations. Why do you want to be a solicitor instead of a barrister?"
+"Let's test your technical knowledge of the trainee role. What tasks do trainees typically handle, and why would you excel at them?"
+
+✗ WRONG (don't do this):
+"[BEHAVIORAL] Tell me about a time..." ← Don't say the tag literally
+"Question 5: How do you manage your time?" ← Don't number questions
+"Describe a situation where..." ← Missing category signal
+
+CATEGORY SIGNAL PHRASES:
+- BEHAVIORAL: "Tell me about a past experience...", "Using the STAR method, describe...", "I want to hear about a time when..."
+- TECHNICAL: "Let's test your knowledge of...", "I want to understand your technical grasp of...", "Tell me about your understanding of..."
+- COMPETENCY: "I want to see how you handle...", "Demonstrate your ability to...", "How do you approach..."
+- SITUATIONAL: "Let me give you a scenario...", "What would you do if...", "Here's a hypothetical situation..."
+- STRENGTHS/WEAKNESSES: "I want to understand your self-awareness...", "Help me understand your strengths...", "Tell me about areas for growth..."
+- CULTURE FIT: "I want to understand your motivations...", "Help me understand why...", "What attracts you to..."
+
+WHY THIS MATTERS:
+The same question asked in different categories requires different answers:
+- "Tell me about a mistake" as BEHAVIORAL → Use STAR, tell the story chronologically
+- "Tell me about a mistake" as WEAKNESSES → Focus on self-awareness and growth mindset
+- "Tell me about a mistake" as COMPETENCY → Emphasize resilience and learning ability
+
+By signaling the category, you help the candidate practice the meta-skill of recognizing what's being tested.`;
   }
 
   // Default to existing priority order if not provided

@@ -276,6 +276,25 @@ function ConfigureInterviewContent() {
               </div>
             </div>
 
+            {/* Industry-Specific Disclaimer for Tech */}
+            {industry === 'technology' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-1">
+                      Behavioral Interview Practice
+                    </h3>
+                    <p className="text-sm text-blue-800">
+                      This practice focuses on behavioral and communication skills for tech interviews.
+                      For coding rounds (LeetCode, algorithms, data structures), supplement with platforms like
+                      LeetCode, HackerRank, or AlgoExpert.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Company Name */}
             <div>
               <label

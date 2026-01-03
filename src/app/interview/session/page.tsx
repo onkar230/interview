@@ -306,14 +306,6 @@ function InterviewSessionContent() {
     setError(null);
     setCurrentAudioUrl(null);
 
-    // LATENCY MASKING: Show immediate "thinking" response
-    const thinkingMessage: Message = {
-      role: 'assistant',
-      content: '...',
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, thinkingMessage]);
-
     try {
       // Step 1: Transcribe audio
       console.log(`[handleRecordingComplete] Audio blob size: ${(audioBlob.size / 1024 / 1024).toFixed(2)} MB`);
@@ -336,13 +328,21 @@ function InterviewSessionContent() {
       const { text } = await transcriptResponse.json();
       console.log(`[handleRecordingComplete] Transcription successful: ${text.substring(0, 50)}...`);
 
-      // Add user message to conversation
+      // Add user message to conversation FIRST
       const userMessage: Message = {
         role: 'user',
         content: text,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, userMessage]);
+
+      // THEN add thinking indicator (so it appears AFTER user's message)
+      const thinkingMessage: Message = {
+        role: 'assistant',
+        content: 'Interviewer bot is thinking...',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, thinkingMessage]);
 
       // Get the last AI question for feedback context
       const lastQuestion = messages.length > 0 ? messages[messages.length - 1].content : '';
@@ -813,7 +813,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               {isProcessing && !streamingText && (
                 <div className="flex items-center gap-2 text-primary-foreground/80 text-sm">
                   <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                  <span>{!isInitialized ? 'Preparing...' : 'AI is thinking...'}</span>
+                  <span>{!isInitialized ? 'Preparing...' : 'Interviewer bot is thinking...'}</span>
                 </div>
               )}
 
