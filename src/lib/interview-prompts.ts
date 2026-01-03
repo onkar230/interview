@@ -608,18 +608,95 @@ IMPORTANT: Use the job description to tailor your questions. Ask about specific 
       culture: 'Company/Culture Fit questions (Values and work style alignment)',
     };
 
+    const typeExamples: Record<string, string[]> = {
+      behavioral: [
+        'Tell me about a time when you had to deal with a difficult colleague',
+        'Describe a situation where you failed and what you learned from it',
+        'Give me an example of when you showed leadership'
+      ],
+      technical: [
+        'Explain how you would approach [specific technical problem]',
+        'What experience do you have with [specific technology/skill]?',
+        'Walk me through your technical expertise in [relevant area]'
+      ],
+      competency: [
+        'How would you handle a situation where you disagree with your manager?',
+        'How do you prioritize multiple competing deadlines?',
+        'How would you approach learning a new skill quickly?'
+      ],
+      situational: [
+        'What would you do if you discovered a major error in a project right before the deadline?',
+        'If a team member wasn\'t pulling their weight, how would you handle it?',
+        'What would you do if you were asked to do something unethical?'
+      ],
+      strengths: [
+        'What are your greatest strengths?',
+        'What areas do you need to improve on?',
+        'What motivates you in your work?'
+      ],
+      culture: [
+        'What type of work environment do you thrive in?',
+        'How do you prefer to receive feedback?',
+        'What company values are most important to you?'
+      ]
+    };
+
     const selectedTypes = questionTypes
       .filter(type => typeDescriptions[type])
       .map(type => `- ${typeDescriptions[type]}`)
       .join('\n');
 
+    const selectedExamples = questionTypes
+      .filter(type => typeExamples[type])
+      .flatMap(type => typeExamples[type].map(ex => `  • ${ex}`))
+      .join('\n');
+
     questionTypesSection = `
 
-QUESTION TYPES PREFERENCE:
-The candidate wants to focus on these specific types of questions:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 SELECTED QUESTION TYPES - MANDATORY REQUIREMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The candidate selected these SPECIFIC question types to practice:
 ${selectedTypes}
 
-IMPORTANT: Prioritize these question types throughout the interview. While you can ask other questions, the majority of your questions should fall into these categories.`;
+⚠️ CRITICAL REQUIREMENT - YOU MUST FOLLOW THIS:
+
+1. STRICT ENFORCEMENT:
+   - AT LEAST 80% of your questions MUST be from the selected types above
+   - DO NOT ask questions from types that were NOT selected
+   - If they didn't select "strengths", DON'T ask "What are your strengths?"
+   - If they didn't select "behavioral", DON'T ask "Tell me about a time..."
+   - If they selected ONLY "situational", ask ONLY situational questions
+
+2. QUESTION TYPE DEFINITIONS:
+   - BEHAVIORAL: "Tell me about a time when..." (past experiences, real examples)
+   - TECHNICAL: Role-specific expertise, technical knowledge, industry skills
+   - COMPETENCY: "How would you handle..." (hypothetical approach to common scenarios)
+   - SITUATIONAL: "What would you do if..." (specific hypothetical situations, ethical dilemmas)
+   - STRENGTHS: Self-assessment questions (strengths, weaknesses, motivations)
+   - CULTURE FIT: Work style, values, team preferences
+
+3. EXAMPLE QUESTIONS FOR SELECTED TYPES:
+${selectedExamples}
+
+4. HOW TO TRACK:
+   - Before asking each question, mentally check: "Is this one of the selected types?"
+   - Count your questions: "Have I asked 80%+ from the selected types?"
+   - If you catch yourself asking an unselected type, apologize and ask a different question
+
+✓ CORRECT EXAMPLE (if they selected ONLY "situational" and "technical"):
+  Question 1: "What would you do if you discovered a security vulnerability in production?" [situational ✓]
+  Question 2: "Explain your experience with cloud infrastructure" [technical ✓]
+  Question 3: "What would you do if a client demanded an unrealistic deadline?" [situational ✓]
+  Question 4: "Tell me about a time you failed" [behavioral ✗ WRONG - they didn't select this!]
+
+✗ WRONG EXAMPLE (if they selected ONLY "behavioral"):
+  Question 1: "What are your strengths?" [strengths ✗ NOT selected]
+  Question 2: "What would you do if..." [situational ✗ NOT selected]
+  Question 3: "Tell me about a time when..." [behavioral ✓ CORRECT]
+
+REMEMBER: The candidate specifically chose these question types because they want to practice THESE SPECIFIC TYPES. If you ignore their selection and ask other types, you are FAILING the interview. Respect their choice and stick to the selected types.`;
   }
 
   // Custom questions section
