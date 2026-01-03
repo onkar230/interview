@@ -21,12 +21,18 @@ export interface User {
  */
 export type InterviewStatus = 'pending' | 'active' | 'completed' | 'cancelled';
 
+/**
+ * Question source types for priority ordering
+ */
+export type QuestionSourceType = 'custom' | 'cv' | 'generic';
+
 export interface InterviewConfig {
   industry: Industry;
   role: string;
   difficulty: Difficulty;
   duration?: number; // in minutes
   focusAreas?: string[];
+  questionPriority?: QuestionSourceType[]; // Order in which question sources are asked
 }
 
 export interface InterviewSession {

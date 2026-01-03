@@ -14,7 +14,7 @@ import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import PerformanceScore from '@/components/interview/PerformanceScore';
-import { Industry, generateInterviewPrompt } from '@/lib/interview-prompts';
+import { Industry, QuestionSourceType, generateInterviewPrompt } from '@/lib/interview-prompts';
 import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap } from 'lucide-react';
 
 interface Message {
@@ -37,6 +37,7 @@ function InterviewSessionContent() {
   const followUpIntensity = (searchParams.get('followUpIntensity') as 'none' | 'light' | 'moderate' | 'intensive') || 'moderate';
   const maxQuestions = parseInt(searchParams.get('questionCount') || '10', 10);
   const cvText = searchParams.get('cv') || '';
+  const questionPriorityParam = searchParams.get('questionPriority') || 'custom-cv-generic';
 
   // Parse question types from comma-separated string
   const questionTypes = questionTypesParam ? questionTypesParam.split(',') : [];
@@ -45,6 +46,9 @@ function InterviewSessionContent() {
   const customQuestions = customQuestionsParam
     ? customQuestionsParam.split('|||').filter(q => q.trim().length > 0)
     : [];
+
+  // Parse question priority from dash-separated string
+  const questionPriority: QuestionSourceType[] = questionPriorityParam.split('-') as QuestionSourceType[];
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -191,7 +195,8 @@ function InterviewSessionContent() {
           customQuestions,
           followUpIntensity,
           maxQuestions,
-          cvText
+          cvText,
+          questionPriority
         );
 
         // Add optimistic message immediately
@@ -331,7 +336,8 @@ function InterviewSessionContent() {
         customQuestions,
         followUpIntensity,
         maxQuestions,
-        cvText
+        cvText,
+        questionPriority
       );
       const conversationMessages = [
         { role: 'system', content: systemPrompt },
@@ -543,7 +549,8 @@ function InterviewSessionContent() {
           customQuestions,
           followUpIntensity,
           maxQuestions,
-          cvText
+          cvText,
+          questionPriority
         );
 
         const conversationMessages = [

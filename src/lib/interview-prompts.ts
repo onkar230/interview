@@ -20,6 +20,8 @@ export type Industry =
 
 export type Difficulty = 'entry-level' | 'mid-level' | 'senior' | 'executive';
 
+export type QuestionSourceType = 'custom' | 'cv' | 'generic';
+
 /**
  * Base system prompt for the AI interviewer
  */
@@ -540,7 +542,8 @@ export function generateInterviewPrompt(
   customQuestions?: string[],
   followUpIntensity?: 'none' | 'light' | 'moderate' | 'intensive',
   questionCount?: number,
-  cvText?: string
+  cvText?: string,
+  questionPriority?: QuestionSourceType[]
 ): string {
   const industryConfig = INDUSTRY_PROMPTS[industry];
   const difficultyAdjustment = DIFFICULTY_ADJUSTMENTS[difficulty];
@@ -979,21 +982,46 @@ INSTRUCTIONS FOR USING THESE QUESTIONS:
 - Mix different types: commercial awareness, competency-based, situational, etc.`;
   }
 
-  return `${BASE_INTERVIEWER_PROMPT}
-${questionCountInstructions}
+  // Default to existing priority order if not provided
+  const priority = questionPriority || ['custom', 'cv', 'generic'];
 
+  // Build sections object for dynamic ordering
+  const sections: Record<QuestionSourceType, string> = {
+    custom: customQuestionsSection,
+    cv: cvSection,
+    generic: lawSpecificStyle
+  };
+
+  // Build dynamic priority header based on user's chosen order
+  const priorityLabels: Record<QuestionSourceType, string> = {
+    custom: 'Custom Questions - If provided, ask ALL of them verbatim',
+    cv: 'CV-Based Questions - If CV uploaded, ask questions about their CV',
+    generic: 'Generic Question Bank - Default questions for the industry/role'
+  };
+
+  const priorityHeader = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 QUESTION PRIORITY ORDER - FOLLOW THIS HIERARCHY STRICTLY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-PRIORITY 1 (HIGHEST): Custom Questions - If provided, ask ALL of them FIRST, verbatim
-PRIORITY 2 (SECOND):   CV-Based Questions - If CV uploaded, ask questions about their CV
-PRIORITY 3 (LOWEST):   Generic Question Bank - Default questions for the industry/role
+${priority.map((source, idx) => {
+    const priorityLevel = idx === 0 ? '(HIGHEST)' : idx === priority.length - 1 ? '(LOWEST)' : '(SECOND)';
+    return `PRIORITY ${idx + 1} ${priorityLevel}: ${priorityLabels[source]}`;
+  }).join('\n')}
 
-CRITICAL: Never mix priorities! Finish PRIORITY 1 completely, then PRIORITY 2, then PRIORITY 3.
-${customQuestionsSection}
-${cvSection}
-${lawSpecificStyle}
+CRITICAL: Never mix priorities! Finish PRIORITY 1 completely, then PRIORITY 2, then PRIORITY 3.`;
+
+  // Assemble sections in user's chosen order
+  const orderedSections = priority
+    .map(source => sections[source])
+    .filter(section => section) // Remove empty sections
+    .join('\n');
+
+  return `${BASE_INTERVIEWER_PROMPT}
+${questionCountInstructions}
+
+${priorityHeader}
+${orderedSections}
 
 INTERVIEW CONTEXT:
 INDUSTRY: ${industry.charAt(0).toUpperCase() + industry.slice(1)}

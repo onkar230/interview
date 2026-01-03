@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Loader2, Shield, Upload, FileText, X } from 'lucide-react';
-import { Industry, Difficulty } from '@/lib/interview-prompts';
+import { ArrowLeft, Loader2, Shield, Upload, FileText, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
 
 // Industry-specific suggestions
@@ -75,8 +75,41 @@ function ConfigureInterviewContent() {
   const [cvText, setCvText] = useState('');
   const [isUploadingCv, setIsUploadingCv] = useState(false);
   const [cvError, setCvError] = useState('');
+  const [questionPriority, setQuestionPriority] = useState<QuestionSourceType[]>([
+    'custom',
+    'cv',
+    'generic'
+  ]);
 
   const suggestions = industry ? INDUSTRY_SUGGESTIONS[industry] : null;
+
+  // Question priority labels and descriptions
+  const QUESTION_SOURCE_LABELS: Record<QuestionSourceType, string> = {
+    custom: 'Your Custom Questions',
+    cv: 'CV-Based Questions',
+    generic: 'Generic Question Bank'
+  };
+
+  const QUESTION_SOURCE_DESCRIPTIONS: Record<QuestionSourceType, string> = {
+    custom: 'Questions you specifically want to be asked',
+    cv: 'Questions tailored to your CV/resume',
+    generic: 'Standard industry-specific questions'
+  };
+
+  // Functions to reorder question priorities
+  const moveUp = (index: number) => {
+    if (index === 0) return;
+    const newOrder = [...questionPriority];
+    [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
+    setQuestionPriority(newOrder);
+  };
+
+  const moveDown = (index: number) => {
+    if (index === questionPriority.length - 1) return;
+    const newOrder = [...questionPriority];
+    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+    setQuestionPriority(newOrder);
+  };
 
   const handleQuestionTypeToggle = (type: string) => {
     setQuestionTypes((prev) =>
@@ -194,6 +227,9 @@ function ConfigureInterviewContent() {
     if (cvText.trim()) {
       params.append('cv', cvText.trim().slice(0, 8000)); // Limit to 8000 chars
     }
+
+    // Add question priority order
+    params.append('questionPriority', questionPriority.join('-'));
 
     router.push(`/interview/session?${params.toString()}`);
   };
@@ -504,6 +540,63 @@ function ConfigureInterviewContent() {
               <p className="mt-1 text-sm text-muted-foreground">
                 {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
               </p>
+            </div>
+
+            {/* Question Priority Order */}
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Question Priority Order
+              </label>
+              <p className="text-xs text-muted-foreground mb-3">
+                Choose the order in which questions will be asked during the interview. Use the arrow buttons to reorder.
+              </p>
+
+              <div className="space-y-2">
+                {questionPriority.map((source, index) => (
+                  <div
+                    key={source}
+                    className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white"
+                  >
+                    <span className="text-lg font-bold text-muted-foreground min-w-[24px]">
+                      {index + 1}
+                    </span>
+
+                    <div className="flex-1">
+                      <div className="font-medium text-card-foreground">
+                        {QUESTION_SOURCE_LABELS[source]}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {QUESTION_SOURCE_DESCRIPTIONS[source]}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveUp(index)}
+                        disabled={index === 0}
+                        aria-label="Move up"
+                        className="h-8 w-8"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => moveDown(index)}
+                        disabled={index === questionPriority.length - 1}
+                        aria-label="Move down"
+                        className="h-8 w-8"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Privacy Notice */}
