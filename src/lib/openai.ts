@@ -221,19 +221,19 @@ CRITICAL - LAW FIRM SPECIFIC ANALYSIS:
 - DO NOT assess technical coding accuracy - this is a law interview
 - British English and legal terminology expected
 
-FATAL ERRORS TO FLAG IN THREATS (Score 0-10):
-✗ Purely money-motivated ("I love money", "high salary", "prestige only") → Score: 0-10
-✗ Unethical suggestions (hiding evidence, lying to clients, following unethical instructions) → Score: 0-5
-✗ Generic firm praise without specifics ("You're prestigious") → Score: 10-20
-✗ No commercial understanding (can't connect news to legal services) → Score: 15-25
-✗ Can't distinguish law from banking/consulting → Score: 10-20
+FATAL ERRORS TO FLAG IN THREATS (Score 0-1):
+✗ Purely money-motivated ("I love money", "high salary", "prestige only") → Score: 0-1/10
+✗ Unethical suggestions (hiding evidence, lying to clients, following unethical instructions) → Score: 0/10
+✗ Generic firm praise without specifics ("You're prestigious") → Score: 1-2/10
+✗ No commercial understanding (can't connect news to legal services) → Score: 2-3/10
+✗ Can't distinguish law from banking/consulting → Score: 1-2/10
 
 LAW INTERVIEW SCORING SPECIFICS:
-- "I love money" / "high salary" motivation → 5/100 for relevantExperience, 5/100 for technicalKnowledge
-- Generic firm answer with no research → 15-25/100 maximum
-- No commercial awareness → Deduct 30-40 points from technicalKnowledge
-- Unethical response → 0-10/100 across all categories
-- Strong commercial awareness + genuine interest + structured → 70-85/100
+- "I love money" / "high salary" motivation → 0-1/10 for relevantExperience, 0-1/10 for technicalKnowledge
+- Generic firm answer with no research → 2-3/10 maximum
+- No commercial awareness → Deduct 3-4 points from technicalKnowledge
+- Unethical response → 0-1/10 across all categories
+- Strong commercial awareness + genuine interest + structured → 8-9/10
 `
     : industry === 'technology'
     ? `
@@ -245,20 +245,20 @@ CRITICAL - TECH INTERVIEW SPECIFIC ANALYSIS:
 - Evaluate their ability to EXPLAIN technical concepts verbally (this is voice-based)
 - DO NOT assess commercial awareness or legal knowledge - this is a tech interview
 
-FATAL ERRORS TO FLAG IN THREATS (Score 0-10):
-✗ Cannot explain code/solution in plain English → Score: 5-15
-✗ Silent coder (no thought process explained) → Score: 10-20
-✗ Wrong Big O complexity with no correction → Score: 10-25
-✗ Entry-level claiming distributed systems expertise they don't have → Score: 15-25
-✗ Uses jargon but can't define it → Score: 5-15
+FATAL ERRORS TO FLAG IN THREATS (Score 0-1):
+✗ Cannot explain code/solution in plain English → Score: 0-1/10
+✗ Silent coder (no thought process explained) → Score: 1-2/10
+✗ Wrong Big O complexity with no correction → Score: 1-2/10
+✗ Entry-level claiming distributed systems expertise they don't have → Score: 2-3/10
+✗ Uses jargon but can't define it → Score: 0-1/10
 
 TECH INTERVIEW SCORING SPECIFICS:
-- Cannot verbally explain technical concepts → 10/100 for communication
-- Wrong algorithmic complexity → 15-25/100 for problemSolving
-- No code explanation / "I would just write it" → 15/100 for communication
-- Silent problem-solving → 20/100 for problemSolving
-- Generic "I'm passionate about tech" → 20-30/100
-- Strong technical explanation with complexity analysis → 70-85/100
+- Cannot verbally explain technical concepts → 1/10 for communication
+- Wrong algorithmic complexity → 2-3/10 for problemSolving
+- No code explanation / "I would just write it" → 2/10 for communication
+- Silent problem-solving → 2/10 for problemSolving
+- Generic "I'm passionate about tech" → 3-4/10
+- Strong technical explanation with complexity analysis → 8-9/10
 `
     : '';
 
@@ -316,46 +316,46 @@ SUGGESTED IMPROVEMENTS EXAMPLES:
 - "Add context about why this was important to the business"
 - "Describe what you learned from this experience"
 
-SCORING (0-100 for each category):
+SCORING (0-10 for each category):
 Also provide numerical scores for this answer in these categories:
-- communication: How clearly they articulated their answer (0-100)
-- technicalKnowledge: Demonstration of role-specific expertise (0-100)
-- problemSolving: Analytical thinking and approach (0-100)
-- relevantExperience: Quality and relevance of examples (0-100)
+- communication: How clearly they articulated their answer (0-10)
+- technicalKnowledge: Demonstration of role-specific expertise (0-10)
+- problemSolving: Analytical thinking and approach (0-10)
+- relevantExperience: Quality and relevance of examples (0-10)
 
-CRITICAL SCORING GUIDELINES - BE BRUTALLY HONEST:
+CRITICAL SCORING GUIDELINES - BE BRUTALLY HONEST (0-10 SCALE):
 
-0-10: TERRIBLE (Red flags, one-word answers, completely inappropriate, unethical, "I love money" type answers)
+0-1: TERRIBLE (Red flags, one-word answers, completely inappropriate, unethical, "I love money")
   Examples: "I don't know", "I love money", "Because it's easy", unethical suggestions
 
-10-25: VERY POOR (No substance, extremely vague, shows zero preparation or understanding)
+2-3: VERY POOR (No substance, extremely vague, shows zero preparation)
   Examples: "I work hard", "I'm a team player" (no examples), generic platitudes
 
-25-40: POOR (Weak answer, lacks specifics, minimal effort, vague examples)
+4-5: POOR (Weak answer, lacks specifics, minimal effort, vague)
   Examples: Generic answers with no concrete details, no metrics, surface-level thinking
 
-40-55: BELOW AVERAGE (Some substance but needs major improvement, lacks depth)
+6: BELOW AVERAGE (Some substance but needs major improvement, lacks depth)
   Examples: Provides examples but vague, no outcomes mentioned, limited detail
 
-55-70: AVERAGE (Decent answer, some specifics, could be stronger)
+7: AVERAGE (Decent answer, some specifics, could be stronger)
   Examples: Has structure, mentions outcomes, but could add more metrics/depth
 
-70-85: GOOD (Strong answer with specifics, clear examples, demonstrates competence)
+8: GOOD (Strong answer with specifics, clear examples, demonstrates competence)
   Examples: Uses STAR naturally, provides metrics, shows impact, demonstrates expertise
 
-85-95: VERY GOOD (Exceptional answer, detailed, compelling, shows deep understanding)
+9: VERY GOOD (Exceptional answer, detailed, compelling, shows deep understanding)
   Examples: Detailed examples with metrics, clear business impact, insightful analysis
 
-95-100: OUTSTANDING (Textbook perfect answer, interviewer would be impressed)
+10: OUTSTANDING (Textbook perfect answer, interviewer would be impressed)
   Examples: Everything above + unique insights, demonstrates exceptional expertise
 
 DO NOT BE GENEROUS:
-- If they gave a one-word answer, score 5-15 maximum
-- If they said something unethical or showed red flags, score 0-10
-- If they were vague with no examples, score 20-35
-- Average scores should be 40-60 for most candidates, NOT 60-80
-- Reserve 70+ for genuinely strong answers only
-- Reserve 85+ for truly exceptional answers that would impress senior interviewers
+- If they gave a one-word answer, score 0-1
+- If they said something unethical or showed red flags, score 0-1
+- If they were vague with no examples, score 3-4
+- Average scores should be 5-7 for most candidates, NOT 7-9
+- Reserve 8+ for genuinely strong answers only
+- Reserve 9-10 for truly exceptional answers that would impress senior interviewers
 
 Respond in JSON format:
 {
@@ -365,10 +365,10 @@ Respond in JSON format:
   "threats": ["Answer is too vague and lacks substance"] or [],
   "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"],
   "scores": {
-    "communication": 65,
-    "technicalKnowledge": 70,
-    "problemSolving": 55,
-    "relevantExperience": 60
+    "communication": 7,
+    "technicalKnowledge": 6,
+    "problemSolving": 5,
+    "relevantExperience": 6
   }
 }`;
 
@@ -391,10 +391,10 @@ Respond in JSON format:
     threats: result.threats || [],
     suggestedImprovements: result.suggestedImprovements || [],
     scores: {
-      communication: result.scores?.communication || 50,
-      technicalKnowledge: result.scores?.technicalKnowledge || 50,
-      problemSolving: result.scores?.problemSolving || 50,
-      relevantExperience: result.scores?.relevantExperience || 50,
+      communication: result.scores?.communication || 5,
+      technicalKnowledge: result.scores?.technicalKnowledge || 5,
+      problemSolving: result.scores?.problemSolving || 5,
+      relevantExperience: result.scores?.relevantExperience || 5,
     },
   };
 }

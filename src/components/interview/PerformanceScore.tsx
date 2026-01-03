@@ -12,16 +12,16 @@ interface PerformanceScoreProps {
 }
 
 export default function PerformanceScore({ overallScore, categoryScores, answersCount }: PerformanceScoreProps) {
-  // Calculate color based on score
+  // Calculate color based on score (0-10 scale)
   const getScoreColor = (score: number) => {
-    if (score >= 70) return 'text-green-600';
-    if (score >= 50) return 'text-amber-600';
+    if (score >= 7) return 'text-green-600';
+    if (score >= 5) return 'text-amber-600';
     return 'text-red-600';
   };
 
   const getBarColor = (score: number) => {
-    if (score >= 70) return 'bg-green-600';
-    if (score >= 50) return 'bg-amber-600';
+    if (score >= 7) return 'bg-green-600';
+    if (score >= 5) return 'bg-amber-600';
     return 'bg-red-600';
   };
 
@@ -40,11 +40,11 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${getBarColor(categoryScores.communication)}`}
-                style={{ width: `${categoryScores.communication}%` }}
+                style={{ width: `${(categoryScores.communication / 10) * 100}%` }}
               />
             </div>
-            <div className="w-12 text-xs text-right text-muted-foreground">
-              {Math.round(categoryScores.communication)}/100
+            <div className="w-10 text-xs text-right text-muted-foreground">
+              {categoryScores.communication.toFixed(1)}/10
             </div>
           </div>
 
@@ -54,11 +54,11 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${getBarColor(categoryScores.technicalKnowledge)}`}
-                style={{ width: `${categoryScores.technicalKnowledge}%` }}
+                style={{ width: `${(categoryScores.technicalKnowledge / 10) * 100}%` }}
               />
             </div>
-            <div className="w-12 text-xs text-right text-muted-foreground">
-              {Math.round(categoryScores.technicalKnowledge)}/100
+            <div className="w-10 text-xs text-right text-muted-foreground">
+              {categoryScores.technicalKnowledge.toFixed(1)}/10
             </div>
           </div>
 
@@ -68,11 +68,11 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
             <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${getBarColor(categoryScores.problemSolving)}`}
-                style={{ width: `${categoryScores.problemSolving}%` }}
+                style={{ width: `${(categoryScores.problemSolving / 10) * 100}%` }}
               />
             </div>
-            <div className="w-12 text-xs text-right text-muted-foreground">
-              {Math.round(categoryScores.problemSolving)}/100
+            <div className="w-10 text-xs text-right text-muted-foreground">
+              {categoryScores.problemSolving.toFixed(1)}/10
             </div>
           </div>
         </div>
@@ -80,9 +80,9 @@ export default function PerformanceScore({ overallScore, categoryScores, answers
         {/* Right side: Overall score */}
         <div className="flex flex-col items-center justify-center px-6 border-l border-border">
           <div className={`text-5xl font-bold ${getScoreColor(overallScore)} transition-all duration-500`}>
-            {Math.round(overallScore)}
+            {overallScore.toFixed(1)}
           </div>
-          <div className="text-lg text-muted-foreground font-medium">/100</div>
+          <div className="text-lg text-muted-foreground font-medium">/10</div>
           <div className="text-xs text-card-foreground font-medium mt-2">Interview Score</div>
           <div className="text-xs text-muted-foreground italic">Updates in real-time</div>
         </div>
