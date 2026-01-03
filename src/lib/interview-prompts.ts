@@ -118,14 +118,62 @@ export const INDUSTRY_PROMPTS: Record<
       'Learning and adaptability',
     ],
     sampleQuestions: [
-      'Tell me about a time you had to debug a production issue under time pressure. Walk me through your exact process.',
-      'Describe a technical decision you made that you later regretted. What would you do differently?',
-      'Your code review gets 30 comments pointing out issues. How do you handle feedback that contradicts your technical approach?',
-      'Tell me about a time you had to choose between shipping quickly and refactoring for better code quality. What did you decide and why?',
-      'Walk me through a situation where you had to explain a complex technical concept to a non-technical stakeholder.',
-      'Describe a time when you disagreed with a senior engineer\'s technical approach. How did you handle it?',
-      'Tell me about the most challenging bug you\'ve ever encountered. How long did it take to find? What was the root cause?',
-      'Give me an example of when you had to make a trade-off between performance and maintainability. What factors did you consider?',
+      // BEHAVIORAL - STAR Method Focus (Tests for red flags and collaboration)
+      '[BEHAVIORAL] Describe a situation where you had a conflict with a team member. How did you handle it?',
+      '[BEHAVIORAL] Describe a situation where you had to meet a tight deadline. How did you prioritise?',
+      '[BEHAVIORAL] Tell me about a mistake you made in a technical project. How did you fix it?',
+      '[BEHAVIORAL] Describe a time you had to learn a new technology quickly',
+      '[BEHAVIORAL] Tell me about a time you disagreed with a supervisor or professor\'s approach',
+      '[BEHAVIORAL] Describe the most challenging technical bug you\'ve faced. How did you solve it?',
+      '[BEHAVIORAL] Tell me about a time you took initiative outside of your defined role or coursework',
+      '[BEHAVIORAL] Describe a time you had to explain a complex technical concept to a non-technical person',
+      '[BEHAVIORAL] Tell me about a time you received constructive feedback. What did you do with it?',
+      '[BEHAVIORAL] Describe a situation where you worked with a difficult personality',
+
+      // TECHNICAL - CS Fundamentals & Coding (Voice-based conceptual verification)
+      '[TECHNICAL] Explain the difference between TCP and UDP. When would you use each?',
+      '[TECHNICAL] What is the difference between a Process and a Thread?',
+      '[TECHNICAL] Explain the concept of Recursion to a 5-year-old',
+      '[TECHNICAL] What is the difference between SQL (Relational) and NoSQL databases?',
+      '[TECHNICAL] Explain Polymorphism in Object-Oriented Programming with a real-world example',
+      '[TECHNICAL] What happens behind the scenes when you type a URL into a browser and hit enter?',
+      '[TECHNICAL] Explain the difference between GET and POST requests',
+      '[TECHNICAL] What is Big O Notation and why do we care about it?',
+      '[TECHNICAL] Explain the concept of a RESTful API',
+      '[TECHNICAL] What is a Race Condition, and how do you prevent it?',
+
+      // TECHNICAL - System Design (Junior Level)
+      '[TECHNICAL] How would you design a simple URL shortener (like bit.ly)?',
+      '[TECHNICAL] How would you design a Parking Lot system (Classes and relationships)?',
+      '[TECHNICAL] If an application is running slowly, what steps do you take to debug the latency?',
+      '[TECHNICAL] How do you handle user authentication and security in a web app?',
+      '[TECHNICAL] Explain the concept of Load Balancing',
+
+      // SITUATIONAL - Hypothetical Scenarios (Tests judgment and engineering maturity)
+      '[SITUATIONAL] You find a security vulnerability in a colleague\'s code during a review. They deny it. What do you do?',
+      '[SITUATIONAL] Production goes down 10 minutes before you are supposed to leave for the weekend. What is your process?',
+      '[SITUATIONAL] You are halfway through a project and realise the technology stack you chose is wrong. What do you do?',
+      '[SITUATIONAL] You have to deliver a feature tomorrow, but to do so, you must write "dirty" code (technical debt). Do you do it?',
+      '[SITUATIONAL] A product manager asks for a feature that you know will negatively impact system performance. How do you handle this?',
+      '[SITUATIONAL] You are blocked on a task, and the senior engineer is on vacation. How do you proceed?',
+      '[SITUATIONAL] How do you decide when to comment your code versus making the code self-documenting?',
+
+      // STRENGTHS & WEAKNESSES - Self-awareness and honesty
+      '[WEAKNESSES] What is your biggest professional or academic weakness, and what are you doing to fix it?',
+      '[STRENGTHS] What is the one technical skill you are currently trying to improve?',
+      '[WEAKNESSES] What part of the software development lifecycle (SDLC) do you enjoy the least?',
+      '[STRENGTHS] If I asked your previous teammates or classmates, what would they say is your biggest strength?',
+      '[BEHAVIORAL] Tell me about a time you were overwhelmed. How did you handle it?',
+
+      // CULTURE FIT - Motivational (Tests whether they have done research)
+      '[CULTURE FIT] Why do you want to work in this industry specifically?',
+      '[CULTURE FIT] We use a different tech stack than you\'re familiar with. How will you bridge that gap?',
+      '[CULTURE FIT] What is a recent tech trend you are excited about, and why?',
+      '[CULTURE FIT] Describe your ideal work environment',
+      '[CULTURE FIT] How do you keep your technical skills sharp outside of work or school?',
+      '[CULTURE FIT] Why do you think you are a good fit for this type of company?',
+      '[CULTURE FIT] If you could change one thing about your favourite app, what would it be and why?',
+      '[CULTURE FIT] Do you prefer working on the backend, frontend, or full stack, and why?',
     ],
     companies: [
       'Google',
@@ -1074,6 +1122,68 @@ INTERVIEW LENGTH:
 - You will conduct approximately ${maxQuestions} questions total
 - If you've asked ${Math.max(1, maxQuestions - 2)}+ questions, begin wrapping up the interview naturally`;
 
+  // Tech-specific interviewer style modification
+  let techSpecificStyle = '';
+  if (industry === 'technology') {
+    techSpecificStyle = `
+
+TECH INTERVIEW STYLE (Special Override):
+
+CRITICAL - SIGNAL THE QUESTION CATEGORY:
+Each question in your question bank is tagged with a category like [BEHAVIORAL], [TECHNICAL], [SITUATIONAL], [STRENGTHS], [WEAKNESSES], or [CULTURE FIT].
+
+When you ask a question, you MUST signal which category it belongs to. This helps the candidate understand what you're testing and how to frame their answer.
+
+HOW TO SIGNAL THE CATEGORY:
+- Natural lead-in that mentions what you're testing
+- Don't say the tag literally (don't say "[BEHAVIORAL]")
+- Make it conversational like a real interviewer would
+
+EXAMPLES:
+
+✓ CORRECT:
+"Let me test your understanding of CS fundamentals. Explain the difference between TCP and UDP."
+"I want to hear about a past experience using the STAR method. Describe a time when you had a conflict with a team member."
+"Let me give you a hypothetical scenario. Production goes down 10 minutes before you're supposed to leave for the weekend. What is your process?"
+"I want to understand your self-awareness. What is your biggest professional or academic weakness?"
+"Tell me about your motivations. Why do you want to work in this industry specifically?"
+"Walk me through your technical knowledge. How would you design a simple URL shortener?"
+
+✗ WRONG (don't do this):
+"[BEHAVIORAL] Tell me about a time..." ← Don't say the tag literally
+"Question 5: Explain TCP vs UDP" ← Don't number questions
+"Describe a conflict..." ← Missing category signal
+
+CATEGORY SIGNAL PHRASES:
+- BEHAVIORAL: "Tell me about a past experience...", "Using the STAR method, describe...", "I want to hear about a time when..."
+- TECHNICAL: "Let me test your understanding of...", "Walk me through your technical knowledge of...", "Explain how..."
+- SITUATIONAL: "Let me give you a hypothetical scenario...", "What would you do if...", "Here's a situation..."
+- STRENGTHS/WEAKNESSES: "I want to understand your self-awareness...", "Help me understand your strengths...", "Tell me about areas for growth..."
+- CULTURE FIT: "I want to understand your motivations...", "Help me understand why...", "What attracts you to..."
+
+WHY THIS MATTERS:
+The same question asked in different categories requires different answers:
+- "Tell me about a bug" as BEHAVIORAL → Use STAR, tell the story chronologically
+- "Tell me about a bug" as TECHNICAL → Explain debugging methodology, tools, root cause analysis
+- "Tell me about a bug" as WEAKNESSES → Focus on what you learned, growth mindset
+
+By signaling the category, you help the candidate practice the meta-skill of recognizing what's being tested.
+
+TOP ${industryConfig.sampleQuestions.length} TECH INTERVIEW QUESTIONS - YOU MUST USE THESE:
+
+CRITICAL REQUIREMENT: The questions below are the most commonly asked questions at tech companies (FAANG, startups, etc.). You MUST prioritize asking questions from this list. These are the actual questions candidates need to practice.
+
+${industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
+
+INSTRUCTIONS FOR USING THESE QUESTIONS:
+- Choose questions RANDOMLY from this list - don't go in order
+- You should ask mostly (70-80%) from this specific list
+- You can adapt them slightly to fit the conversation flow
+- You can ask follow-ups and variations, but prioritize these core questions
+- Mix different types: behavioral, technical, situational, strengths/weaknesses, culture fit
+`;
+  }
+
   // Law-specific interviewer style modification
   let lawSpecificStyle = '';
   if (industry === 'law') {
@@ -1211,7 +1321,7 @@ By signaling the category, you help the candidate practice the meta-skill of rec
   const sections: Record<QuestionSourceType, string> = {
     custom: customQuestionsSection,
     cv: cvSection,
-    generic: lawSpecificStyle
+    generic: industry === 'technology' ? techSpecificStyle : lawSpecificStyle
   };
 
   // Build dynamic priority header based on user's chosen order
