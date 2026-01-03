@@ -543,61 +543,73 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* Question Priority Order */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Question Priority Order
-              </label>
-              <p className="text-xs text-muted-foreground mb-3">
-                Choose the order in which questions will be asked during the interview. Use the arrow buttons to reorder.
-              </p>
+            {/* Only show if user has at least 2 question sources (custom questions or CV) */}
+            {(customQuestions.trim().length > 0 || cvText.trim().length > 0) && (
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  Question Priority Order
+                </label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Choose the order in which questions will be asked during the interview. Use the arrow buttons to reorder.
+                </p>
 
-              <div className="space-y-2">
-                {questionPriority.map((source, index) => (
-                  <div
-                    key={source}
-                    className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white"
-                  >
-                    <span className="text-lg font-bold text-muted-foreground min-w-[24px]">
-                      {index + 1}
-                    </span>
-
-                    <div className="flex-1">
-                      <div className="font-medium text-card-foreground">
-                        {QUESTION_SOURCE_LABELS[source]}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {QUESTION_SOURCE_DESCRIPTIONS[source]}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => moveUp(index)}
-                        disabled={index === 0}
-                        aria-label="Move up"
-                        className="h-8 w-8"
+                <div className="space-y-2">
+                  {questionPriority
+                    .filter(source => {
+                      // Only show 'custom' if user has custom questions
+                      if (source === 'custom' && customQuestions.trim().length === 0) return false;
+                      // Only show 'cv' if user has uploaded a CV
+                      if (source === 'cv' && cvText.trim().length === 0) return false;
+                      // Always show 'generic'
+                      return true;
+                    })
+                    .map((source, index, filteredArray) => (
+                      <div
+                        key={source}
+                        className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white"
                       >
-                        <ChevronUp className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => moveDown(index)}
-                        disabled={index === questionPriority.length - 1}
-                        aria-label="Move down"
-                        className="h-8 w-8"
-                      >
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                        <span className="text-lg font-bold text-muted-foreground min-w-[24px]">
+                          {index + 1}
+                        </span>
+
+                        <div className="flex-1">
+                          <div className="font-medium text-card-foreground">
+                            {QUESTION_SOURCE_LABELS[source]}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {QUESTION_SOURCE_DESCRIPTIONS[source]}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => moveUp(questionPriority.indexOf(source))}
+                            disabled={index === 0}
+                            aria-label="Move up"
+                            className="h-8 w-8"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => moveDown(questionPriority.indexOf(source))}
+                            disabled={index === filteredArray.length - 1}
+                            aria-label="Move down"
+                            className="h-8 w-8"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Privacy Notice */}
             <div className="bg-muted border border-border rounded-lg p-4 flex gap-3">
