@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeAnswer } from '@/lib/openai';
 
+// Increase function timeout for GPT-4 analysis (can take 10-30 seconds for detailed feedback)
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 /**
  * POST /api/interview/analyze-answer
  * Provides real-time SWOT feedback for a candidate's answer

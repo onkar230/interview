@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateStreamingResponse } from '@/lib/openai';
 
+// Increase function timeout for GPT-4 streaming responses (can take 10-30 seconds)
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 /**
  * POST /api/interview/message
  * Generates AI interview responses using GPT-4 with streaming

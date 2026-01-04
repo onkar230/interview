@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluateInterview } from '@/lib/openai';
 
+// Increase function timeout for interview evaluation (can take 20-40 seconds for full analysis)
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 /**
  * POST /api/interview/evaluate
  * Evaluates an interview conversation and provides feedback

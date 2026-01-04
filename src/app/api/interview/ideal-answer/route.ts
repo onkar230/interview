@@ -5,6 +5,9 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Increase function timeout for ideal answer generation (can take 10-20 seconds)
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 export async function POST(request: NextRequest) {
   try {
     const { question, answer, industry, role, difficulty, company } = await request.json();

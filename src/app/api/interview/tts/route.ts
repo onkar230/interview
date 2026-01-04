@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { textToSpeech } from '@/lib/openai';
 
+// Increase function timeout for TTS generation (can take 5-15 seconds for long text)
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 /**
  * POST /api/interview/tts
  * Converts text to speech using OpenAI TTS
