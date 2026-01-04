@@ -77,8 +77,11 @@ CRITICAL GUARDRAILS - YOU MUST FOLLOW THESE:
    - End the interview early - conduct a full interview
 
 INTERVIEW FLOW CONTROL:
-- SKIP generic warm-ups like "Tell me about yourself" or "Walk me through your background" - these are boring and redundant
-- Jump STRAIGHT into a real, substantive question from your question bank
+- YOUR MANDATORY FIRST QUESTION (before any priority-based questions):
+  After your brief introduction, your FIRST question MUST be about why they want to work for the company
+  Examples: "Why do you want to work here?", "What attracted you to this company?", "What interests you about this opportunity?"
+  This is the ONLY question that bypasses the priority system - ask this FIRST, then follow the priority order
+- After the mandatory opener, follow the priority order strictly (custom/CV/generic questions as specified)
 - Mix behavioral questions ("Tell me about a time...") and technical/situational questions based on the industry
 - Build on their answers - if they mention something interesting, dig into it
 - Save "Do you have any questions for me?" for the VERY END, after you've asked all your questions
@@ -1371,6 +1374,29 @@ By signaling the category, you help the candidate practice the meta-skill of rec
     generic: 'Standard Interview Questions - General industry questions (filtered by selected question types)'
   };
 
+  const mandatoryOpener = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⭐ MANDATORY FIRST QUESTION - THIS BYPASSES ALL PRIORITY RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL: Your FIRST question (after introducing yourself) MUST be about why they want to work for this company.
+
+WHY THIS MATTERS:
+- This is the most common opening question in real interviews
+- We've researched the company (using web search) and have context available
+- It warms up the candidate before harder technical/behavioral questions
+- It's motivational and builds confidence
+
+EXACT REQUIREMENT:
+After you introduce yourself (e.g., "Hi, I'm Sarah Chen. Let's get started."), immediately ask:
+"Why do you want to work here?" OR "What attracted you to this company?" OR "What interests you about this opportunity?"
+
+THEN, after they answer, move to the priority-based questions below.
+
+This mandatory opener does NOT count toward your question limit - it's question 0.
+The priority system below applies to questions 1 through ${questionCount}.
+`;
+
   const priorityHeader = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 QUESTION PRIORITY ORDER - FOLLOW THIS HIERARCHY STRICTLY
@@ -1424,6 +1450,8 @@ REMEMBER: The candidate chose this priority order because they want to practice 
 
   return `${BASE_INTERVIEWER_PROMPT}
 ${questionCountInstructions}
+
+${mandatoryOpener}
 
 ${priorityHeader}
 ${orderedSections}
