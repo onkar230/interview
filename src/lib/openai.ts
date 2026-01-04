@@ -326,6 +326,10 @@ ${industrySpecificInstructions}
 
 Provide HONEST, CRITICAL feedback in SWOT format. Be specific to THIS answer, not generic.
 
+LANGUAGE REQUIREMENT:
+- Use British English spelling throughout (e.g., "organised", "analyse", "realise", "behaviour", "specialise", "recognise")
+- Apply this to all feedback sections: strengths, weaknesses, opportunities, threats, and suggested improvements
+
 CRITICAL ANALYSIS REQUIREMENTS:
 
 1. ANSWER STRUCTURE CHECK:
@@ -351,7 +355,7 @@ SWOT GUIDELINES:
 - Weaknesses: What needs improvement (1-3 points, honest but constructive). Focus on CONTENT issues, not structure.
 - Opportunities: What they should have done differently (1-3 points). Be specific about what was missing.
 - Threats: Critical red flags (0-2 points). ONLY for serious issues (unethical, one-word answers, completely off-topic).
-- Suggested Improvements: Specific points they could have added to strengthen their answer (2-4 points). Based on what they said, what else would make it stronger?
+- Suggested Improvements: Specific actionable points to strengthen their answer (2-4 points). Based on what they said, what content/examples/metrics would make it stronger?
 
 IMPORTANT: STOP mentioning STAR/CAR/PEEL method in every answer. Only mention it if the answer is genuinely confusing or disorganized.
 
@@ -564,6 +568,10 @@ Evaluate based on:
 Industry: ${industry}
 
 ${industryFatalErrorChecks}
+
+LANGUAGE REQUIREMENT:
+- Use British English spelling throughout (e.g., "organised", "analyse", "realise", "behaviour", "specialise", "recognise")
+- Apply this to all evaluation sections: strengths, weaknesses, deal breakers, and detailed feedback
 
 Provide your evaluation in the following JSON format:
 {

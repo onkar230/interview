@@ -50,7 +50,7 @@ Provide in this format (markdown):
 [1-2 sentence summary of their key points]
 
 ## How to Strengthen This Answer
-[2-3 specific, actionable improvements based on what they said]
+[3-5 specific, actionable improvements based on what they said - include both content improvements (what to add, what metrics/examples would help) and delivery improvements (structure, clarity, confidence)]
 
 ## Enhanced Version of YOUR Answer
 [Rewrite THEIR answer with improvements - keep their examples/stories but add:
@@ -60,20 +60,20 @@ Provide in this format (markdown):
 - Concrete outcomes
 - Business impact]
 
-## Missing Elements
-[Bullet list of 2-3 things they could have added to make it even better]
-
 ## Why This Works
 [1-2 sentences explaining what makes the enhanced version stronger]
 
-IMPORTANT: This should feel like "your answer, but better" - NOT a completely different answer. Use their specific examples and experiences.`;
+IMPORTANT:
+- This should feel like "your answer, but better" - NOT a completely different answer
+- Use their specific examples and experiences
+- Use British English spelling throughout (e.g., "organised", "analyse", "realise", "behaviour")`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: 'You are an expert career coach and interview trainer. Provide clear, actionable guidance.',
+          content: 'You are an expert career coach and interview trainer. Provide clear, actionable guidance using British English spelling (e.g., "organised", "analyse", "realise", "behaviour").',
         },
         {
           role: 'user',
