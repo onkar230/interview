@@ -60,7 +60,6 @@ function InterviewSessionContent() {
   const [feedbackHistory, setFeedbackHistory] = useState<FeedbackItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
-  const [showIdealAnswers, setShowIdealAnswers] = useState(true); // Toggle for ideal answers (on by default)
   const [streamingText, setStreamingText] = useState<string>('');
   const [companyResearch, setCompanyResearch] = useState<string>('');
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -337,25 +336,48 @@ function InterviewSessionContent() {
 
     try {
       // Step 1: Transcribe audio
-      console.log(`[handleRecordingComplete] Audio blob size: ${(audioBlob.size / 1024 / 1024).toFixed(2)} MB`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('[CLIENT] ========== STARTING AUDIO TRANSCRIPTION ==========');
+      console.log(`[CLIENT] Audio blob size: ${(audioBlob.size / 1024 / 1024).toFixed(2)} MB (${audioBlob.size} bytes)`);
+      console.log(`[CLIENT] Audio type: ${audioBlob.type}`);
+      console.log(`[CLIENT] Current time: ${new Date().toISOString()}`);
 
       const formData = new FormData();
       formData.append('audio', audioBlob);
 
-      console.log('[handleRecordingComplete] Sending audio for transcription...');
+      console.log('[CLIENT] Sending fetch request to /api/interview/audio...');
+      const fetchStartTime = Date.now();
+
       const transcriptResponse = await fetch('/api/interview/audio', {
         method: 'POST',
         body: formData,
+      }).catch((fetchError) => {
+        const fetchDuration = Date.now() - fetchStartTime;
+        console.error(`[CLIENT] ❌ FETCH FAILED after ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
+        console.error('[CLIENT] Fetch error details:', fetchError);
+        console.error('[CLIENT] Error name:', fetchError?.name);
+        console.error('[CLIENT] Error message:', fetchError?.message);
+        throw fetchError;
       });
+
+      const fetchDuration = Date.now() - fetchStartTime;
+      console.log(`[CLIENT] ✓ Fetch completed in ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
+      console.log(`[CLIENT] Response status: ${transcriptResponse.status} ${transcriptResponse.statusText}`);
 
       if (!transcriptResponse.ok) {
         const errorData = await transcriptResponse.json().catch(() => ({}));
-        console.error('[handleRecordingComplete] Transcription failed:', transcriptResponse.status, errorData);
+        console.error('[CLIENT] ❌ Transcription API returned error');
+        console.error('[CLIENT] Status:', transcriptResponse.status);
+        console.error('[CLIENT] Error data:', errorData);
         throw new Error(errorData.error || `Failed to transcribe audio (${transcriptResponse.status})`);
       }
 
       const { text } = await transcriptResponse.json();
-      console.log(`[handleRecordingComplete] Transcription successful: ${text.substring(0, 50)}...`);
+      console.log(`[CLIENT] ✓ Transcription successful`);
+      console.log(`[CLIENT] Text length: ${text.length} characters`);
+      console.log(`[CLIENT] Text preview: ${text.substring(0, 100)}...`);
+      console.log('[CLIENT] ========== TRANSCRIPTION COMPLETE ==========');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
       // Get the last AI question for feedback context BEFORE modifying messages
       // This prevents race conditions where we might read stale state
@@ -469,29 +491,27 @@ function InterviewSessionContent() {
           }));
         }
 
-        // Generate ideal answer if enabled
-        if (showIdealAnswers) {
-          try {
-            const idealAnswerResponse = await fetch('/api/interview/ideal-answer', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                question: lastQuestion,
-                answer: text, // Pass the candidate's actual answer
-                industry,
-                role,
-                difficulty,
-                company,
-              }),
-            });
+        // Generate ideal answer (always enabled)
+        try {
+          const idealAnswerResponse = await fetch('/api/interview/ideal-answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              question: lastQuestion,
+              answer: text, // Pass the candidate's actual answer
+              industry,
+              role,
+              difficulty,
+              company,
+            }),
+          });
 
-            if (idealAnswerResponse.ok) {
-              const { idealAnswer } = await idealAnswerResponse.json();
-              newFeedback.idealAnswer = idealAnswer;
-            }
-          } catch (error) {
-            console.error('Failed to generate ideal answer:', error);
+          if (idealAnswerResponse.ok) {
+            const { idealAnswer } = await idealAnswerResponse.json();
+            newFeedback.idealAnswer = idealAnswer;
           }
+        } catch (error) {
+          console.error('Failed to generate ideal answer:', error);
         }
 
         setFeedbackHistory((prev) => [newFeedback, ...prev]); // Newest at top
@@ -804,7 +824,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             <div className="mx-4 mt-3 mb-2 bg-blue-500/20 border border-blue-400/30 rounded-lg p-2.5 flex gap-2 flex-shrink-0">
               <Info className="h-4 w-4 text-blue-300 flex-shrink-0 mt-0.5" />
               <p className="text-[11px] text-blue-100 leading-relaxed">
-                <strong className="font-semibold">Tip:</strong> Keep answers concise (under 60 seconds). Longer answers take more time to process and may timeout.
+                <strong className="font-semibold">Tip:</strong> Longer answers take more time to process and may timeout.
               </p>
             </div>
 
@@ -928,26 +948,6 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{showWebcam ? 'Hide webcam' : 'Show webcam'}</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={() => setShowIdealAnswers(!showIdealAnswers)}
-                      variant="outline"
-                      size="icon"
-                      className={`backdrop-blur-md border-primary/30 hover:bg-secondary hover:text-primary-foreground shadow-lg ${
-                        showIdealAnswers
-                          ? 'bg-blue-600/90 text-white'
-                          : 'bg-primary/95 text-primary-foreground/90'
-                      }`}
-                    >
-                      <GraduationCap className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{showIdealAnswers ? 'Hide answer improvements' : 'Show how to improve your answers after each question'}</p>
                   </TooltipContent>
                 </Tooltip>
 
