@@ -52,10 +52,11 @@ CRITICAL GUARDRAILS - YOU MUST FOLLOW THESE:
    - Don't number your questions or say "Question 1:", "Question 2:", etc.
 
 3. FOLLOW-UP DISCIPLINE:
-   - If a candidate gives a vague or generic answer, ask ONE specific follow-up question
+   - Maximum ONE follow-up question per main question, then you MUST move to the next main question
    - Don't accept surface-level answers - probe for concrete examples with numbers, metrics, and specifics
    - Apply pressure naturally: "Can you be more specific about that?", "What were the actual numbers?", "Walk me through your specific role in that"
    - If they say "we did X", ask "What specifically did YOU do?"
+   - After asking 1 follow-up, STOP and move to a new main question - no exceptions
 
 4. REALISTIC INTERVIEWER BEHAVIOR:
    - Don't be overly friendly, enthusiastic, or encouraging during the interview
@@ -846,8 +847,8 @@ ${customQuestions.map((q, idx) => `[ ] ${idx + 1}. "${q}"`).join('\n')}
    - DO NOT change the question structure or tone
 
 3. FOLLOW-UP RULES:
-   - After they answer a custom question, you MAY ask 1-2 follow-up questions to probe deeper
-   - Then move to the next custom question from the list above
+   - After they answer a custom question, you MAY ask 1 follow-up question maximum to probe deeper
+   - After 1 follow-up, MUST move to the next custom question from the list above
    - DO NOT skip any custom questions
 
 4. TRACKING:
@@ -998,25 +999,24 @@ TRACKING:
 
 FOLLOW-UP INTENSITY: MODERATE (Default)
 
-CRITICAL: Track your follow-ups to avoid endless loops!
+CRITICAL: Maximum 1 follow-up per main question!
 
 MENTAL COUNTING MECHANISM (MANDATORY):
 Before asking each question, mentally count:
 - Main question = "This is main question #X, follow-up count: 0"
-- First follow-up = "This is follow-up 1 of maximum 2"
-- Second follow-up = "This is follow-up 2 of maximum 2 - MUST move to new main question after this"
-- If you've asked 2 follow-ups, you MUST ask a NEW main question next, even if their answer is weak
+- First follow-up = "This is follow-up 1 of maximum 1 - MUST move to new main question after this"
+- If you've asked 1 follow-up, you MUST ask a NEW main question next, even if their answer is weak
 
 HARD ENFORCEMENT:
-- After 2 follow-ups on one topic, your ONLY option is to ask a NEW main question
-- Do NOT ask a 3rd follow-up under any circumstances
+- After 1 follow-up on one topic, your ONLY option is to ask a NEW main question
+- Do NOT ask a 2nd follow-up under any circumstances
 - Better to move on than get stuck in a loop
 
 FOLLOW-UP RULES:
-- Maximum 1-2 follow-up questions PER MAIN QUESTION, then MUST move to next main question
+- Maximum 1 follow-up question PER MAIN QUESTION, then MUST move to next main question
 - A "topic" = one main question from your question list
-- After asking a main question and 1-2 follow-ups, you MUST ask a NEW main question
-- DO NOT keep drilling on the same topic beyond 2 follow-ups
+- After asking a main question and 1 follow-up, you MUST ask a NEW main question
+- DO NOT keep drilling on the same topic beyond 1 follow-up
 
 FOLLOW-UP TRACKING EXAMPLE:
 
@@ -1025,8 +1025,6 @@ YOU: "Tell me about a time you led a project" [MAIN QUESTION - count: 0 follow-u
 THEM: "I led a website redesign"
 YOU: "What challenges did you face?" [FOLLOW-UP 1 - count: 1 follow-up]
 THEM: "Budget constraints and tight deadline"
-YOU: "How did you overcome the budget issue?" [FOLLOW-UP 2 - count: 2 follow-ups]
-THEM: "We prioritised features and cut scope"
 YOU: "Describe a time you had to deal with conflict" [NEW MAIN QUESTION - reset count to 0]
 
 ✗ WRONG (endless loop):
@@ -1034,11 +1032,7 @@ YOU: "Tell me about a time you led a project" [MAIN QUESTION]
 THEM: "I led a website redesign"
 YOU: "What challenges did you face?" [FOLLOW-UP 1]
 THEM: "Budget constraints"
-YOU: "What was the budget?" [FOLLOW-UP 2]
-THEM: "£50k"
-YOU: "Why was it £50k?" [FOLLOW-UP 3 - TOO MANY!]
-THEM: "That's what we had"
-YOU: "How did you decide on that?" [FOLLOW-UP 4 - ENDLESS LOOP!]
+YOU: "How did you overcome the budget issue?" [FOLLOW-UP 2 - TOO MANY!]
 
 WHEN TO FOLLOW-UP:
 - Answer is vague or generic ("I worked hard", "It was challenging")
@@ -1046,12 +1040,12 @@ WHEN TO FOLLOW-UP:
 - Used "we" without explaining their personal role
 
 WHEN TO MOVE ON (stop following up):
-- You've asked 2 follow-ups on this topic already
+- You've asked 1 follow-up on this topic already - STOP and ask a new main question
 - They provided a decent answer with some specifics
 - The answer is "good enough" even if not perfect
 - You need to cover more ground in the interview
 
-REMEMBER: After 1-2 follow-ups, MOVE TO THE NEXT MAIN QUESTION. Don't get stuck!`;
+REMEMBER: After 1 follow-up, MOVE TO THE NEXT MAIN QUESTION. Don't get stuck!`;
       break;
 
     case 'intensive':
@@ -1059,60 +1053,58 @@ REMEMBER: After 1-2 follow-ups, MOVE TO THE NEXT MAIN QUESTION. Don't get stuck!
 
 FOLLOW-UP INTENSITY: INTENSIVE (Maximum Pressure)
 
-CRITICAL: Even in intensive mode, you MUST stop after 3 follow-ups!
+CRITICAL: Even in intensive mode, maximum 1 follow-up per main question!
 
 MENTAL COUNTING MECHANISM (MANDATORY):
 Before asking each question, mentally count:
 - Main question = "This is main question #X, follow-up count: 0"
-- First follow-up = "This is follow-up 1 of maximum 3"
-- Second follow-up = "This is follow-up 2 of maximum 3"
-- Third follow-up = "This is follow-up 3 of maximum 3 - MUST move to new main question after this"
-- If you've asked 3 follow-ups, you MUST ask a NEW main question next
+- First follow-up = "This is follow-up 1 of maximum 1 - MUST move to new main question after this"
+- If you've asked 1 follow-up, you MUST ask a NEW main question next
 
 HARD ENFORCEMENT:
-- After 3 follow-ups on one topic, your ONLY option is to ask a NEW main question
-- Do NOT ask a 4th follow-up under any circumstances
+- After 1 follow-up on one topic, your ONLY option is to ask a NEW main question
+- Do NOT ask a 2nd follow-up under any circumstances
 - Better to move on than drill endlessly
 
 FOLLOW-UP RULES:
-- Ask 2-3 follow-up questions per topic to really drill down
-- Maximum 3 follow-ups per main question, then MUST move to next main question
-- After 3 follow-ups, you've grilled them enough - move on
+- Maximum 1 follow-up question per main question to apply pressure
+- After 1 follow-up, MUST move to next main question
+- Make your ONE follow-up count - be direct and challenging
 
 FOLLOW-UP TRACKING EXAMPLE:
 
 ✓ CORRECT:
 YOU: "Tell me about your biggest achievement" [MAIN QUESTION]
 THEM: "I increased sales by 30%"
-YOU: "How exactly did you do that?" [FOLLOW-UP 1]
-THEM: "I changed the pricing strategy"
-YOU: "What was your specific role in that decision?" [FOLLOW-UP 2]
+YOU: "How exactly did you do that? What was YOUR specific role?" [FOLLOW-UP 1 - make it count]
 THEM: "I analysed competitor pricing and proposed new tiers"
-YOU: "What metrics validated your approach?" [FOLLOW-UP 3 - LAST ONE]
-THEM: "Customer acquisition cost dropped 15%"
 YOU: "Describe a time you failed at something" [NEW MAIN QUESTION - reset count]
 
 ✗ WRONG:
-YOU: [Asks main question + 4, 5, 6 follow-ups on same topic] - TOO MANY!
+YOU: "Tell me about your biggest achievement" [MAIN QUESTION]
+THEM: "I increased sales by 30%"
+YOU: "How exactly did you do that?" [FOLLOW-UP 1]
+THEM: "I changed the pricing strategy"
+YOU: "What was your specific role?" [FOLLOW-UP 2 - TOO MANY!]
 
 WHEN TO FOLLOW-UP:
-- Challenge vague answers aggressively
+- Challenge vague answers aggressively with ONE pointed follow-up
 - Probe "we" statements: "What did YOU do?"
 - Demand specifics: "What exact numbers?", "What metrics?"
 - Test their claims: "How did you validate that?"
 
 WHEN TO MOVE ON:
-- You've asked 3 follow-ups already - STOP and move to new question
+- You've asked 1 follow-up on this topic - STOP and ask a new main question
 - They've given you detailed, specific answers
 - You need to cover more ground
 
-PRESSURE TACTICS:
+PRESSURE TACTICS (Use in your ONE follow-up):
 - Challenge assumptions: "Why that approach?"
 - Ask for metrics: "What were the actual numbers?"
 - Probe individual contribution: "What specifically did YOU do?"
-- This simulates a top-tier company interview
+- Make your single follow-up sharp and direct
 
-REMEMBER: Maximum 3 follow-ups per main question, then MOVE ON to a new topic!`;
+REMEMBER: Maximum 1 follow-up per main question, then MOVE ON to a new topic!`;
       break;
   }
 
@@ -1125,6 +1117,30 @@ INTERVIEW LENGTH:
   // Tech-specific interviewer style modification
   let techSpecificStyle = '';
   if (industry === 'technology') {
+    // Filter questions based on selected question types
+    const filteredTechQuestions = questionTypes && questionTypes.length > 0
+      ? industryConfig.sampleQuestions.filter(q => {
+          const categoryMatch = q.match(/^\[([^\]]+)\]/);
+          if (!categoryMatch) return false;
+
+          const category = categoryMatch[1].toLowerCase();
+
+          // Map category tags to questionTypes values
+          if (category.includes('behavioral') && questionTypes.includes('behavioral')) return true;
+          if (category.includes('technical') && questionTypes.includes('technical')) return true;
+          if (category.includes('situational') && questionTypes.includes('situational')) return true;
+          if (category.includes('competency') && questionTypes.includes('competency')) return true;
+          if ((category.includes('strengths') || category.includes('weaknesses')) && questionTypes.includes('strengths')) return true;
+          if (category.includes('culture') && questionTypes.includes('culture')) return true;
+
+          return false;
+        })
+      : industryConfig.sampleQuestions;
+
+    const questionList = filteredTechQuestions.length > 0
+      ? filteredTechQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')
+      : industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n');
+
     techSpecificStyle = `
 
 TECH INTERVIEW STYLE (Special Override):
@@ -1169,24 +1185,48 @@ The same question asked in different categories requires different answers:
 
 By signaling the category, you help the candidate practice the meta-skill of recognizing what's being tested.
 
-TOP ${industryConfig.sampleQuestions.length} TECH INTERVIEW QUESTIONS - YOU MUST USE THESE:
+TOP ${filteredTechQuestions.length} TECH INTERVIEW QUESTIONS - YOU MUST USE THESE:
 
-CRITICAL REQUIREMENT: The questions below are the most commonly asked questions at tech companies (FAANG, startups, etc.). You MUST prioritize asking questions from this list. These are the actual questions candidates need to practice.
+CRITICAL REQUIREMENT: The questions below have been FILTERED based on the candidate's selected question types. You MUST ask ONLY from this filtered list. DO NOT ask questions from categories that were not selected.
 
-${industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
+${questionList}
 
 INSTRUCTIONS FOR USING THESE QUESTIONS:
 - Choose questions RANDOMLY from this list - don't go in order
-- You should ask mostly (70-80%) from this specific list
+- You MUST ask ONLY from this filtered list - these are the types the candidate selected
 - You can adapt them slightly to fit the conversation flow
 - You can ask follow-ups and variations, but prioritize these core questions
-- Mix different types: behavioral, technical, situational, strengths/weaknesses, culture fit
+- If the list is small, you can ask variations of these questions, but stay within the selected categories
 `;
   }
 
   // Law-specific interviewer style modification
   let lawSpecificStyle = '';
   if (industry === 'law') {
+    // Filter questions based on selected question types
+    const filteredLawQuestions = questionTypes && questionTypes.length > 0
+      ? industryConfig.sampleQuestions.filter(q => {
+          const categoryMatch = q.match(/^\[([^\]]+)\]/);
+          if (!categoryMatch) return false;
+
+          const category = categoryMatch[1].toLowerCase();
+
+          // Map category tags to questionTypes values
+          if (category.includes('behavioral') && questionTypes.includes('behavioral')) return true;
+          if (category.includes('technical') && questionTypes.includes('technical')) return true;
+          if (category.includes('situational') && questionTypes.includes('situational')) return true;
+          if (category.includes('competency') && questionTypes.includes('competency')) return true;
+          if ((category.includes('strengths') || category.includes('weaknesses')) && questionTypes.includes('strengths')) return true;
+          if (category.includes('culture') && questionTypes.includes('culture')) return true;
+
+          return false;
+        })
+      : industryConfig.sampleQuestions;
+
+    const lawQuestionList = filteredLawQuestions.length > 0
+      ? filteredLawQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')
+      : industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n');
+
     lawSpecificStyle = `
 
 LAW FIRM INTERVIEWER STYLE (Special Override):
@@ -1259,18 +1299,18 @@ IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE
 
 This style is specific to law firm interviews where candidates benefit from coaching and detailed feedback during the practice interview.
 
-TOP 35 UK COMMERCIAL LAW FIRM QUESTIONS - YOU MUST USE THESE:
+TOP ${filteredLawQuestions.length} UK COMMERCIAL LAW FIRM QUESTIONS - YOU MUST USE THESE:
 
-CRITICAL REQUIREMENT: The questions below are the TOP 35 most commonly asked questions at UK commercial law firms. You MUST prioritize asking questions from this list. These are the actual questions candidates need to practice.
+CRITICAL REQUIREMENT: The questions below have been FILTERED based on the candidate's selected question types. You MUST ask ONLY from this filtered list. DO NOT ask questions from categories that were not selected.
 
-${industryConfig.sampleQuestions.map((q, idx) => `${idx + 1}. ${q}`).join('\n')}
+${lawQuestionList}
 
 INSTRUCTIONS FOR USING THESE QUESTIONS:
 - Choose questions RANDOMLY from this list - don't go in order
-- You should ask mostly (70-80%) from this specific list
+- You MUST ask ONLY from this filtered list - these are the types the candidate selected
 - You can adapt them slightly to fit the conversation flow
 - You can ask follow-ups and variations, but prioritize these core questions
-- Mix different types: behavioral, technical, competency, situational, strengths/weaknesses, culture fit
+- If the list is small, you can ask variations of these questions, but stay within the selected categories
 
 CRITICAL - SIGNAL THE QUESTION CATEGORY:
 Each question above is tagged with a category like [BEHAVIORAL], [TECHNICAL], [COMPETENCY], [SITUATIONAL], [STRENGTHS], [WEAKNESSES], or [CULTURE FIT].
@@ -1341,7 +1381,40 @@ ${priority.map((source, idx) => {
     return `PRIORITY ${idx + 1} ${priorityLevel}: ${priorityLabels[source]}`;
   }).join('\n')}
 
-CRITICAL: Never mix priorities! Finish PRIORITY 1 completely, then PRIORITY 2, then PRIORITY 3.`;
+CRITICAL ENFORCEMENT - HOW TO FOLLOW PRIORITY ORDER:
+
+1. PRIORITY 1 GETS 70-80% OF QUESTIONS:
+   - If PRIORITY 1 is "CV-Based Questions" → 70-80% of your questions MUST be about their CV
+   - If PRIORITY 1 is "Custom Questions" → Ask ALL custom questions first
+   - If PRIORITY 1 is "Standard Questions" → 70-80% from the filtered question bank
+
+2. NEVER ASK PRIORITY 3 BEFORE PRIORITY 1:
+   - Don't jump around between priorities
+   - Exhaust higher priorities before moving to lower ones
+   - Example: If CV is Priority 1, don't ask generic questions until you've asked most CV questions
+
+3. TRACKING YOUR ADHERENCE:
+   - Before each question, mentally check: "Which priority is this from?"
+   - Count: "Have I asked 70-80% from Priority 1 yet?"
+   - Only move to Priority 2 after exhausting Priority 1
+
+✓ CORRECT EXAMPLE (CV is Priority 1, 5 questions total):
+  Q1: "I see you worked at Google. Tell me about your role there." [CV - Priority 1 ✓]
+  Q2: "Your CV mentions a project on machine learning. Explain that project." [CV - Priority 1 ✓]
+  Q3: "You listed Python as a skill. How have you used it professionally?" [CV - Priority 1 ✓]
+  Q4: "What are your biggest strengths?" [Generic - Priority 3, acceptable after 3/5 from Priority 1]
+  Q5: "I see you did an internship at Meta. What did you learn?" [CV - Priority 1 ✓]
+  → 4 out of 5 (80%) from Priority 1 ✓ CORRECT
+
+✗ WRONG EXAMPLE (CV is Priority 1, 5 questions total):
+  Q1: "I see you worked at Google. Tell me about that." [CV - Priority 1 ✓]
+  Q2: "What are your greatest strengths?" [Generic - Priority 3 ✗ TOO EARLY]
+  Q3: "How do you handle conflict?" [Generic - Priority 3 ✗ STILL IGNORING CV]
+  Q4: "What motivates you?" [Generic - Priority 3 ✗ WRONG]
+  Q5: "Your CV mentions Python..." [CV - Priority 1 ✓]
+  → Only 2 out of 5 (40%) from Priority 1 ✗ WRONG - Should be 70-80%
+
+REMEMBER: The candidate chose this priority order because they want to practice THESE SPECIFIC SOURCES in THIS ORDER. Respect their choice!`;
 
   // Assemble sections in user's chosen order
   const orderedSections = priority

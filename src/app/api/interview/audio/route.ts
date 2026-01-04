@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { transcribeAudio } from '@/lib/openai';
 
+// Increase function timeout for large audio files (Whisper can take 10-15 seconds)
+// Free tier: 10s max, Hobby tier: 10s default (need to set), Pro tier: 60s max
+export const maxDuration = 60; // 60 seconds (requires Vercel Pro plan)
+
 /**
  * POST /api/interview/audio
  * Transcribes audio to text using OpenAI Whisper

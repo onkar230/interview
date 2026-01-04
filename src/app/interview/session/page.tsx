@@ -16,7 +16,7 @@ import WebcamMirror from '@/components/interview/WebcamMirror';
 import PerformanceScore from '@/components/interview/PerformanceScore';
 import { Industry, QuestionSourceType, generateInterviewPrompt } from '@/lib/interview-prompts';
 import { hasCompanyStyle } from '@/lib/company-styles';
-import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap } from 'lucide-react';
+import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap, Info } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -60,7 +60,7 @@ function InterviewSessionContent() {
   const [feedbackHistory, setFeedbackHistory] = useState<FeedbackItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true); // Default ON for better UX
-  const [showIdealAnswers, setShowIdealAnswers] = useState(false); // Toggle for ideal answers
+  const [showIdealAnswers, setShowIdealAnswers] = useState(true); // Toggle for ideal answers (on by default)
   const [streamingText, setStreamingText] = useState<string>('');
   const [companyResearch, setCompanyResearch] = useState<string>('');
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -287,7 +287,8 @@ function InterviewSessionContent() {
           console.error('Initial TTS failed:', err);
         });
 
-        setQuestionCount(1);
+        // Don't increment questionCount here - it should only increment AFTER user answers
+        // questionCount tracks "number of questions answered", not "questions asked"
         setIsInitialized(true);
         console.log('Interview initialized successfully');
       } catch (err) {
@@ -300,6 +301,34 @@ function InterviewSessionContent() {
 
     initializeInterview();
   }, [industry, isInitialized]);
+
+  // Helper function to format assistant messages with bold questions
+  const formatMessageWithBoldQuestions = (text: string) => {
+    // Split by sentences ending with "?" and make those bold
+    const parts = text.split(/(\?)/);
+    const formatted: React.ReactNode[] = [];
+
+    let currentSentence = '';
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i] === '?') {
+        // This is a question mark - bold the entire question
+        currentSentence += '?';
+        formatted.push(<strong key={i} className="font-semibold">{currentSentence}</strong>);
+        currentSentence = '';
+      } else if (i === parts.length - 1) {
+        // Last part (no question mark after it)
+        currentSentence += parts[i];
+        if (currentSentence.trim()) {
+          formatted.push(<span key={i}>{currentSentence}</span>);
+        }
+      } else {
+        // Regular part - accumulate for next question
+        currentSentence += parts[i];
+      }
+    }
+
+    return <>{formatted}</>;
+  };
 
   const handleRecordingComplete = async (audioBlob: Blob) => {
     setIsProcessing(true);
@@ -328,6 +357,17 @@ function InterviewSessionContent() {
       const { text } = await transcriptResponse.json();
       console.log(`[handleRecordingComplete] Transcription successful: ${text.substring(0, 50)}...`);
 
+      // Get the last AI question for feedback context BEFORE modifying messages
+      // This prevents race conditions where we might read stale state
+      let lastQuestion = '';
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].role === 'assistant' && messages[i].content !== 'Interviewer bot is thinking...') {
+          lastQuestion = messages[i].content;
+          break;
+        }
+      }
+      console.log(`[handleRecordingComplete] Captured question for feedback: ${lastQuestion.substring(0, 50)}...`);
+
       // Add user message to conversation FIRST
       const userMessage: Message = {
         role: 'user',
@@ -343,9 +383,6 @@ function InterviewSessionContent() {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, thinkingMessage]);
-
-      // Get the last AI question for feedback context
-      const lastQuestion = messages.length > 0 ? messages[messages.length - 1].content : '';
 
       // Step 2: Generate real-time feedback (parallel with AI response)
       setIsAnalyzing(true);
@@ -411,7 +448,7 @@ function InterviewSessionContent() {
       if (feedbackResponse.ok) {
         const feedbackData = await feedbackResponse.json();
         const newFeedback: FeedbackItem = {
-          questionNumber: questionCount,
+          questionNumber: questionCount + 1, // +1 because we haven't incremented yet
           question: lastQuestion,
           answer: text,
           strengths: feedbackData.strengths || [],
@@ -511,14 +548,16 @@ function InterviewSessionContent() {
 
       if (err instanceof Error) {
         // Check for common error types
-        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-          errorMessage = 'Network error. Please check your internet connection and try again.';
+        if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+          errorMessage = 'Audio processing timed out. Your answer may be too long - try keeping it under 60 seconds.';
         } else if (err.message.includes('413') || err.message.includes('too large')) {
           errorMessage = 'Recording too long. Please keep answers under 60 seconds and try again.';
+        } else if (err.message.includes('ERR_CONNECTION_RESET') || err.message.includes('connection reset')) {
+          errorMessage = 'Server connection reset. Your answer was likely too long - try keeping it under 60 seconds and recording again.';
+        } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.';
         } else if (err.message.includes('No speech detected')) {
           errorMessage = 'No speech detected. Please ensure your microphone is working and try again.';
-        } else if (err.message.includes('timeout')) {
-          errorMessage = 'Request timed out. Please try a shorter answer or check your connection.';
         } else {
           errorMessage = `Error: ${err.message}`;
         }
@@ -536,8 +575,8 @@ function InterviewSessionContent() {
     if (messages.length >= 2) {
       // Remove last 2 messages (user answer + AI follow-up)
       setMessages((prev) => prev.slice(0, -2));
-      // Decrement question count
-      setQuestionCount((prev) => Math.max(1, prev - 1));
+      // Decrement question count (can go back to 0)
+      setQuestionCount((prev) => Math.max(0, prev - 1));
       // Remove the latest feedback item
       setFeedbackHistory((prev) => prev.slice(1));
       // Remove the latest scores
@@ -760,6 +799,15 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             <h3 className="text-sm font-semibold text-primary-foreground/90 p-4 pb-3 border-b border-primary/30 flex-shrink-0">
               Interview Conversation
             </h3>
+
+            {/* Response Time Tip */}
+            <div className="mx-4 mt-3 mb-2 bg-blue-500/20 border border-blue-400/30 rounded-lg p-2.5 flex gap-2 flex-shrink-0">
+              <Info className="h-4 w-4 text-blue-300 flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-blue-100 leading-relaxed">
+                <strong className="font-semibold">Tip:</strong> Keep answers concise (under 60 seconds). Longer answers take more time to process and may timeout.
+              </p>
+            </div>
+
             <div className="flex-1 overflow-y-auto p-4 pt-3 space-y-4">
               {messages.map((message, idx) => (
                 <div
@@ -783,7 +831,12 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                         : 'bg-primary/50 border border-primary/20 text-primary-foreground shadow-md'
                     }`}
                   >
-                    <p className="text-xs whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-xs whitespace-pre-wrap">
+                      {message.role === 'assistant'
+                        ? formatMessageWithBoldQuestions(message.content)
+                        : message.content
+                      }
+                    </p>
                   </div>
 
                   {message.role === 'user' && (
@@ -804,7 +857,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                     </div>
                   </div>
                   <div className="max-w-[80%] rounded-lg p-3 bg-primary/50 border border-primary/20 text-primary-foreground shadow-md">
-                    <p className="text-xs whitespace-pre-wrap">{streamingText}</p>
+                    <p className="text-xs whitespace-pre-wrap">{formatMessageWithBoldQuestions(streamingText)}</p>
                     <span className="inline-block w-2 h-4 bg-accent ml-1 animate-pulse"></span>
                   </div>
                 </div>
@@ -855,7 +908,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 </Tooltip>
 
                 <div className="text-xs text-primary-foreground/90 bg-primary/95 backdrop-blur-md px-3 py-2 rounded-lg border border-primary/30 shadow-lg">
-                  Question {questionCount}/{maxQuestions}
+                  Question {Math.min(questionCount + 1, maxQuestions)}/{maxQuestions}
                 </div>
 
                 <Tooltip>
@@ -933,9 +986,9 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               </div>
             )}
 
-            {/* Interview Complete Notice */}
+            {/* Interview Complete Notice - Positioned absolutely to avoid pushing other elements */}
             {questionCount >= maxQuestions && !error && (
-              <div className="bg-indigo-900/90 backdrop-blur-md border border-indigo-500/50 rounded-lg p-4 text-indigo-200 shadow-lg animate-in fade-in slide-in-from-top duration-500">
+              <div className="absolute bottom-full mb-3 left-1/2 transform -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-indigo-900/90 backdrop-blur-md border border-indigo-500/50 rounded-lg p-4 text-indigo-200 shadow-lg animate-in fade-in slide-in-from-top duration-500">
                 <div className="flex items-start gap-3">
                   <GraduationCap className="h-5 w-5 text-indigo-300 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">

@@ -65,7 +65,7 @@ function ConfigureInterviewContent() {
     'competency',
   ]); // Default selections
   const [customQuestions, setCustomQuestions] = useState('');
-  const [followUpIntensity, setFollowUpIntensity] = useState<'none' | 'light' | 'moderate' | 'intensive'>('moderate');
+  const [followUpIntensity, setFollowUpIntensity] = useState<'none' | 'light' | 'moderate' | 'intensive'>('light');
   const [questionCount, setQuestionCount] = useState(10);
   const [errors, setErrors] = useState<{
     company?: string;

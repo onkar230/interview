@@ -63,12 +63,26 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   // Convert Blob to File (required by OpenAI API)
   const audioFile = new File([audioBlob], 'audio.webm', { type: audioBlob.type });
 
-  const transcription = await client.audio.transcriptions.create({
-    file: audioFile,
-    model: 'whisper-1',
-  });
+  try {
+    // Add timeout to prevent hanging (Whisper typically takes 5-15 seconds for long audio)
+    const timeoutMs = 50000; // 50 seconds timeout
+    const transcriptionPromise = client.audio.transcriptions.create({
+      file: audioFile,
+      model: 'whisper-1',
+    });
 
-  return transcription.text;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Whisper transcription timeout after 50 seconds')), timeoutMs)
+    );
+
+    const transcription = await Promise.race([transcriptionPromise, timeoutPromise]);
+    return transcription.text;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Whisper transcription failed: ${error.message}`);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -293,10 +307,11 @@ CRITICAL ANALYSIS REQUIREMENTS:
    - Structure feedback should be RARE - only for truly confusing answers
    - Many good answers don't explicitly use STAR and that's perfectly fine
 
-2. HONESTY OVER KINDNESS:
-   - If the answer is terrible, vague, or one-sentence, DO NOT invent fake strengths
-   - It's OKAY to have 0 strengths if the answer is genuinely poor
-   - Be honest: "The answer was too vague", "No specific examples provided", "Answer lacks substance"
+2. BALANCED FEEDBACK - FIND WHAT WORKED:
+   - Even for mediocre answers, find at least ONE thing they did well (e.g., "Attempted to provide context", "Spoke clearly")
+   - ONLY give 0 strengths for truly terrible answers (one-word, completely off-topic, unethical)
+   - For decent answers (not great, just okay), acknowledge what worked before suggesting improvements
+   - Be honest about weaknesses, but don't ignore positives
 
 3. RED FLAGS TO CATCH:
    - One-word or one-sentence answers (e.g., "I'm good enough") → FLAG IN THREATS
@@ -305,10 +320,10 @@ CRITICAL ANALYSIS REQUIREMENTS:
    - Generic platitudes ("I work hard", "I'm a team player") → FLAG IN OPPORTUNITIES
 
 SWOT GUIDELINES:
-- Strengths: What they ACTUALLY did well (0-2 points). ONLY include if genuinely good. Empty array is fine.
-- Weaknesses: What's wrong with the answer (1-3 points, brutally honest). Focus on CONTENT issues, not structure.
-- Opportunities: What they should have done (1-3 points). Be specific about what was missing.
-- Threats: Critical red flags (0-2 points). Include for terrible/lazy answers.
+- Strengths: What they did well (1-3 points). Find positives even in average answers (e.g., "Provided context", "Spoke confidently", "Used a relevant example"). ONLY give 0 strengths for truly awful answers.
+- Weaknesses: What needs improvement (1-3 points, honest but constructive). Focus on CONTENT issues, not structure.
+- Opportunities: What they should have done differently (1-3 points). Be specific about what was missing.
+- Threats: Critical red flags (0-2 points). ONLY for serious issues (unethical, one-word answers, completely off-topic).
 - Suggested Improvements: Specific points they could have added to strengthen their answer (2-4 points). Based on what they said, what else would make it stronger?
 
 IMPORTANT: STOP mentioning STAR/CAR/PEEL method in every answer. Only mention it if the answer is genuinely confusing or disorganized.
@@ -357,26 +372,26 @@ CRITICAL SCORING GUIDELINES - BE BRUTALLY HONEST (0-10 SCALE):
 10: OUTSTANDING (Textbook perfect answer, interviewer would be impressed)
   Examples: Everything above + unique insights, demonstrates exceptional expertise
 
-DO NOT BE GENEROUS:
-- If they gave a one-word answer, score 0-1
-- If they said something unethical or showed red flags, score 0-1
-- If they were vague with no examples, score 3-4
-- Average scores should be 5-7 for most candidates, NOT 7-9
-- Reserve 8+ for genuinely strong answers only
+BE FAIR AND CALIBRATED:
+- If they gave a one-word answer or unethical response, score 0-1
+- If they were vague with no examples, score 3-5
+- Decent answers with some substance should get 6-7 (this is positive - they're learning!)
+- Good answers with specifics and structure should get 7-8
 - Reserve 9-10 for truly exceptional answers that would impress senior interviewers
+- Remember: This is PRACTICE. A 6-7 is good progress, not a failure.
 
 Respond in JSON format:
 {
-  "strengths": ["actual strength 1"] or [],
-  "weaknesses": ["specific weakness 1", "specific weakness 2"],
-  "opportunities": ["missed point 1", "Could have provided specific metrics or numbers"],
-  "threats": ["Answer is too vague and lacks substance"] or [],
+  "strengths": ["Provided relevant context", "Spoke clearly and confidently"],
+  "weaknesses": ["Could have included specific metrics", "Limited detail on outcomes"],
+  "opportunities": ["Could have used the STAR method for better structure", "Could have provided specific numbers or results"],
+  "threats": [] or ["One-word answer - needs substantial improvement"],
   "suggestedImprovements": ["Add specific metrics or outcomes", "Explain the business impact", "Describe what you learned"],
   "scores": {
     "communication": 7,
     ${industry === 'law' ? '"commercialAwareness": 6' : '"technicalKnowledge": 6'},
-    "problemSolving": 5,
-    "relevantExperience": 6
+    "problemSolving": 6,
+    "relevantExperience": 7
   }
 }`;
 
