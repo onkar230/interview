@@ -16,7 +16,8 @@ export type Industry =
   | 'consulting'
   | 'education'
   | 'engineering'
-  | 'law';
+  | 'law'
+  | 'other';
 
 export type Difficulty = 'entry-level' | 'mid-level' | 'senior' | 'executive';
 
@@ -564,6 +565,76 @@ export const INDUSTRY_PROMPTS: Record<
       'Probe values and ethics: "Walk me through your thinking on that ethical dilemma step by step"',
       'Request concrete examples: "Give me a specific time when you demonstrated that skill, not hypothetically"',
       'Test legal tech understanding: "How would you use AI tools to improve efficiency in due diligence?"',
+    ],
+  },
+  other: {
+    description: 'Generic interview for all other industries - behavioral and situational questions',
+    focusAreas: [
+      'Communication and teamwork',
+      'Problem-solving ability',
+      'Professional experience',
+      'Motivation and career goals',
+      'Adaptability and learning',
+    ],
+    sampleQuestions: [
+      // BEHAVIORAL - Universal STAR method questions
+      'Tell me about yourself and your background',
+      'Describe a challenging situation you faced at work or in your studies. How did you handle it?',
+      'Tell me about a time you worked in a team. What was your role?',
+      'Describe a situation where you had to meet a tight deadline. How did you manage it?',
+      'Tell me about a time you disagreed with a colleague or supervisor. How did you resolve it?',
+      'Describe a mistake you made. How did you handle it?',
+      'Tell me about a time you had to learn something new quickly',
+      'Describe a situation where you showed leadership',
+      'Tell me about a time you received constructive criticism. What did you do?',
+      'Describe a time you went above and beyond your responsibilities',
+
+      // SITUATIONAL - Hypothetical scenarios
+      'How do you prioritise tasks when you have multiple deadlines?',
+      'What would you do if you disagreed with a decision made by your manager?',
+      'How do you handle stress and pressure?',
+      'What would you do if you made a mistake that affected others?',
+      'How do you approach learning new skills or technologies?',
+
+      // STRENGTHS & WEAKNESSES
+      'What are your greatest strengths?',
+      'What areas do you need to improve on?',
+      'What motivates you in your work?',
+
+      // CULTURE FIT & MOTIVATION
+      'Why do you want to work in this industry?',
+      'What interests you about this role?',
+      'Where do you see yourself in 5 years?',
+      'What type of work environment do you thrive in?',
+      'How do you keep yourself motivated?',
+      'What do you know about our organisation?',
+
+      // PROFESSIONAL EXPERIENCE
+      'What has been your biggest achievement so far?',
+      'Describe a project you are particularly proud of',
+      'What have you learned from your previous roles or experiences?',
+      'How do you measure success in your work?',
+      'Tell me about a time you had to adapt to significant change',
+    ],
+    companies: [
+      'a fast-growing startup',
+      'a multinational corporation',
+      'a non-profit organisation',
+      'a government agency',
+      'a family-owned business',
+      'an e-commerce company',
+      'a manufacturing company',
+      'a hospitality company',
+      'a retail business',
+      'a media company',
+    ],
+    pressureTactics: [
+      'Ask for specific examples: "Can you give me a concrete example of that?"',
+      'Probe for metrics: "What were the measurable results?"',
+      'Challenge vague answers: "Can you be more specific about your role in that?"',
+      'Ask about failures: "Tell me about a time that approach didn\'t work"',
+      'Test self-awareness: "What would your colleagues say about that?"',
+      'Dig deeper: "Walk me through your thought process step by step"',
     ],
   },
 };
@@ -1559,6 +1630,12 @@ function getTitleForIndustryAndLevel(industry: Industry, difficulty: Difficulty)
       'mid-level': ['Senior Associate', 'Legal Counsel', 'Senior Solicitor'],
       'senior': ['Partner', 'Senior Counsel', 'Head of Legal'],
       'executive': ['Managing Partner', 'General Counsel', 'Chief Legal Officer'],
+    },
+    other: {
+      'entry-level': ['HR Manager', 'Talent Acquisition Manager', 'Department Manager'],
+      'mid-level': ['Senior Manager', 'Director', 'Head of Department'],
+      'senior': ['Senior Director', 'VP', 'Head of Division'],
+      'executive': ['Chief Officer', 'Managing Director', 'President'],
     },
   };
 

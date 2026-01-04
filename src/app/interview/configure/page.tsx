@@ -48,6 +48,10 @@ const INDUSTRY_SUGGESTIONS: Record<Industry, { companies: string[]; roles: strin
     companies: ['Clifford Chance', 'Linklaters', 'Allen & Overy', 'Freshfields', 'Slaughter and May', 'DLA Piper', 'Herbert Smith Freehills', 'White & Case'],
     roles: ['Associate Solicitor', 'Trainee Solicitor', 'Legal Counsel', 'Senior Associate', 'Partner', 'Paralegal', 'Legal Advisor', 'In-House Counsel'],
   },
+  other: {
+    companies: ['Unilever', 'Deloitte', 'BBC', 'Tesco', 'British Airways', 'Shell', 'Vodafone', 'IKEA', 'Nike', 'PepsiCo'],
+    roles: ['Manager', 'Project Manager', 'Team Lead', 'Coordinator', 'Specialist', 'Associate', 'Officer', 'Administrator'],
+  },
 };
 
 function ConfigureInterviewContent() {

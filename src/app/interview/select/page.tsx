@@ -10,7 +10,8 @@ import {
   Briefcase,
   GraduationCap,
   Wrench,
-  Scale
+  Scale,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Industry, INDUSTRY_PROMPTS } from '@/lib/interview-prompts';
@@ -26,13 +27,14 @@ const INDUSTRY_ICONS = {
   education: GraduationCap,
   engineering: Wrench,
   law: Scale,
+  other: Building2,
 };
 
 export default function SelectIndustryPage() {
   const router = useRouter();
 
-  // Currently showing only Technology and Law (other industries hidden for now)
-  const AVAILABLE_INDUSTRIES: Industry[] = ['technology', 'law'];
+  // Currently showing only Technology, Law, and Other (other industries hidden for now)
+  const AVAILABLE_INDUSTRIES: Industry[] = ['technology', 'law', 'other'];
 
   // Hidden industries (can be re-enabled later): 'engineering', 'finance', 'healthcare', 'marketing', 'sales', 'consulting', 'education'
 
