@@ -794,7 +794,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
       <div className="flex-1 relative bg-primary overflow-hidden">
 
           {/* Fullscreen Webcam Background - Aligned with side panels */}
-          <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 680px)' }}>
+          <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 820px)' }}>
             {showWebcam ? (
               <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30">
                 <WebcamMirror
@@ -815,7 +815,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Left Overlay: Conversation */}
-          <div className="absolute left-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col">
+          <div className="absolute left-4 top-4 bottom-4 w-96 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col">
             <h3 className="text-sm font-semibold text-primary-foreground/90 p-4 pb-3 border-b border-primary/30 flex-shrink-0">
               Interview Conversation
             </h3>
@@ -899,7 +899,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Right Overlay: Feedback */}
-          <div className="absolute right-4 top-4 bottom-4 w-80 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg overflow-hidden shadow-2xl">
+          <div className="absolute right-4 top-4 bottom-4 w-96 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg overflow-hidden shadow-2xl">
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}

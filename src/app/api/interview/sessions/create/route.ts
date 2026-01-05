@@ -1,0 +1,32 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth, createInterviewSession } from '@/lib/supabase';
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await requireAuth();
+    const body = await request.json();
+
+    const session = await createInterviewSession(user.id, {
+      industry: body.industry,
+      role: body.role,
+      company: body.company,
+      difficulty: body.difficulty,
+      jobDescription: body.jobDescription,
+      questionTypes: body.questionTypes,
+      customQuestions: body.customQuestions,
+      followUpIntensity: body.followUpIntensity,
+      maxQuestions: body.maxQuestions,
+      cvText: body.cvText,
+      questionPriority: body.questionPriority,
+      companyResearch: body.companyResearch,
+    });
+
+    return NextResponse.json({ sessionId: session.id });
+  } catch (error) {
+    console.error('Error creating session:', error);
+    return NextResponse.json(
+      { error: 'Failed to create session' },
+      { status: 500 }
+    );
+  }
+}

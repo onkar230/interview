@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { ArrowLeft, Loader2, Shield, Upload, FileText, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
+import { getSupabaseClient } from '@/lib/supabase-client';
 
 // Industry-specific suggestions
 const INDUSTRY_SUGGESTIONS: Record<Industry, { companies: string[]; roles: string[] }> = {
@@ -57,8 +58,9 @@ const INDUSTRY_SUGGESTIONS: Record<Industry, { companies: string[]; roles: strin
 function ConfigureInterviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const industry = searchParams.get('industry') as Industry;
+  const urlIndustry = searchParams.get('industry') as Industry | null;
 
+  const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(urlIndustry);
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const difficulty: Difficulty = 'entry-level'; // Fixed to entry-level for student/grad-level jobs
@@ -84,8 +86,10 @@ function ConfigureInterviewContent() {
     'cv',
     'generic'
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const suggestions = industry ? INDUSTRY_SUGGESTIONS[industry] : null;
+  const suggestions = selectedIndustry ? INDUSTRY_SUGGESTIONS[selectedIndustry] : null;
 
   // Question priority labels and descriptions
   const QUESTION_SOURCE_LABELS: Record<QuestionSourceType, string> = {
@@ -184,68 +188,117 @@ function ConfigureInterviewContent() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Navigate to interview session with configuration
-    const params = new URLSearchParams({
-      industry: industry || '',
-      company: company.trim(),
-      role: role.trim(),
-      difficulty: difficulty,
-    });
+    setIsLoading(true);
+    setError(null);
 
-    if (jobDescription.trim()) {
-      params.append('jd', jobDescription.trim().slice(0, 2000));
-    }
+    try {
+      // Get authenticated user
+      const supabase = getSupabaseClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-    // Add question types (comma-separated)
-    if (questionTypes.length > 0) {
-      params.append('questionTypes', questionTypes.join(','));
-    }
-
-    // Add custom questions (one per line, limit to 5 questions max)
-    if (customQuestions.trim()) {
-      const questions = customQuestions
-        .split('\n')
-        .map(q => q.trim())
-        .filter(q => q.length > 0)
-        .slice(0, 5); // Limit to 5 custom questions
-
-      if (questions.length > 0) {
-        params.append('customQuestions', questions.join('|||'));
+      if (!user) {
+        router.push('/login');
+        return;
       }
+
+      // Prepare custom questions array
+      const customQuestionsArray = customQuestions.trim()
+        ? customQuestions
+            .split('\n')
+            .map(q => q.trim())
+            .filter(q => q.length > 0)
+            .slice(0, 5) // Limit to 5 custom questions
+        : undefined;
+
+      // Create session via API route
+      const response = await fetch('/api/interview/sessions/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industry: selectedIndustry || '',
+          company: company.trim(),
+          role: role.trim(),
+          difficulty: difficulty,
+          jobDescription: jobDescription.trim() || undefined,
+          questionTypes: questionTypes.length > 0 ? questionTypes : undefined,
+          customQuestions: customQuestionsArray,
+          followUpIntensity: followUpIntensity,
+          maxQuestions: questionCount,
+          cvText: cvText.trim() || undefined,
+          questionPriority: questionPriority,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create session');
+      }
+
+      const { sessionId } = await response.json();
+
+      // Navigate to session page with session ID
+      router.push(`/interview/session?sessionId=${sessionId}`);
+    } catch (err) {
+      console.error('Error creating session:', err);
+      setError('Failed to start interview. Please try again.');
+      setIsLoading(false);
     }
-
-    // Add follow-up intensity
-    params.append('followUpIntensity', followUpIntensity);
-
-    // Add question count
-    params.append('questionCount', questionCount.toString());
-
-    // Add CV text if available
-    if (cvText.trim()) {
-      params.append('cv', cvText.trim().slice(0, 8000)); // Limit to 8000 chars
-    }
-
-    // Add question priority order
-    params.append('questionPriority', questionPriority.join('-'));
-
-    router.push(`/interview/session?${params.toString()}`);
   };
 
-  if (!industry) {
+  if (!selectedIndustry) {
+    // Show industry selection
+    const AVAILABLE_INDUSTRIES: { id: Industry; name: string; icon: string }[] = [
+      { id: 'technology', name: 'Technology', icon: '💻' },
+      { id: 'law', name: 'Law', icon: '⚖️' },
+      { id: 'other', name: 'Other', icon: '🏢' },
+    ];
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-destructive mb-4">No industry selected</p>
-          <Button onClick={() => router.push('/interview/select')} className="bg-primary hover:bg-secondary text-primary-foreground">
-            Select Industry
-          </Button>
+      <div className="min-h-screen bg-background p-8">
+        <div className="max-w-4xl mx-auto">
+          <ProgressSteps currentStep={1} />
+
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              Select Your Industry
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Choose the industry that matches your career goals
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {AVAILABLE_INDUSTRIES.map((ind) => (
+              <button
+                key={ind.id}
+                onClick={() => setSelectedIndustry(ind.id)}
+                className="bg-card border border-border rounded-xl p-8 shadow-md hover:shadow-xl hover:shadow-primary/10 transition-all duration-200 hover:scale-105 text-center group"
+              >
+                <div className="text-5xl mb-4">{ind.icon}</div>
+                <h3 className="text-2xl font-semibold text-card-foreground mb-2">
+                  {ind.name}
+                </h3>
+                <div className="mt-4 text-sm font-medium text-primary group-hover:text-secondary">
+                  Select →
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/interview/select')}
+            >
+              ← Back to Dashboard
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -270,18 +323,28 @@ function ConfigureInterviewContent() {
         {/* Form Card */}
         <div className="bg-card border border-border rounded-xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Industry (Read-only) */}
+            {/* Industry (Read-only with change option) */}
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Industry
               </label>
-              <div className="px-4 py-3 bg-white rounded-lg border border-border text-gray-900 capitalize font-medium">
-                {industry}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 px-4 py-3 bg-white rounded-lg border border-border text-gray-900 capitalize font-medium">
+                  {selectedIndustry}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSelectedIndustry(null)}
+                  className="whitespace-nowrap"
+                >
+                  Change
+                </Button>
               </div>
             </div>
 
             {/* Industry-Specific Disclaimer for Tech */}
-            {industry === 'technology' && (
+            {selectedIndustry === 'technology' && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex gap-3">
                   <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />

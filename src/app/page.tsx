@@ -15,6 +15,8 @@ import {
   SiTesla
 } from 'react-icons/si'; // Simple Icons from react-icons
 import { FaAmazon, FaMicrosoft } from 'react-icons/fa'; // Font Awesome brand icons
+import { getSupabaseClient } from '@/lib/supabase-client';
+import UserNav from '@/components/navigation/UserNav';
 
 // Animated Score Component with Skill Scores
 function AnimatedScoreSection() {
@@ -196,6 +198,27 @@ function CompanyCarousel() {
 }
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const ctaLink = isAuthenticated ? '/interview/select' : '/login';
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -210,11 +233,17 @@ export default function Home() {
           <Link href="#pricing" className="text-foreground hover:text-primary transition-colors">
             Pricing
           </Link>
-          <Link href="/interview/select">
-            <Button className="bg-primary hover:bg-secondary text-primary-foreground">
-              Get Started Free
-            </Button>
-          </Link>
+          {!isLoading && (
+            isAuthenticated ? (
+              <UserNav />
+            ) : (
+              <Link href="/login">
+                <Button className="bg-primary hover:bg-secondary text-primary-foreground">
+                  Get Started Free
+                </Button>
+              </Link>
+            )
+          )}
         </div>
       </nav>
 
@@ -233,12 +262,12 @@ export default function Home() {
           Get instant feedback and walk into your interview with confidence.
         </p>
 
-        <Link href="/interview/select">
+        <Link href={ctaLink}>
           <Button
             size="lg"
             className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl"
           >
-            Get Started Free →
+            {isAuthenticated ? 'Go to Dashboard →' : 'Get Started Free →'}
           </Button>
         </Link>
 
@@ -451,9 +480,9 @@ export default function Home() {
               </li>
             </ul>
 
-            <Link href="/interview/select">
+            <Link href={ctaLink}>
               <Button className="w-full bg-muted hover:bg-muted/80">
-                Start Free
+                {isAuthenticated ? 'Go to Dashboard' : 'Start Free'}
               </Button>
             </Link>
           </div>
@@ -546,12 +575,12 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/interview/select">
+          <Link href={ctaLink}>
             <Button
               size="lg"
               className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground"
             >
-              Start Your First Interview Free
+              {isAuthenticated ? 'Go to Your Dashboard' : 'Start Your First Interview Free'}
             </Button>
           </Link>
         </div>
