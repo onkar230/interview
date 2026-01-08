@@ -886,13 +886,26 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
     }
   };
 
+  // Show loading state while fetching session
+  if (isLoadingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading interview session...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if session couldn't be loaded or no industry found
   if (!industry) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-red-600 mb-4">No industry selected</p>
+          <p className="text-red-600 mb-4">Failed to load interview session</p>
           <Button onClick={() => router.push('/interview/select')}>
-            Select Industry
+            Back to Dashboard
           </Button>
         </div>
       </div>
