@@ -28,28 +28,24 @@ interface Message {
 function InterviewSessionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const industry = searchParams.get('industry') as Industry;
-  const company = searchParams.get('company') || 'A Leading Company';
-  const role = searchParams.get('role') || 'General Role';
-  const difficulty = (searchParams.get('difficulty') as 'entry-level' | 'mid-level' | 'senior' | 'executive') || 'mid-level';
-  const jobDescription = searchParams.get('jd') || '';
-  const questionTypesParam = searchParams.get('questionTypes') || '';
-  const customQuestionsParam = searchParams.get('customQuestions') || '';
-  const followUpIntensity = (searchParams.get('followUpIntensity') as 'none' | 'light' | 'moderate' | 'intensive') || 'moderate';
-  const maxQuestions = parseInt(searchParams.get('questionCount') || '10', 10);
-  const cvText = searchParams.get('cv') || '';
-  const questionPriorityParam = searchParams.get('questionPriority') || 'custom-cv-generic';
+  const sessionId = searchParams.get('sessionId');
 
-  // Parse question types from comma-separated string
-  const questionTypes = questionTypesParam ? questionTypesParam.split(',') : [];
+  // Session data from database
+  const [sessionData, setSessionData] = useState<any>(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
 
-  // Parse custom questions from delimiter-separated string
-  const customQuestions = customQuestionsParam
-    ? customQuestionsParam.split('|||').filter(q => q.trim().length > 0)
-    : [];
-
-  // Parse question priority from dash-separated string
-  const questionPriority: QuestionSourceType[] = questionPriorityParam.split('-') as QuestionSourceType[];
+  // Extract data from session once loaded
+  const industry = (sessionData?.industry as Industry) || null;
+  const company = sessionData?.company || 'A Leading Company';
+  const role = sessionData?.role || 'General Role';
+  const difficulty = sessionData?.difficulty || 'entry-level';
+  const jobDescription = sessionData?.job_description || '';
+  const questionTypes = sessionData?.question_types || [];
+  const customQuestions = sessionData?.custom_questions || [];
+  const followUpIntensity = sessionData?.follow_up_intensity || 'moderate';
+  const maxQuestions = sessionData?.max_questions || 10;
+  const cvText = sessionData?.cv_text || '';
+  const questionPriority: QuestionSourceType[] = sessionData?.question_priority || ['custom', 'cv', 'generic'];
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -167,9 +163,50 @@ function InterviewSessionContent() {
     return { response: fullResponse, shouldEnd };
   };
 
+  // Load session from database
+  useEffect(() => {
+    if (!sessionId || sessionData) return;
+
+    const loadSession = async () => {
+      try {
+        console.log('Loading session from database:', sessionId);
+        const response = await fetch(`/api/interview/sessions/${sessionId}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to load session');
+        }
+
+        const data = await response.json();
+        console.log('Session loaded:', data);
+
+        setSessionData(data.session);
+
+        // Load existing messages if resuming
+        if (data.messages && data.messages.length > 0) {
+          const loadedMessages = data.messages.map((m: any) => ({
+            role: m.role,
+            content: m.content,
+            audioUrl: m.audio_url,
+            timestamp: new Date(m.created_at),
+          }));
+          setMessages(loadedMessages);
+          setQuestionCount(loadedMessages.filter((m: Message) => m.role === 'assistant').length);
+          setIsInitialized(true);
+        }
+      } catch (err) {
+        console.error('Error loading session:', err);
+        setError('Failed to load interview session. Please try again.');
+      } finally {
+        setIsLoadingSession(false);
+      }
+    };
+
+    loadSession();
+  }, [sessionId, sessionData]);
+
   // Initialize interview with opening question
   useEffect(() => {
-    if (!industry || isInitialized || initializingRef.current) return;
+    if (!industry || isInitialized || initializingRef.current || isLoadingSession) return;
 
     const initializeInterview = async () => {
       // Prevent double initialization (React Strict Mode runs effects twice)
@@ -278,6 +315,23 @@ function InterviewSessionContent() {
               audioUrl,
               timestamp: new Date(),
             }]);
+
+            // Save initial AI message to database
+            if (sessionId) {
+              try {
+                await fetch(`/api/interview/sessions/${sessionId}/messages`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    role: 'assistant',
+                    content: aiResponse,
+                    audioUrl: audioUrl,
+                  }),
+                });
+              } catch (err) {
+                console.error('Failed to save initial AI message to database:', err);
+              }
+            }
 
             // Auto-play
             setCurrentAudioUrl(audioUrl);
@@ -398,6 +452,22 @@ function InterviewSessionContent() {
       };
       setMessages((prev) => [...prev, userMessage]);
 
+      // Save user message to database
+      if (sessionId) {
+        try {
+          await fetch(`/api/interview/sessions/${sessionId}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              role: 'user',
+              content: text,
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to save user message to database:', err);
+        }
+      }
+
       // THEN add thinking indicator (so it appears AFTER user's message)
       const thinkingMessage: Message = {
         role: 'assistant',
@@ -515,6 +585,30 @@ function InterviewSessionContent() {
         }
 
         setFeedbackHistory((prev) => [newFeedback, ...prev]); // Newest at top
+
+        // Save feedback to database
+        if (sessionId) {
+          try {
+            await fetch(`/api/interview/sessions/${sessionId}/feedback`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                questionNumber: newFeedback.questionNumber,
+                question: newFeedback.question,
+                answer: newFeedback.answer,
+                strengths: newFeedback.strengths,
+                weaknesses: newFeedback.weaknesses,
+                opportunities: newFeedback.opportunities,
+                threats: newFeedback.threats,
+                suggestedImprovements: newFeedback.suggestedImprovements,
+                idealAnswer: newFeedback.idealAnswer,
+                scores: feedbackData.scores,
+              }),
+            });
+          } catch (err) {
+            console.error('Failed to save feedback to database:', err);
+          }
+        }
       } else {
         console.error('Failed to generate feedback');
       }
@@ -546,6 +640,23 @@ function InterviewSessionContent() {
             }
             return updated;
           });
+
+          // Save AI message to database with audio URL
+          if (sessionId) {
+            try {
+              await fetch(`/api/interview/sessions/${sessionId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  role: 'assistant',
+                  content: aiResponse,
+                  audioUrl: audioUrl,
+                }),
+              });
+            } catch (err) {
+              console.error('Failed to save AI message to database:', err);
+            }
+          }
 
           // Auto-play the audio
           setCurrentAudioUrl(audioUrl);
