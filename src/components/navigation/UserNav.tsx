@@ -34,6 +34,7 @@ export default function UserNav() {
   const handleLogout = async () => {
     const supabase = getSupabaseClient();
     await supabase.auth.signOut();
+    // Don't clear remembered email on logout - keep it for next login
     router.push('/login');
     router.refresh();
   };

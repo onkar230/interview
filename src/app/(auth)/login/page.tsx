@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,18 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load saved email on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +87,16 @@ export default function LoginPage() {
       }
 
       console.log('✅ STEP 3 COMPLETE: Session verified');
-      console.log('🔵 STEP 4: Initiating redirect to /interview/select');
+      console.log('🔵 STEP 4: Saving remember me preference and initiating redirect');
+
+      // Save or clear remembered email based on checkbox
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        console.log('✅ Email saved to localStorage');
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        console.log('✅ Cleared remembered email from localStorage');
+      }
 
       // Redirect using Next.js router
       router.push('/interview/select');
@@ -167,6 +186,19 @@ export default function LoginPage() {
                 required
                 className="bg-white"
               />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-card-foreground">
+                Remember me
+              </label>
             </div>
 
             <Button
