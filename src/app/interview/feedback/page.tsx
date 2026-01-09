@@ -85,25 +85,17 @@ function FeedbackContent() {
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push('/interview/select')}
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
-              </Button>
-              <h1 className="text-2xl font-bold text-foreground">Interview Feedback</h1>
-            </div>
+          <div className="flex items-center gap-4">
             <Button
-              variant="outline"
-              onClick={() => router.push(`/interview/evaluation?sessionId=${sessionId}`)}
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/interview/select')}
+              className="gap-2"
             >
-              View Full Report
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
             </Button>
+            <h1 className="text-2xl font-bold text-foreground">Interview Feedback</h1>
           </div>
         </div>
       </header>
