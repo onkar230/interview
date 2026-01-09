@@ -8,14 +8,14 @@ export async function GET(
   try {
     const user = await requireAuth();
     const { sessionId } = await params;
-    const { session, messages } = await getInterviewSession(sessionId);
+    const { session, messages, feedbackItems } = await getInterviewSession(sessionId);
 
     // Verify ownership
     if (session.user_id !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    return NextResponse.json({ session, messages });
+    return NextResponse.json({ session, messages, feedbackItems });
   } catch (error) {
     console.error('Error fetching session:', error);
     return NextResponse.json(

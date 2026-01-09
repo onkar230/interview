@@ -180,7 +180,7 @@ export async function saveInterviewMessage(
 }
 
 /**
- * Get interview session with messages
+ * Get interview session with messages and feedback items
  */
 export async function getInterviewSession(sessionId: string) {
   const supabase = await getServerSupabase();
@@ -201,7 +201,16 @@ export async function getInterviewSession(sessionId: string) {
 
   if (messagesError) throw messagesError;
 
-  return { session, messages };
+  // Also fetch feedback items for resuming sessions
+  const { data: feedbackItems, error: feedbackError } = await supabase
+    .from('interview_feedback_items')
+    .select('*')
+    .eq('session_id', sessionId)
+    .order('question_number', { ascending: true });
+
+  if (feedbackError) throw feedbackError;
+
+  return { session, messages, feedbackItems };
 }
 
 /**

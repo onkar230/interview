@@ -193,6 +193,45 @@ function InterviewSessionContent() {
           setQuestionCount(loadedMessages.filter((m: Message) => m.role === 'assistant').length);
           setIsInitialized(true);
         }
+
+        // Load existing feedback items if resuming
+        if (data.feedbackItems && data.feedbackItems.length > 0) {
+          const loadedFeedback = data.feedbackItems.map((item: any) => ({
+            strengths: item.strengths || [],
+            weaknesses: item.weaknesses || [],
+            opportunities: item.opportunities || [],
+            threats: item.threats || [],
+            suggestedImprovements: item.suggested_improvements || [],
+            scores: {
+              communication: item.communication_score || 0,
+              technicalKnowledge: item.technical_score || 0,
+              problemSolving: item.problem_solving_score || 0,
+              relevantExperience: item.relevant_experience_score || 0,
+            },
+          }));
+          setFeedbackHistory(loadedFeedback);
+
+          // Restore cumulative scores
+          const communicationScores = data.feedbackItems
+            .map((item: any) => item.communication_score)
+            .filter((score: number | null) => score !== null);
+          const technicalScores = data.feedbackItems
+            .map((item: any) => item.technical_score)
+            .filter((score: number | null) => score !== null);
+          const problemSolvingScores = data.feedbackItems
+            .map((item: any) => item.problem_solving_score)
+            .filter((score: number | null) => score !== null);
+          const experienceScores = data.feedbackItems
+            .map((item: any) => item.relevant_experience_score)
+            .filter((score: number | null) => score !== null);
+
+          setCumulativeScores({
+            communication: communicationScores,
+            technicalKnowledge: technicalScores,
+            problemSolving: problemSolvingScores,
+            relevantExperience: experienceScores,
+          });
+        }
       } catch (err) {
         console.error('Error loading session:', err);
         setError('Failed to load interview session. Please try again.');
