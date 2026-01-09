@@ -44,6 +44,16 @@ CRITICAL INSTRUCTIONS:
 - Show how to enhance THEIR specific points, not generic advice
 - Keep their voice and examples, just make them stronger
 
+LANGUAGE TONE (VERY IMPORTANT):
+- Sound like a REAL PERSON in a conversation, NOT a corporate script
+- Avoid overly formal phrases like "I'm thrilled and prestigious", "delighted to", "esteemed", "honour", "privileged"
+- Don't use corporate buzzwords or flowery language
+- Use natural, conversational English like you're talking to a friend
+- Be authentic and genuine, not rehearsed or scripted
+- Good: "I'm really excited about...", "What drew me to..."
+- Bad: "I'm honoured and privileged...", "It would be a tremendous opportunity..."
+- Think: How would a confident, articulate person NATURALLY speak?
+
 Provide in this format (markdown):
 
 ## What You Said
@@ -56,9 +66,10 @@ Provide in this format (markdown):
 [Rewrite THEIR answer with improvements - keep their examples/stories but add:
 - More specific metrics/numbers
 - Clearer structure (if needed)
-- Stronger action verbs
+- Stronger action verbs (but natural ones, not corporate jargon)
 - Concrete outcomes
-- Business impact]
+- Business impact
+- CRITICAL: Use natural, conversational language that sounds authentic, NOT overly formal or scripted]
 
 ## Why This Works
 [1-2 sentences explaining what makes the enhanced version stronger]
@@ -66,6 +77,8 @@ Provide in this format (markdown):
 IMPORTANT:
 - This should feel like "your answer, but better" - NOT a completely different answer
 - Use their specific examples and experiences
+- Sound like a REAL PERSON talking naturally, not reading from a script
+- Avoid overly sophisticated vocabulary - be clear and conversational
 - Use British English spelling throughout (e.g., "organised", "analyse", "realise", "behaviour")`;
 
     const completion = await openai.chat.completions.create({
