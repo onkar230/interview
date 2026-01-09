@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +20,7 @@ interface Evaluation {
   detailedFeedback: string;
 }
 
-export default function EvaluationPage() {
+function EvaluationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
@@ -220,5 +220,19 @@ export default function EvaluationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EvaluationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading evaluation...</p>
+        </div>
+      </div>
+    }>
+      <EvaluationContent />
+    </Suspense>
   );
 }
