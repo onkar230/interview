@@ -128,20 +128,53 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border">
+      {/* Header - Matches Homepage Navigation */}
+      <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">InterviewAI</h1>
-              <p className="text-sm text-muted-foreground">Your Interview Dashboard</p>
-            </div>
+            {/* Logo */}
+            <button
+              onClick={() => router.push('/')}
+              className="text-2xl font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
+            >
+              InterviewAI
+            </button>
+
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              <button
+                onClick={() => router.push('/#features')}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => router.push('/#pricing')}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Pricing
+              </button>
+              <button
+                onClick={() => router.push('/interview/select')}
+                className="text-primary font-medium"
+              >
+                Dashboard
+              </button>
+            </nav>
+
+            {/* User Menu */}
             <UserNav />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Your Interview Dashboard</h1>
+          <p className="text-muted-foreground">Track your progress and continue practicing</p>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
