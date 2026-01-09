@@ -311,6 +311,7 @@ export default function DashboardPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                              className="w-[140px]"
                             >
                               View Feedback
                             </Button>
@@ -319,6 +320,7 @@ export default function DashboardPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
+                              className="w-[140px]"
                             >
                               Resume
                             </Button>
