@@ -843,32 +843,39 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
     setIsProcessing(true);
 
     try {
-      console.log('Ending interview with', messages.length, 'messages');
+      console.log('Ending interview - aggregating live feedback from', feedbackHistory.length, 'questions');
 
-      // Generate evaluation
-      const evaluationResponse = await fetch('/api/interview/evaluate', {
+      // Aggregate all live feedback into final evaluation
+      const evaluationResponse = await fetch(`/api/interview/sessions/${sessionId}/aggregate-feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transcript: messages.map(m => ({ role: m.role, content: m.content })),
-          industry,
-        }),
       });
 
       if (!evaluationResponse.ok) {
         const errorData = await evaluationResponse.json().catch(() => ({}));
         console.error('Evaluation API error:', evaluationResponse.status, errorData);
-        throw new Error(errorData.error || `Evaluation failed with status ${evaluationResponse.status}`);
+        throw new Error(errorData.error || `Failed to aggregate feedback: ${evaluationResponse.status}`);
       }
 
-      const evaluation = await evaluationResponse.json();
-      console.log('Evaluation generated successfully');
+      const { evaluation } = await evaluationResponse.json();
+      console.log('Live feedback aggregated successfully');
 
-      // Store evaluation in sessionStorage
-      sessionStorage.setItem('interviewEvaluation', JSON.stringify(evaluation));
+      // Save evaluation to database
+      if (sessionId) {
+        const saveResponse = await fetch(`/api/interview/sessions/${sessionId}/evaluation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(evaluation),
+        });
 
-      // Navigate to evaluation page
-      router.push('/interview/evaluation');
+        if (!saveResponse.ok) {
+          throw new Error('Failed to save evaluation to database');
+        }
+        console.log('Evaluation saved to database');
+      }
+
+      // Navigate to evaluation page with sessionId
+      router.push(`/interview/evaluation?sessionId=${sessionId}`);
     } catch (err) {
       console.error('Error ending interview:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';

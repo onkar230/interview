@@ -25,7 +25,15 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ sessions });
+    // Transform interview_evaluations from object to array for frontend compatibility
+    const transformedSessions = sessions?.map(session => ({
+      ...session,
+      interview_evaluations: session.interview_evaluations
+        ? [session.interview_evaluations]  // Wrap in array
+        : []
+    })) || [];
+
+    return NextResponse.json({ sessions: transformedSessions });
   } catch (error) {
     console.error('Error fetching sessions:', error);
     return NextResponse.json(

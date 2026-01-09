@@ -156,45 +156,25 @@ export default function DashboardPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Interviews</p>
-                <p className="text-3xl font-bold text-foreground mt-2">{stats.total}</p>
-              </div>
-              <BarChart3 className="h-10 w-10 text-primary opacity-20" />
-            </div>
+            <p className="text-sm font-medium text-muted-foreground">Total Interviews</p>
+            <p className="text-3xl font-bold text-foreground mt-2">{stats.total}</p>
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{stats.completed}</p>
-              </div>
-              <CheckCircle className="h-10 w-10 text-green-600 opacity-20" />
-            </div>
+            <p className="text-sm font-medium text-muted-foreground">Completed</p>
+            <p className="text-3xl font-bold text-green-600 mt-2">{stats.completed}</p>
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">{stats.inProgress}</p>
-              </div>
-              <Clock className="h-10 w-10 text-blue-600 opacity-20" />
-            </div>
+            <p className="text-sm font-medium text-muted-foreground">In Progress</p>
+            <p className="text-3xl font-bold text-blue-600 mt-2">{stats.inProgress}</p>
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Avg Score</p>
-                <p className="text-3xl font-bold text-primary mt-2">
-                  {stats.averageScore > 0 ? stats.averageScore.toFixed(1) : '-'}
-                </p>
-              </div>
-              <TrendingUp className="h-10 w-10 text-primary opacity-20" />
-            </div>
+            <p className="text-sm font-medium text-muted-foreground">Avg Score</p>
+            <p className="text-3xl font-bold text-primary mt-2">
+              {stats.averageScore > 0 ? stats.averageScore.toFixed(1) : '-'}
+            </p>
           </div>
         </div>
 
@@ -288,13 +268,22 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {session.status === 'completed' && session.interview_evaluations?.[0] ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push(`/interview/evaluation?sessionId=${session.id}`)}
-                          >
-                            View Report
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                            >
+                              View Feedback
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/interview/evaluation?sessionId=${session.id}`)}
+                            >
+                              View Report
+                            </Button>
+                          </div>
                         ) : session.status === 'active' ? (
                           <Button
                             variant="outline"

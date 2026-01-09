@@ -1039,7 +1039,8 @@ REMEMBER: The candidate took the time to upload their CV. They expect CV-based q
   }
 
   // Follow-up intensity configuration
-  const intensity = followUpIntensity || 'moderate';
+  // Force 'none' intensity if only 1 question selected (no room for follow-ups)
+  const intensity = questionCount === 1 ? 'none' : (followUpIntensity || 'moderate');
   let followUpInstructions = '';
 
   switch (intensity) {
@@ -1571,7 +1572,10 @@ CRITICAL REMINDERS:
 - Ask ONE question at a time
 - Probe vague answers with follow-ups
 - Maintain professional evaluative distance
-- Save "Do you have questions for me?" for the very end
+${questionCount === 1
+  ? `- SPECIAL: This is a 1-question interview - do NOT ask "Do you have questions for me?" at the end. Just accept their answer and let the interview end naturally.`
+  : `- Save "Do you have questions for me?" for the very end`
+}
 
 Begin the interview now with your introduction.`;
 }

@@ -73,6 +73,7 @@ function ConfigureInterviewContent() {
   const [customQuestions, setCustomQuestions] = useState('');
   const [followUpIntensity, setFollowUpIntensity] = useState<'none' | 'light' | 'moderate' | 'intensive'>('light');
   const [questionCount, setQuestionCount] = useState(10);
+  const [includeMandatoryQuestion, setIncludeMandatoryQuestion] = useState(true);
   const [errors, setErrors] = useState<{
     company?: string;
     role?: string;
@@ -233,6 +234,7 @@ function ConfigureInterviewContent() {
           maxQuestions: questionCount,
           cvText: cvText.trim() || undefined,
           questionPriority: questionPriority,
+          includeMandatoryQuestion: includeMandatoryQuestion,
         }),
       });
 
@@ -450,7 +452,18 @@ function ConfigureInterviewContent() {
                 </div>
                 <Slider
                   value={[questionCount]}
-                  onValueChange={(value) => setQuestionCount(value[0])}
+                  onValueChange={(value) => {
+                    const newCount = value[0];
+                    setQuestionCount(newCount);
+                    // Clear all optional inputs if only 1 question AND mandatory question is enabled
+                    if (newCount === 1 && includeMandatoryQuestion) {
+                      setQuestionTypes([]);
+                      setJobDescription('');
+                      setCustomQuestions('');
+                      setCvFile(null);
+                      setCvText('');
+                    }
+                  }}
                   min={1}
                   max={10}
                   step={1}
@@ -468,14 +481,42 @@ function ConfigureInterviewContent() {
               </p>
             </div>
 
+            {/* Mandatory Question Toggle */}
+            <div className="bg-blue-50/50 border border-blue-200 rounded-lg p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeMandatoryQuestion}
+                  onChange={(e) => setIncludeMandatoryQuestion(e.target.checked)}
+                  className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-sm text-blue-900">
+                    Include company motivation question
+                  </div>
+                  <div className="text-xs text-blue-700 mt-1">
+                    Start with: "Why do you want to work at {company || '[company name]'}?"
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1 italic">
+                    This is typically the first question in real interviews. Uncheck if you want to practice other questions only.
+                  </div>
+                </div>
+              </label>
+            </div>
+
             {/* Job Description (Optional) */}
-            <div>
+            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
               <label
                 htmlFor="jobDescription"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Job Description (Optional)
               </label>
+              {questionCount === 1 && includeMandatoryQuestion && (
+                <p className="text-xs text-yellow-600 mb-2">
+                  Not used with 1 question - you'll only get the mandatory opening question
+                </p>
+              )}
               <Textarea
                 id="jobDescription"
                 placeholder="Paste the job description here to help the AI ask more relevant questions..."
@@ -483,7 +524,8 @@ function ConfigureInterviewContent() {
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={6}
                 maxLength={2000}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border"
+                disabled={questionCount === 1 && includeMandatoryQuestion}
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
               />
               <p className="mt-1 text-sm text-muted-foreground">
                 {jobDescription.length}/2000 characters
@@ -491,16 +533,22 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* CV Upload (Optional) */}
-            <div>
+            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
               <label
                 htmlFor="cvUpload"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Upload Your CV/Resume (Optional)
               </label>
-              <p className="text-xs text-muted-foreground mb-3">
-                Upload your CV to get more personalised questions based on your experience. Supports PDF, DOCX, and images.
-              </p>
+              {questionCount === 1 && includeMandatoryQuestion ? (
+                <p className="text-xs text-yellow-600 mb-3">
+                  Not used with 1 question - you'll only get the mandatory opening question
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mb-3">
+                  Upload your CV to get more personalised questions based on your experience. Supports PDF, DOCX, and images.
+                </p>
+              )}
 
               {!cvFile ? (
                 <div className="relative">
@@ -509,11 +557,16 @@ function ConfigureInterviewContent() {
                     type="file"
                     accept=".pdf,.doc,.docx,image/*"
                     onChange={handleCvUpload}
+                    disabled={questionCount === 1 && includeMandatoryQuestion}
                     className="hidden"
                   />
                   <label
                     htmlFor="cvUpload"
-                    className="flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors bg-muted"
+                    className={`flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg transition-colors bg-muted ${
+                      questionCount === 1 && includeMandatoryQuestion
+                        ? 'cursor-not-allowed'
+                        : 'cursor-pointer hover:border-primary hover:bg-primary/5'
+                    }`}
                   >
                     <Upload className="h-6 w-6 text-muted-foreground" />
                     <div className="text-center">
@@ -573,9 +626,15 @@ function ConfigureInterviewContent() {
               <label className="block text-sm font-medium text-muted-foreground mb-2">
                 What types of questions do you want to practise? (Optional)
               </label>
-              <p className="text-xs text-muted-foreground mb-3">
-                Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
-              </p>
+              {questionCount === 1 && includeMandatoryQuestion ? (
+                <p className="text-xs text-muted-foreground mb-3">
+                  With 1 question selected and mandatory question enabled, you'll only get: "Why do you want to work at this company?"
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mb-3">
+                  Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
+                </p>
+              )}
               <div className="space-y-2">
                 {[
                   { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
@@ -587,13 +646,18 @@ function ConfigureInterviewContent() {
                 ].map((type) => (
                   <label
                     key={type.id}
-                    className="flex items-start gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors bg-muted"
+                    className={`flex items-start gap-3 p-3 border border-border rounded-lg transition-colors ${
+                      questionCount === 1 && includeMandatoryQuestion
+                        ? 'opacity-50 cursor-not-allowed bg-muted'
+                        : 'cursor-pointer hover:bg-muted bg-muted'
+                    }`}
                   >
                     <input
                       type="checkbox"
                       checked={questionTypes.includes(type.id)}
                       onChange={() => handleQuestionTypeToggle(type.id)}
-                      className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary"
+                      disabled={questionCount === 1 && includeMandatoryQuestion}
+                      className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary disabled:cursor-not-allowed"
                     />
                     <div className="flex-1">
                       <div className="font-medium text-sm text-card-foreground">{type.label}</div>
@@ -605,23 +669,30 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* Custom Questions */}
-            <div>
+            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
               <label
                 htmlFor="customQuestions"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Add Your Own Questions (Optional)
               </label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Enter specific questions that you struggle with or want to practise. One question per line, max 5 questions.
-              </p>
+              {questionCount === 1 && includeMandatoryQuestion ? (
+                <p className="text-xs text-yellow-600 mb-2">
+                  Not used with 1 question - you'll only get the mandatory opening question
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mb-2">
+                  Enter specific questions that you struggle with or want to practise. One question per line, max 5 questions.
+                </p>
+              )}
               <Textarea
                 id="customQuestions"
                 placeholder="Example:&#10;Tell me about a time you failed and what you learned from it&#10;How do you handle conflicts with team members?&#10;Describe a situation where you had to meet a tight deadline"
                 value={customQuestions}
                 onChange={(e) => setCustomQuestions(e.target.value)}
                 rows={5}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border"
+                disabled={questionCount === 1 && includeMandatoryQuestion}
+                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
               />
               <p className="mt-1 text-sm text-muted-foreground">
                 {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions

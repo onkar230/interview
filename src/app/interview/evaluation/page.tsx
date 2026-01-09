@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle2,
@@ -22,27 +22,39 @@ interface Evaluation {
 
 export default function EvaluationPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Retrieve evaluation from sessionStorage
-    const storedEvaluation = sessionStorage.getItem('interviewEvaluation');
-
-    if (storedEvaluation) {
-      try {
-        const parsed = JSON.parse(storedEvaluation);
-        setEvaluation(parsed);
-      } catch (err) {
-        console.error('Error parsing evaluation:', err);
+    const loadEvaluation = async () => {
+      if (!sessionId) {
+        console.error('No sessionId provided');
+        setIsLoading(false);
+        return;
       }
-    }
 
-    setIsLoading(false);
-  }, []);
+      try {
+        const response = await fetch(`/api/interview/sessions/${sessionId}/evaluation`);
+
+        if (!response.ok) {
+          throw new Error('Failed to load evaluation');
+        }
+
+        const data = await response.json();
+        setEvaluation(data.evaluation);
+      } catch (err) {
+        console.error('Error loading evaluation:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEvaluation();
+  }, [sessionId]);
 
   const handleStartNewInterview = () => {
-    sessionStorage.removeItem('interviewEvaluation');
     router.push('/interview/select');
   };
 
@@ -189,10 +201,10 @@ export default function EvaluationPage() {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/interview/select')}
             className="px-8"
           >
-            Back to Home
+            Back to Dashboard
           </Button>
         </div>
 

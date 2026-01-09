@@ -75,7 +75,21 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    return NextResponse.json({ evaluation });
+    // Transform snake_case to camelCase for frontend
+    const transformedEvaluation = {
+      verdict: evaluation.verdict,
+      overallScore: evaluation.overall_score,
+      communicationScore: evaluation.communication_score,
+      technicalScore: evaluation.technical_score,
+      problemSolvingScore: evaluation.problem_solving_score,
+      relevantExperienceScore: evaluation.relevant_experience_score,
+      strengths: evaluation.strengths || [],
+      weaknesses: evaluation.weaknesses || [],
+      dealBreakers: evaluation.deal_breakers || [],
+      detailedFeedback: evaluation.detailed_feedback || '',
+    };
+
+    return NextResponse.json({ evaluation: transformedEvaluation });
   } catch (error) {
     console.error('Error fetching evaluation:', error);
     return NextResponse.json(
