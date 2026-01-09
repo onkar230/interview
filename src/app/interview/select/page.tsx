@@ -268,22 +268,13 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {session.status === 'completed' && session.interview_evaluations?.[0] ? (
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
-                            >
-                              View Feedback
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/interview/evaluation?sessionId=${session.id}`)}
-                            >
-                              View Report
-                            </Button>
-                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                          >
+                            View Feedback
+                          </Button>
                         ) : session.status === 'active' ? (
                           <Button
                             variant="outline"
