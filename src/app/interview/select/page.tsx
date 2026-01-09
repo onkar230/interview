@@ -134,33 +134,11 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/interview/select')}
               className="text-2xl font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
             >
               InterviewAI
             </button>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              <button
-                onClick={() => router.push('/#features')}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Features
-              </button>
-              <button
-                onClick={() => router.push('/#pricing')}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Pricing
-              </button>
-              <button
-                onClick={() => router.push('/interview/select')}
-                className="text-primary font-medium"
-              >
-                Dashboard
-              </button>
-            </nav>
 
             {/* User Menu */}
             <UserNav />
