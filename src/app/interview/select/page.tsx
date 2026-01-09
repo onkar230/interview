@@ -11,6 +11,7 @@ import {
   Calendar,
   Building2,
   Briefcase,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserNav from '@/components/navigation/UserNav';
@@ -39,6 +40,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
@@ -123,6 +125,42 @@ export default function DashboardPage() {
         return <span className="text-red-600 font-semibold">✗ Fail</span>;
       default:
         return null;
+    }
+  };
+
+  const handleDeleteSession = async (sessionId: string) => {
+    if (!confirm('Are you sure you want to delete this interview? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingId(sessionId);
+    try {
+      const response = await fetch(`/api/interview/sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete session');
+
+      // Remove from UI
+      setSessions(prevSessions => prevSessions.filter(s => s.id !== sessionId));
+
+      // Recalculate stats
+      const updatedSessions = sessions.filter(s => s.id !== sessionId);
+      const total = updatedSessions.length;
+      const completed = updatedSessions.filter(s => s.status === 'completed').length;
+      const inProgress = updatedSessions.filter(s => s.status === 'active').length;
+      const scoresSum = updatedSessions
+        .filter(s => s.interview_evaluations?.[0]?.overall_score)
+        .reduce((sum, s) => sum + (s.interview_evaluations[0].overall_score || 0), 0);
+      const scoresCount = updatedSessions.filter(s => s.interview_evaluations?.[0]?.overall_score).length;
+      const averageScore = scoresCount > 0 ? scoresSum / scoresCount : 0;
+
+      setStats({ total, completed, inProgress, averageScore });
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      alert('Failed to delete interview. Please try again.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -267,25 +305,39 @@ export default function DashboardPage() {
                         {getVerdictBadge(session.interview_evaluations?.[0]?.verdict || null)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {session.status === 'completed' && session.interview_evaluations?.[0] ? (
+                        <div className="flex gap-2">
+                          {session.status === 'completed' && session.interview_evaluations?.[0] ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                            >
+                              View Feedback
+                            </Button>
+                          ) : session.status === 'active' ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
+                            >
+                              Resume
+                            </Button>
+                          ) : null}
+
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                            onClick={() => handleDeleteSession(session.id)}
+                            disabled={deletingId === session.id}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
-                            View Feedback
+                            {deletingId === session.id ? (
+                              <span className="inline-block animate-spin">⏳</span>
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
-                        ) : session.status === 'active' ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
-                          >
-                            Resume
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   ))}
