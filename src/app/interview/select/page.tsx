@@ -2,16 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Plus,
-  TrendingUp,
   CheckCircle,
   Clock,
   BarChart3,
   Calendar,
   Building2,
-  Briefcase,
   Trash2,
+  Target,
+  TrendingUp,
+  ArrowRight,
+  Check,
+  Sparkles,
+  Mic,
+  Video,
+  MessageSquare,
+  Bot,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserNav from '@/components/navigation/UserNav';
@@ -92,37 +100,49 @@ export default function DashboardPage() {
     switch (status) {
       case 'completed':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle className="h-3 w-3 mr-1" />
+          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-accent text-accent-foreground border border-border">
+            <CheckCircle className="h-3 w-3 mr-1.5" aria-hidden="true" />
             Completed
           </span>
         );
       case 'active':
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            <Clock className="h-3 w-3 mr-1" />
+          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
+            <Clock className="h-3 w-3 mr-1.5" aria-hidden="true" />
             In Progress
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
             Pending
           </span>
         );
     }
   };
 
-  const getVerdictBadge = (verdict: string | null) => {
+  const getVerdictDisplay = (verdict: string | null, score: number | null) => {
     if (!verdict) return null;
 
     switch (verdict) {
       case 'pass':
-        return <span className="text-green-600 font-semibold">✓ Pass</span>;
+        return (
+          <span className="text-primary font-semibold">
+            Pass
+          </span>
+        );
       case 'borderline':
-        return <span className="text-yellow-600 font-semibold">~ Borderline</span>;
+        return (
+          <span className="text-muted-foreground font-semibold">
+            Borderline
+          </span>
+        );
       case 'fail':
-        return <span className="text-red-600 font-semibold">✗ Fail</span>;
+        return (
+          <span className="text-destructive font-semibold">
+            Needs Work
+          </span>
+        );
       default:
         return null;
     }
@@ -166,188 +186,471 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - Matches Homepage Navigation */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <button
-              onClick={() => router.push('/interview/select')}
-              className="text-2xl font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
-            >
-              InterviewAI
-            </button>
+      {/* Navigation - Matches Landing Page Exactly */}
+      <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+        <Link href="/" className="text-2xl font-bold text-primary">
+          InterviewAI
+        </Link>
+        <div className="hidden md:flex items-center gap-8">
+          <Link href="/#features" className="text-foreground hover:text-primary transition-colors">
+            Features
+          </Link>
+          <Link href="/#pricing" className="text-foreground hover:text-primary transition-colors">
+            Pricing
+          </Link>
+          <UserNav />
+        </div>
+        {/* Mobile: Just show UserNav */}
+        <div className="md:hidden">
+          <UserNav />
+        </div>
+      </nav>
 
-            {/* User Menu */}
-            <UserNav />
+      {/* Hero/Welcome Section - Centered, Inspirational */}
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+          Welcome Back to Your{' '}
+          <span className="text-primary">Practice Space</span>
+        </h1>
+        <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+          Every interview you complete brings you one step closer to landing your dream role.
+          Keep practicing, keep improving, and watch your confidence grow.
+        </p>
+        <Button
+          onClick={() => router.push('/interview/configure')}
+          size="lg"
+          className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl"
+        >
+          <Plus className="h-5 w-5 mr-2" aria-hidden="true" />
+          Start New Interview
+        </Button>
+
+        {/* Trust Indicators - Matches Landing Page */}
+        <div className="flex flex-wrap items-center justify-center gap-8 mt-8 text-muted-foreground text-sm">
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Unlimited practice sessions
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Real-time AI feedback
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Track your improvement
           </div>
         </div>
-      </header>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Your Interview Dashboard</h1>
-          <p className="text-muted-foreground">Track your progress and continue practicing</p>
+      {/* Stats Section - Centered Header */}
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Your Progress at a Glance
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            See how far you have come in your interview preparation journey
+          </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-card border border-border rounded-lg p-6">
-            <p className="text-sm font-medium text-muted-foreground">Total Interviews</p>
-            <p className="text-3xl font-bold text-foreground mt-2">{stats.total}</p>
+        {/* Stats Cards - Matching Landing Page Proportions (p-8, h-14 w-14 rounded-xl, h-7 w-7 icons) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center">
+                <BarChart3 className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-foreground mb-1">{stats.total}</p>
+              <p className="text-sm text-muted-foreground">Total Interviews</p>
+            </div>
           </div>
 
-          <div className="bg-card border border-border rounded-lg p-6">
-            <p className="text-sm font-medium text-muted-foreground">Completed</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">{stats.completed}</p>
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-14 w-14 bg-accent rounded-xl flex items-center justify-center">
+                <CheckCircle className="h-7 w-7 text-accent-foreground" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-foreground mb-1">{stats.completed}</p>
+              <p className="text-sm text-muted-foreground">Completed</p>
+            </div>
           </div>
 
-          <div className="bg-card border border-border rounded-lg p-6">
-            <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-            <p className="text-3xl font-bold text-blue-600 mt-2">{stats.inProgress}</p>
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-14 w-14 bg-secondary rounded-xl flex items-center justify-center">
+                <Clock className="h-7 w-7 text-secondary-foreground" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-foreground mb-1">{stats.inProgress}</p>
+              <p className="text-sm text-muted-foreground">In Progress</p>
+            </div>
           </div>
 
-          <div className="bg-card border border-border rounded-lg p-6">
-            <p className="text-sm font-medium text-muted-foreground">Avg Score</p>
-            <p className="text-3xl font-bold text-primary mt-2">
-              {stats.averageScore > 0 ? stats.averageScore.toFixed(1) : '-'}
-            </p>
+          <div className="bg-card rounded-xl p-8 border border-border">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center">
+                <TrendingUp className="h-7 w-7 text-primary-foreground" aria-hidden="true" />
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-foreground mb-1">
+                {stats.averageScore > 0 ? stats.averageScore.toFixed(1) : '-'}
+                {stats.averageScore > 0 && <span className="text-lg text-muted-foreground">/10</span>}
+              </p>
+              <p className="text-sm text-muted-foreground">Average Score</p>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-foreground">Interview History</h2>
-          <Button onClick={() => router.push('/interview/configure')} className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Interview
+        {/* Motivational Trust Indicators */}
+        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-muted-foreground text-sm">
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Detailed performance analytics
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Personalized improvement tips
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
+            Industry-specific insights
+          </div>
+        </div>
+      </div>
+
+      {/* Dark Teal "Practice Room" Bridge Section - Matches Interview Session Theme */}
+      <div className="bg-primary py-20 relative overflow-hidden">
+        {/* Subtle decorative elements mimicking interview session UI */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute left-8 top-8 bottom-8 w-64 border border-primary-foreground/20 rounded-lg" />
+          <div className="absolute right-8 top-8 bottom-8 w-64 border border-primary-foreground/20 rounded-lg" />
+        </div>
+
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          {/* Bot avatar - matches interview session */}
+          <div className="flex justify-center mb-8">
+            <div className="h-20 w-20 rounded-full bg-accent/20 flex items-center justify-center border-2 border-accent/30">
+              <Bot className="h-10 w-10 text-accent" aria-hidden="true" />
+            </div>
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+            Step Into the Practice Room
+          </h2>
+          <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+            Experience a realistic interview environment with AI-powered feedback.
+            Your next session awaits - just like the real thing, but with room to grow.
+          </p>
+
+          {/* Feature pills - styled like interview session UI elements */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+            <div className="flex items-center gap-2 bg-primary/50 backdrop-blur-sm border border-primary-foreground/20 rounded-lg px-4 py-2">
+              <Video className="h-4 w-4 text-accent" aria-hidden="true" />
+              <span className="text-sm text-primary-foreground/90">Live Webcam</span>
+            </div>
+            <div className="flex items-center gap-2 bg-primary/50 backdrop-blur-sm border border-primary-foreground/20 rounded-lg px-4 py-2">
+              <Mic className="h-4 w-4 text-accent" aria-hidden="true" />
+              <span className="text-sm text-primary-foreground/90">Voice Recording</span>
+            </div>
+            <div className="flex items-center gap-2 bg-primary/50 backdrop-blur-sm border border-primary-foreground/20 rounded-lg px-4 py-2">
+              <MessageSquare className="h-4 w-4 text-accent" aria-hidden="true" />
+              <span className="text-sm text-primary-foreground/90">Real-time Feedback</span>
+            </div>
+          </div>
+
+          <Button
+            onClick={() => router.push('/interview/configure')}
+            size="lg"
+            className="px-12 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-2xl"
+          >
+            Enter Practice Room
+            <ArrowRight className="h-5 w-5 ml-2" aria-hidden="true" />
           </Button>
+
+          <p className="text-sm text-primary-foreground/60 mt-6">
+            Take a deep breath. You have got this.
+          </p>
+        </div>
+      </div>
+
+      {/* Interview History Section */}
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Your Interview History
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Review past sessions, track your growth, and continue where you left off
+          </p>
         </div>
 
-        {/* Interview History Table */}
+        {/* Interview History - Card-Based Layout */}
         {isLoading ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
+          <div className="bg-card border border-border rounded-2xl p-16 text-center max-w-4xl mx-auto">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p className="mt-4 text-muted-foreground">Loading your interviews...</p>
           </div>
         ) : sessions.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
-            <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">No interviews yet</h3>
-            <p className="text-muted-foreground mb-6">Start your first AI mock interview to see your progress here</p>
-            <Button onClick={() => router.push('/interview/configure')}>
-              <Plus className="h-4 w-4 mr-2" />
+          <div className="bg-card border border-border rounded-2xl p-16 text-center max-w-4xl mx-auto">
+            <div className="flex items-center justify-center mb-6">
+              <div className="h-16 w-16 bg-muted rounded-xl flex items-center justify-center">
+                <Target className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-3">
+              No interviews yet
+            </h3>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Start your first AI mock interview to see your progress here.
+              Every expert was once a beginner.
+            </p>
+            <Button
+              onClick={() => router.push('/interview/configure')}
+              className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-lg"
+            >
+              <Sparkles className="h-5 w-5 mr-2" aria-hidden="true" />
               Start Your First Interview
             </Button>
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Company & Role
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Industry
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Score
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Verdict
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {sessions.map((session) => (
-                    <tr key={session.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Building2 className="h-5 w-5 text-muted-foreground mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-foreground">{session.company}</div>
-                            <div className="text-sm text-muted-foreground">{session.role}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-foreground capitalize">{session.industry}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          {formatDate(session.created_at)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(session.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-foreground">
-                          {session.interview_evaluations?.[0]?.overall_score
-                            ? `${session.interview_evaluations[0].overall_score.toFixed(1)}/10`
-                            : '-'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getVerdictBadge(session.interview_evaluations?.[0]?.verdict || null)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
-                          {session.status === 'completed' && session.interview_evaluations?.[0] ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
-                              className="w-[140px]"
-                            >
-                              View Feedback
-                            </Button>
-                          ) : session.status === 'active' ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
-                              className="w-[140px]"
-                            >
-                              Resume
-                            </Button>
-                          ) : null}
+          <div className="space-y-4 max-w-5xl mx-auto">
+            {sessions.map((session) => (
+              <div
+                key={session.id}
+                className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow"
+              >
+                {/* Desktop Layout - Grid for alignment with fixed column widths */}
+                <div className="hidden lg:grid lg:grid-cols-[1fr_100px_110px_115px_60px_85px_140px] lg:items-center lg:gap-4">
+                  {/* Company & Role - flexible width, takes remaining space */}
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="h-12 w-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-serif text-xl font-semibold text-foreground truncate">
+                        {session.company}
+                      </h3>
+                      <p className="text-muted-foreground truncate">{session.role}</p>
+                    </div>
+                  </div>
 
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteSession(session.id)}
-                            disabled={deletingId === session.id}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            {deletingId === session.id ? (
-                              <span className="inline-block animate-spin">⏳</span>
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  {/* Industry - 100px fixed */}
+                  <div className="text-sm text-foreground capitalize truncate">
+                    {session.industry}
+                  </div>
+
+                  {/* Date - 110px fixed */}
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 mr-1.5 flex-shrink-0" aria-hidden="true" />
+                    <span className="truncate">{formatDate(session.created_at)}</span>
+                  </div>
+
+                  {/* Status - 115px fixed */}
+                  <div>
+                    {getStatusBadge(session.status)}
+                  </div>
+
+                  {/* Score - 60px fixed */}
+                  <div className="text-sm">
+                    {session.interview_evaluations?.[0]?.overall_score ? (
+                      <>
+                        <span className="font-semibold text-foreground">
+                          {session.interview_evaluations[0].overall_score.toFixed(1)}
+                        </span>
+                        <span className="text-muted-foreground">/10</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </div>
+
+                  {/* Verdict - 85px fixed */}
+                  <div className="text-sm">
+                    {session.interview_evaluations?.[0]?.verdict ? (
+                      getVerdictDisplay(
+                        session.interview_evaluations[0].verdict,
+                        session.interview_evaluations[0].overall_score
+                      )
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </div>
+
+                  {/* Actions - 140px fixed */}
+                  <div className="flex items-center gap-2 justify-end">
+                    {session.status === 'completed' && session.interview_evaluations?.[0] ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                        className="gap-1.5"
+                      >
+                        Feedback
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    ) : session.status === 'active' ? (
+                      <Button
+                        size="sm"
+                        onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
+                        className="gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground"
+                      >
+                        Resume
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    ) : null}
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteSession(session.id)}
+                      disabled={deletingId === session.id}
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      aria-label="Delete interview"
+                    >
+                      {deletingId === session.id ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Mobile Layout - Stacked for readability */}
+                <div className="lg:hidden">
+                  {/* Header with company info */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="h-12 w-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-6 w-6 text-primary-foreground" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-serif text-xl font-semibold text-foreground truncate">
+                        {session.company}
+                      </h3>
+                      <p className="text-muted-foreground truncate">{session.role}</p>
+                    </div>
+                  </div>
+
+                  {/* Meta grid - 2 columns on mobile */}
+                  <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground block text-xs uppercase tracking-wide mb-0.5">Industry</span>
+                      <span className="text-foreground capitalize">{session.industry}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs uppercase tracking-wide mb-0.5">Date</span>
+                      <span className="text-foreground">{formatDate(session.created_at)}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs uppercase tracking-wide mb-0.5">Status</span>
+                      {getStatusBadge(session.status)}
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs uppercase tracking-wide mb-0.5">Score</span>
+                      {session.interview_evaluations?.[0]?.overall_score ? (
+                        <span className="text-foreground">
+                          <span className="font-semibold">
+                            {session.interview_evaluations[0].overall_score.toFixed(1)}
+                          </span>
+                          /10
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Verdict and Actions */}
+                  <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                    <div className="text-sm">
+                      {session.interview_evaluations?.[0]?.verdict ? (
+                        <>
+                          <span className="text-muted-foreground mr-1.5">Verdict:</span>
+                          {getVerdictDisplay(
+                            session.interview_evaluations[0].verdict,
+                            session.interview_evaluations[0].overall_score
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">No verdict yet</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {session.status === 'completed' && session.interview_evaluations?.[0] ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => router.push(`/interview/feedback?sessionId=${session.id}`)}
+                          className="gap-1.5"
+                        >
+                          Feedback
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                      ) : session.status === 'active' ? (
+                        <Button
+                          size="sm"
+                          onClick={() => router.push(`/interview/session?sessionId=${session.id}`)}
+                          className="gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground"
+                        >
+                          Resume
+                          <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                      ) : null}
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteSession(session.id)}
+                        disabled={deletingId === session.id}
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        aria-label="Delete interview"
+                      >
+                        {deletingId === session.id ? (
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
+      </div>
+
+      {/* Final CTA Section - Matches Landing Page */}
+      <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+          Ready for your next challenge?
+        </h2>
+        <p className="text-xl text-muted-foreground mb-8">
+          The more you practice, the more confident you become. Start another session now.
+        </p>
+        <Button
+          onClick={() => router.push('/interview/configure')}
+          size="lg"
+          className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground"
+        >
+          Start New Interview
+        </Button>
+        <p className="text-sm text-muted-foreground mt-8">
+          Your future self will thank you for the practice you put in today.
+        </p>
+      </div>
+
+      {/* Footer - Matches Landing Page */}
+      <div className="border-t border-border py-8">
+        <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
+          <p>© 2024 InterviewAI. All rights reserved.</p>
+        </div>
       </div>
     </div>
   );
