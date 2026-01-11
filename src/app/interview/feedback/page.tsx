@@ -3,7 +3,20 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, TrendingUp, TrendingDown, AlertTriangle, Lightbulb } from 'lucide-react';
+import {
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  Lightbulb,
+  BarChart3,
+  Sparkles,
+  CheckCircle,
+  XCircle,
+  Minus,
+  Trophy,
+  Target,
+} from 'lucide-react';
 
 interface FeedbackItem {
   id: string;
@@ -22,13 +35,53 @@ interface FeedbackItem {
   relevant_experience_score: number | null;
 }
 
+interface SessionData {
+  id: string;
+  use_personalization: boolean;
+  industry: string;
+  company: string;
+  role: string;
+}
+
+interface TrendInsight {
+  category: string;
+  currentScore: number;
+  historicalAvg: number;
+  trend: 'up' | 'down' | 'stable';
+  delta: number;
+  insight: string;
+}
+
+interface RecurringPattern {
+  type: 'strength' | 'weakness';
+  pattern: string;
+  frequency: number;
+  totalInterviews: number;
+  insight: string;
+}
+
+interface PersonalizedInsights {
+  hasHistory: boolean;
+  totalHistoricalInterviews: number;
+  trendInsights: TrendInsight[];
+  recurringPatterns: RecurringPattern[];
+  overallProgressMessage: string;
+  encouragement: string;
+}
+
 function FeedbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([]);
+  const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Personalized Insights state (Layer 3)
+  const [personalizedInsights, setPersonalizedInsights] = useState<PersonalizedInsights | null>(null);
+  const [isLoadingInsights, setIsLoadingInsights] = useState(false);
+
+  // Load feedback and session data
   useEffect(() => {
     const loadFeedback = async () => {
       if (!sessionId) {
@@ -38,6 +91,7 @@ function FeedbackContent() {
       }
 
       try {
+        // Fetch feedback items
         const response = await fetch(`/api/interview/sessions/${sessionId}/feedback`);
 
         if (!response.ok) {
@@ -46,6 +100,13 @@ function FeedbackContent() {
 
         const data = await response.json();
         setFeedbackItems(data.feedbackItems || []);
+
+        // Also fetch session data to check personalization setting
+        const sessionResponse = await fetch(`/api/interview/sessions/${sessionId}`);
+        if (sessionResponse.ok) {
+          const sessionResult = await sessionResponse.json();
+          setSessionData(sessionResult.session);
+        }
       } catch (err) {
         console.error('Error loading feedback:', err);
       } finally {
@@ -55,6 +116,80 @@ function FeedbackContent() {
 
     loadFeedback();
   }, [sessionId]);
+
+  // Fetch personalized insights AFTER objective feedback is loaded (Layer 3)
+  // This ensures no anchoring bias - insights are fetched separately
+  useEffect(() => {
+    const fetchPersonalizedInsights = async () => {
+      // Only fetch if:
+      // 1. We have session data
+      // 2. Personalization was enabled for this session
+      // 3. We have feedback items with scores
+      // 4. We haven't already loaded insights
+      if (
+        !sessionData ||
+        !sessionData.use_personalization ||
+        feedbackItems.length === 0 ||
+        personalizedInsights
+      ) {
+        return;
+      }
+
+      // Calculate average scores from feedback items for comparison
+      const validItems = feedbackItems.filter(
+        item =>
+          item.communication_score !== null ||
+          item.technical_score !== null ||
+          item.problem_solving_score !== null ||
+          item.relevant_experience_score !== null
+      );
+
+      if (validItems.length === 0) return;
+
+      const avgScores = {
+        communication:
+          validItems.reduce((sum, item) => sum + (item.communication_score || 0), 0) / validItems.length,
+        technicalKnowledge:
+          validItems.reduce((sum, item) => sum + (item.technical_score || 0), 0) / validItems.length,
+        problemSolving:
+          validItems.reduce((sum, item) => sum + (item.problem_solving_score || 0), 0) / validItems.length,
+        relevantExperience:
+          validItems.reduce((sum, item) => sum + (item.relevant_experience_score || 0), 0) / validItems.length,
+      };
+
+      setIsLoadingInsights(true);
+
+      try {
+        const response = await fetch('/api/interview/personalized-insights', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            questionNumber: feedbackItems.length,
+            currentScores: avgScores,
+          }),
+        });
+
+        if (response.ok) {
+          const insights = await response.json();
+          setPersonalizedInsights(insights);
+        }
+      } catch (err) {
+        console.error('Error fetching personalized insights:', err);
+      } finally {
+        setIsLoadingInsights(false);
+      }
+    };
+
+    fetchPersonalizedInsights();
+  }, [sessionData, feedbackItems, sessionId, personalizedInsights]);
+
+  // Helper to render trend icon
+  const TrendIcon = ({ trend }: { trend: 'up' | 'down' | 'stable' }) => {
+    if (trend === 'up') return <TrendingUp className="h-4 w-4 text-green-600" />;
+    if (trend === 'down') return <TrendingDown className="h-4 w-4 text-red-600" />;
+    return <Minus className="h-4 w-4 text-muted-foreground" />;
+  };
 
   if (isLoading) {
     return (
@@ -96,6 +231,12 @@ function FeedbackContent() {
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-foreground">Interview Feedback</h1>
+            {sessionData?.use_personalization && (
+              <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1 ml-auto">
+                <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
+                <span className="text-xs font-medium text-accent">Personalized</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -107,7 +248,7 @@ function FeedbackContent() {
           </p>
         </div>
 
-        {/* Feedback Items */}
+        {/* Feedback Items - Layer 1 & 2: Objective SWOT + Ideal Answer */}
         <div className="space-y-6">
           {feedbackItems.map((item) => (
             <div key={item.id} className="bg-card border border-border rounded-lg p-6">
@@ -138,7 +279,7 @@ function FeedbackContent() {
                 </div>
               </div>
 
-              {/* SWOT Grid */}
+              {/* SWOT Grid - Layer 1: Objective Feedback */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Strengths */}
                 {item.strengths && item.strengths.length > 0 && (
@@ -227,9 +368,165 @@ function FeedbackContent() {
                   </ul>
                 </div>
               )}
+
+              {/* Layer 2: Ideal Answer */}
+              {item.ideal_answer && (
+                <div className="mt-4 bg-secondary/30 border border-border rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="h-5 w-5 text-primary" />
+                    <h4 className="font-semibold text-foreground">Ideal Answer</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.ideal_answer}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
+
+        {/* Layer 3: Personalized Insights Section */}
+        {sessionData?.use_personalization && (
+          <div className="mt-12">
+            <div className="border-t border-border pt-8">
+              {/* Section Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    Personalized Insights
+                    <Sparkles className="h-5 w-5 text-accent" />
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    How this interview compares to your historical performance
+                  </p>
+                </div>
+              </div>
+
+              {isLoadingInsights ? (
+                <div className="bg-card border border-border rounded-xl p-8 text-center">
+                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary mb-3"></div>
+                  <p className="text-muted-foreground text-sm">Analysing your performance history...</p>
+                </div>
+              ) : personalizedInsights?.hasHistory ? (
+                <div className="space-y-6">
+                  {/* Overall Progress Card */}
+                  <div className="bg-primary rounded-xl p-6 text-primary-foreground">
+                    <div className="flex items-start gap-4">
+                      <div className="h-12 w-12 bg-accent/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Trophy className="h-6 w-6 text-accent" />
+                      </div>
+                      <div>
+                        <p className="font-medium mb-1">{personalizedInsights.overallProgressMessage}</p>
+                        <p className="text-sm text-primary-foreground/70">
+                          Based on {personalizedInsights.totalHistoricalInterviews} previous interview{personalizedInsights.totalHistoricalInterviews !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trend Insights Grid */}
+                  {personalizedInsights.trendInsights.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-6">
+                      <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5 text-primary" />
+                        Score Trends vs Historical Average
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {personalizedInsights.trendInsights.map((insight, idx) => (
+                          <div
+                            key={idx}
+                            className={`rounded-lg p-4 ${
+                              insight.trend === 'up'
+                                ? 'bg-green-50/50 border border-green-200'
+                                : insight.trend === 'down'
+                                ? 'bg-red-50/50 border border-red-200'
+                                : 'bg-muted/30 border border-border'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-foreground">{insight.category}</span>
+                              <TrendIcon trend={insight.trend} />
+                            </div>
+                            <div className="flex items-baseline gap-2 mb-1">
+                              <span className="text-2xl font-bold text-foreground">
+                                {insight.currentScore.toFixed(1)}
+                              </span>
+                              <span className="text-sm text-muted-foreground">/10</span>
+                              <span className="text-sm text-muted-foreground ml-2">
+                                vs avg {insight.historicalAvg.toFixed(1)}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {insight.delta > 0 ? '+' : ''}{insight.delta.toFixed(1)} from average
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Recurring Patterns */}
+                  {personalizedInsights.recurringPatterns.length > 0 && (
+                    <div className="bg-card border border-border rounded-xl p-6">
+                      <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Target className="h-5 w-5 text-primary" />
+                        Recurring Patterns Across Your Interviews
+                      </h3>
+                      <div className="space-y-3">
+                        {personalizedInsights.recurringPatterns.map((pattern, idx) => (
+                          <div
+                            key={idx}
+                            className={`flex items-start gap-3 p-3 rounded-lg ${
+                              pattern.type === 'strength'
+                                ? 'bg-green-50/50 border border-green-200'
+                                : 'bg-amber-50/50 border border-amber-200'
+                            }`}
+                          >
+                            {pattern.type === 'strength' ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                            )}
+                            <div>
+                              <p className={`text-sm font-medium ${
+                                pattern.type === 'strength' ? 'text-green-900' : 'text-amber-900'
+                              }`}>
+                                {pattern.insight}
+                              </p>
+                              <p className={`text-xs mt-1 ${
+                                pattern.type === 'strength' ? 'text-green-700' : 'text-amber-700'
+                              }`}>
+                                {pattern.type === 'strength' ? 'Consistent strength' : 'Area for focused improvement'}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Encouragement */}
+                  <div className="bg-accent/10 border border-accent/30 rounded-xl p-6 text-center">
+                    <Sparkles className="h-8 w-8 text-accent mx-auto mb-3" />
+                    <p className="text-foreground font-medium">{personalizedInsights.encouragement}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-card border border-border rounded-xl p-8 text-center">
+                  <div className="h-12 w-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">Building Your Profile</h3>
+                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                    This is your first interview with personalized insights enabled.
+                    Complete more interviews to see how your performance trends over time!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
