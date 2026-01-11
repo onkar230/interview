@@ -73,13 +73,13 @@ export async function GET(request: NextRequest) {
     };
 
     sessions.forEach((session: any) => {
-      const eval = session.interview_evaluations?.[0];
-      if (eval) {
-        if (eval.communication_score) universalScores.communication.push(eval.communication_score);
-        if (eval.technical_score) universalScores.technical.push(eval.technical_score);
-        if (eval.problem_solving_score) universalScores.problemSolving.push(eval.problem_solving_score);
-        if (eval.relevant_experience_score) universalScores.relevantExperience.push(eval.relevant_experience_score);
-        if (eval.overall_score) universalScores.overall.push(eval.overall_score);
+      const evaluation = session.interview_evaluations?.[0];
+      if (evaluation) {
+        if (evaluation.communication_score) universalScores.communication.push(evaluation.communication_score);
+        if (evaluation.technical_score) universalScores.technical.push(evaluation.technical_score);
+        if (evaluation.problem_solving_score) universalScores.problemSolving.push(evaluation.problem_solving_score);
+        if (evaluation.relevant_experience_score) universalScores.relevantExperience.push(evaluation.relevant_experience_score);
+        if (evaluation.overall_score) universalScores.overall.push(evaluation.overall_score);
       }
     });
 
@@ -99,8 +99,8 @@ export async function GET(request: NextRequest) {
     const questionTypeData: Record<string, { count: number; averageScore: number }> = {};
     sessions.forEach((session: any) => {
       const questionTypes = session.question_types || [];
-      const eval = session.interview_evaluations?.[0];
-      const overallScore = eval?.overall_score || 0;
+      const evaluation = session.interview_evaluations?.[0];
+      const overallScore = evaluation?.overall_score || 0;
 
       questionTypes.forEach((type: string) => {
         if (!questionTypeData[type]) {
@@ -120,8 +120,8 @@ export async function GET(request: NextRequest) {
     const industryData: Record<string, { count: number; averageScore: number }> = {};
     sessions.forEach((session: any) => {
       const industry = session.industry;
-      const eval = session.interview_evaluations?.[0];
-      const overallScore = eval?.overall_score || 0;
+      const evaluation = session.interview_evaluations?.[0];
+      const overallScore = evaluation?.overall_score || 0;
 
       if (!industryData[industry]) {
         industryData[industry] = { count: 0, averageScore: 0 };
@@ -138,9 +138,9 @@ export async function GET(request: NextRequest) {
     // Extract top strengths across all sessions
     const allStrengths: string[] = [];
     sessions.forEach((session: any) => {
-      const eval = session.interview_evaluations?.[0];
-      if (eval?.strengths) {
-        allStrengths.push(...eval.strengths);
+      const evaluation = session.interview_evaluations?.[0];
+      if (evaluation?.strengths) {
+        allStrengths.push(...evaluation.strengths);
       }
     });
 
@@ -159,9 +159,9 @@ export async function GET(request: NextRequest) {
     // Extract top weaknesses/focus areas
     const allWeaknesses: string[] = [];
     sessions.forEach((session: any) => {
-      const eval = session.interview_evaluations?.[0];
-      if (eval?.weaknesses) {
-        allWeaknesses.push(...eval.weaknesses);
+      const evaluation = session.interview_evaluations?.[0];
+      if (evaluation?.weaknesses) {
+        allWeaknesses.push(...evaluation.weaknesses);
       }
     });
 
