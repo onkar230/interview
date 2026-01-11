@@ -19,6 +19,9 @@ export async function POST(request: NextRequest) {
       cvText: body.cvText,
       questionPriority: body.questionPriority,
       companyResearch: body.companyResearch,
+      // Personalized coaching settings
+      usePersonalization: body.usePersonalization,
+      personalizationRelevance: body.personalizationRelevance,
     });
 
     return NextResponse.json({ sessionId: session.id });

@@ -121,6 +121,8 @@ export async function createInterviewSession(
     cvText?: string;
     questionPriority?: string[];
     companyResearch?: string;
+    usePersonalization?: boolean;
+    personalizationRelevance?: number;
   }
 ) {
   const supabase = await getServerSupabase();
@@ -141,6 +143,8 @@ export async function createInterviewSession(
       cv_text: config.cvText,
       question_priority: config.questionPriority,
       company_research: config.companyResearch,
+      use_personalization: config.usePersonalization || false,
+      personalization_relevance: config.personalizationRelevance || 0,
       status: 'active',
       started_at: new Date().toISOString(),
     })

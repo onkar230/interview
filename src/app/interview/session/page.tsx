@@ -14,9 +14,9 @@ import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import PerformanceScore from '@/components/interview/PerformanceScore';
-import { Industry, QuestionSourceType, generateInterviewPrompt } from '@/lib/interview-prompts';
+import { Industry, QuestionSourceType, generateInterviewPrompt, generatePersonalizationPrompt, PersonalizationData } from '@/lib/interview-prompts';
 import { hasCompanyStyle } from '@/lib/company-styles';
-import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap, Info } from 'lucide-react';
+import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap, Info, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -46,6 +46,11 @@ function InterviewSessionContent() {
   const maxQuestions = sessionData?.max_questions || 10;
   const cvText = sessionData?.cv_text || '';
   const questionPriority: QuestionSourceType[] = sessionData?.question_priority || ['custom', 'cv', 'generic'];
+  const usePersonalization = sessionData?.use_personalization || false;
+
+  // Personalization context state
+  const [personalizationContext, setPersonalizationContext] = useState<PersonalizationData | null>(null);
+  const [isLoadingPersonalization, setIsLoadingPersonalization] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -243,9 +248,39 @@ function InterviewSessionContent() {
     loadSession();
   }, [sessionId, sessionData]);
 
+  // Fetch personalization context when session loads and personalization is enabled
+  useEffect(() => {
+    if (!sessionData || !usePersonalization || personalizationContext) return;
+
+    const fetchPersonalizationContext = async () => {
+      setIsLoadingPersonalization(true);
+      try {
+        console.log('[Personalization] Fetching personalization context...');
+        const response = await fetch('/api/interview/personalization');
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[Personalization] Context loaded:', data);
+          setPersonalizationContext(data);
+        } else {
+          console.warn('[Personalization] Failed to fetch context, continuing without personalization');
+        }
+      } catch (err) {
+        console.error('[Personalization] Error fetching context:', err);
+        // Continue without personalization if fetch fails
+      } finally {
+        setIsLoadingPersonalization(false);
+      }
+    };
+
+    fetchPersonalizationContext();
+  }, [sessionData, usePersonalization, personalizationContext]);
+
   // Initialize interview with opening question
   useEffect(() => {
+    // Wait for personalization to load if enabled
     if (!industry || isInitialized || initializingRef.current || isLoadingSession) return;
+    if (usePersonalization && isLoadingPersonalization) return; // Wait for personalization context
 
     const initializeInterview = async () => {
       // Prevent double initialization (React Strict Mode runs effects twice)
@@ -294,7 +329,7 @@ function InterviewSessionContent() {
           console.log(`[initializeInterview] Using hardcoded info for "${company}"`);
         }
 
-        const systemPrompt = generateInterviewPrompt(
+        let systemPrompt = generateInterviewPrompt(
           industry,
           role,
           difficulty,
@@ -308,6 +343,13 @@ function InterviewSessionContent() {
           questionPriority,
           companyInfo
         );
+
+        // Inject personalization context if available
+        if (usePersonalization && personalizationContext && personalizationContext.hasHistory) {
+          const personalizationPrompt = generatePersonalizationPrompt(personalizationContext);
+          systemPrompt = systemPrompt + '\n\n' + personalizationPrompt;
+          console.log('[Personalization] Injected personalization context into system prompt');
+        }
 
         // Add optimistic message immediately
         const optimisticMessage: Message = {
@@ -392,7 +434,8 @@ function InterviewSessionContent() {
     };
 
     initializeInterview();
-  }, [industry, isInitialized]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [industry, isInitialized, isLoadingSession, usePersonalization, isLoadingPersonalization, personalizationContext]);
 
   // Helper function to format assistant messages with bold questions
   const formatMessageWithBoldQuestions = (text: string) => {
@@ -986,9 +1029,20 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
 
           {/* Left Overlay: Conversation */}
           <div className="absolute left-4 top-4 bottom-4 w-96 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col">
-            <h3 className="text-sm font-semibold text-primary-foreground/90 p-4 pb-3 border-b border-primary/30 flex-shrink-0">
-              Interview Conversation
-            </h3>
+            <div className="p-4 pb-3 border-b border-primary/30 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-primary-foreground/90">
+                  Interview Conversation
+                </h3>
+                {/* Personalized Mode Indicator */}
+                {usePersonalization && personalizationContext?.hasHistory && (
+                  <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1">
+                    <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
+                    <span className="text-[10px] font-medium text-accent">Personalized</span>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Response Time Tip */}
             <div className="mx-4 mt-3 mb-2 bg-blue-500/20 border border-blue-400/30 rounded-lg p-2.5 flex gap-2 flex-shrink-0">

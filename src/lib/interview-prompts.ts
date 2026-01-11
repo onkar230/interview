@@ -1677,6 +1677,130 @@ export const EVALUATION_CRITERIA = {
 } as const;
 
 /**
+ * Generates personalization context prompt injection for the AI interviewer
+ * This is added to the system prompt when personalization is enabled
+ */
+export interface PersonalizationData {
+  hasHistory: boolean;
+  totalInterviews: number;
+  averageScores: {
+    communication: number;
+    technicalKnowledge: number;
+    problemSolving: number;
+    relevantExperience: number;
+    overall: number;
+  };
+  consistentStrengths: string[];
+  areasForImprovement: string[];
+  improvementTrend: 'improving' | 'declining' | 'stable' | 'insufficient_data';
+  recentVerdicts: string[];
+  industryExperience: Record<string, number>;
+  questionTypeExperience: Record<string, number>;
+}
+
+export function generatePersonalizationPrompt(data: PersonalizationData): string {
+  if (!data.hasHistory || data.totalInterviews === 0) {
+    return '';
+  }
+
+  const trendDescriptions = {
+    improving: 'Their performance has been IMPROVING over recent interviews - acknowledge this positively when giving feedback.',
+    declining: 'Their performance has been declining slightly - be encouraging but focus on fundamentals.',
+    stable: 'Their performance has been stable - help them break through to the next level.',
+    insufficient_data: 'Not enough data to determine trend.',
+  };
+
+  // Build score summary
+  const scoreLines = [];
+  if (data.averageScores.communication > 0) {
+    scoreLines.push(`- Communication: ${data.averageScores.communication}/10`);
+  }
+  if (data.averageScores.technicalKnowledge > 0) {
+    scoreLines.push(`- Technical Knowledge: ${data.averageScores.technicalKnowledge}/10`);
+  }
+  if (data.averageScores.problemSolving > 0) {
+    scoreLines.push(`- Problem Solving: ${data.averageScores.problemSolving}/10`);
+  }
+  if (data.averageScores.relevantExperience > 0) {
+    scoreLines.push(`- Relevant Experience: ${data.averageScores.relevantExperience}/10`);
+  }
+  if (data.averageScores.overall > 0) {
+    scoreLines.push(`- Overall Average: ${data.averageScores.overall}/10`);
+  }
+
+  // Determine coaching approach
+  const lowestScore = Math.min(
+    data.averageScores.communication || 10,
+    data.averageScores.technicalKnowledge || 10,
+    data.averageScores.problemSolving || 10,
+    data.averageScores.relevantExperience || 10
+  );
+
+  let coachingFocus = '';
+  if (lowestScore === data.averageScores.communication) {
+    coachingFocus = 'Communication is their weakest area - pay attention to clarity and structure in their responses.';
+  } else if (lowestScore === data.averageScores.technicalKnowledge) {
+    coachingFocus = 'Technical knowledge is their weakest area - probe deeper on technical questions.';
+  } else if (lowestScore === data.averageScores.problemSolving) {
+    coachingFocus = 'Problem-solving is their weakest area - ask follow-ups about their approach and reasoning.';
+  } else if (lowestScore === data.averageScores.relevantExperience) {
+    coachingFocus = 'Relevant experience is their weakest area - help them connect their experiences to the role.';
+  }
+
+  return `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 PERSONALIZED COACHING CONTEXT (Use this to tailor your feedback)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This candidate has completed ${data.totalInterviews} previous mock interviews with us.
+You have access to their historical performance data to provide more targeted feedback.
+
+AVERAGE SCORES (from ${data.totalInterviews} interviews):
+${scoreLines.join('\n')}
+
+CONSISTENT STRENGTHS (leverage these):
+${data.consistentStrengths.length > 0 ? data.consistentStrengths.map(s => `- ${s}`).join('\n') : '- No consistent patterns identified yet'}
+
+AREAS FOR IMPROVEMENT (focus feedback here):
+${data.areasForImprovement.length > 0 ? data.areasForImprovement.map(a => `- ${a}`).join('\n') : '- No consistent patterns identified yet'}
+
+PERFORMANCE TREND:
+${trendDescriptions[data.improvementTrend]}
+
+RECENT VERDICTS: ${data.recentVerdicts.length > 0 ? data.recentVerdicts.join(', ') : 'None recorded'}
+
+COACHING APPROACH:
+${coachingFocus || 'Take a balanced approach across all areas.'}
+
+HOW TO USE THIS INFORMATION:
+
+1. ACKNOWLEDGE STRENGTHS:
+   - When they demonstrate a known strength, briefly acknowledge it: "Good, clear communication there."
+   - Don't over-praise - just note it naturally.
+
+2. PROBE WEAKNESSES:
+   - When asking questions related to their weak areas, ask thoughtful follow-ups.
+   - In your feedback, provide specific suggestions for improvement in these areas.
+
+3. REFERENCE IMPROVEMENT:
+   - If they show improvement in a previously weak area, note it positively.
+   - "I can see you've been working on [area] - that answer was much more structured."
+
+4. MAINTAIN REALISM:
+   - Don't mention that you have their historical data explicitly.
+   - Act like an interviewer who has read their file and knows their background.
+   - Your feedback should feel insightful and targeted, not generic.
+
+5. BALANCE:
+   - Don't ONLY focus on weaknesses - acknowledge when they do well.
+   - The goal is improvement, not criticism.
+
+IMPORTANT: This is confidential coaching data. Never tell the candidate you have access to their
+historical performance data. Just use it to make your feedback more relevant and targeted.
+`;
+}
+
+/**
  * TODO: Add more industries and specializations as needed
  * TODO: Create industry-specific evaluation rubrics
  * TODO: Add support for custom interview templates
