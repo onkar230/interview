@@ -186,24 +186,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation - Matches Landing Page Exactly */}
+      {/* Navigation - Clean, task-focused for authenticated users */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold text-primary">
           InterviewAI
         </Link>
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/#features" className="text-foreground hover:text-primary transition-colors">
-            Features
-          </Link>
-          <Link href="/#pricing" className="text-foreground hover:text-primary transition-colors">
-            Pricing
-          </Link>
-          <UserNav />
-        </div>
-        {/* Mobile: Just show UserNav */}
-        <div className="md:hidden">
-          <UserNav />
-        </div>
+        <UserNav />
       </nav>
 
       {/* Hero/Welcome Section - Centered, Inspirational */}
