@@ -106,57 +106,61 @@ function ConfigureInterviewContent() {
 
   // Personalized Coaching State
   const [usePersonalization, setUsePersonalization] = useState(true);
+  const [personalizationData, setPersonalizationData] = useState<any>(null);
+  const [isLoadingPersonalization, setIsLoadingPersonalization] = useState(true);
 
-  // Mock data for personalization relevance (will be replaced with real API call)
-  // This simulates a user with 5 previous interviews
-  const mockPersonalizationData = {
-    hasHistory: true,
-    totalInterviews: 5,
-    relevanceScore: 72,
-    universalData: {
-      available: true,
-      interviewCount: 5,
-      communicationAvg: 7.2,
-      structureAvg: 6.8,
-    },
-    questionTypeData: {
-      behavioral: { available: true, count: 4 },
-      technical: { available: true, count: 3 },
-      situational: { available: false, count: 0 },
-      motivational: { available: true, count: 2 },
-      competency: { available: false, count: 0 },
-    },
-    industryData: {
-      technology: { available: true, count: 2 },
-      law: { available: true, count: 2 },
-      consulting: { available: true, count: 1 },
-    },
-    strengths: ['Clear articulation', 'Good rapport building', 'Structured responses'],
-    focusAreas: ['Technical depth', 'Providing specific examples'],
-    trend: 'improving' as const,
-  };
+  // Fetch personalization context from API
+  useEffect(() => {
+    const fetchPersonalizationContext = async () => {
+      try {
+        const response = await fetch('/api/interview/personalization-context');
+        if (!response.ok) throw new Error('Failed to fetch personalization context');
+        const data = await response.json();
+        setPersonalizationData(data);
+      } catch (err) {
+        console.error('Error fetching personalization context:', err);
+        // Default to no history on error
+        setPersonalizationData({
+          hasHistory: false,
+          totalInterviews: 0,
+          universalData: null,
+          questionTypeData: {},
+          industryData: {},
+          strengths: [],
+          focusAreas: [],
+          trend: 'none',
+        });
+      } finally {
+        setIsLoadingPersonalization(false);
+      }
+    };
+
+    fetchPersonalizationContext();
+  }, []);
 
   // Calculate what's relevant for this specific interview
   const getRelevanceBreakdown = () => {
     const breakdown: { label: string; available: boolean; count?: number; isNew?: boolean }[] = [];
 
+    if (!personalizationData) return breakdown;
+
     // Universal is always available if they have history
-    if (mockPersonalizationData.hasHistory) {
+    if (personalizationData.hasHistory) {
       breakdown.push({
         label: 'Communication patterns',
         available: true,
-        count: mockPersonalizationData.totalInterviews,
+        count: personalizationData.totalInterviews,
       });
       breakdown.push({
         label: 'Response structure',
         available: true,
-        count: mockPersonalizationData.totalInterviews,
+        count: personalizationData.totalInterviews,
       });
     }
 
     // Check industry match
-    const industryMatch = selectedIndustry && mockPersonalizationData.industryData[selectedIndustry as keyof typeof mockPersonalizationData.industryData];
-    if (industryMatch?.available) {
+    const industryMatch = selectedIndustry && personalizationData.industryData[selectedIndustry];
+    if (industryMatch) {
       breakdown.push({
         label: `${selectedIndustry} industry context`,
         available: true,
@@ -172,8 +176,8 @@ function ConfigureInterviewContent() {
 
     // Check question type matches
     questionTypes.forEach(qType => {
-      const typeData = mockPersonalizationData.questionTypeData[qType as keyof typeof mockPersonalizationData.questionTypeData];
-      if (typeData?.available) {
+      const typeData = personalizationData.questionTypeData[qType];
+      if (typeData) {
         breakdown.push({
           label: `${qType.charAt(0).toUpperCase() + qType.slice(1)} questions`,
           available: true,
@@ -343,7 +347,7 @@ function ConfigureInterviewContent() {
           questionPriority: questionPriority,
           includeMandatoryQuestion: includeMandatoryQuestion,
           // Personalized Coaching settings
-          usePersonalization: mockPersonalizationData.hasHistory ? usePersonalization : false,
+          usePersonalization: personalizationData?.hasHistory ? usePersonalization : false,
           personalizationRelevance: usePersonalization ? calculatedRelevance : 0,
         }),
       });
@@ -615,7 +619,7 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* Personalized Coaching Card - Dark Teal Theme */}
-            {mockPersonalizationData.hasHistory && (
+            {!isLoadingPersonalization && personalizationData?.hasHistory && (
               <div className="bg-primary rounded-xl p-6 text-primary-foreground relative overflow-hidden">
                 {/* Subtle decorative element */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -708,7 +712,7 @@ function ConfigureInterviewContent() {
                             Your Strengths
                           </p>
                           <ul className="text-xs text-primary-foreground/80 space-y-0.5">
-                            {mockPersonalizationData.strengths.slice(0, 2).map((strength, i) => (
+                            {personalizationData.strengths.slice(0, 2).map((strength: string, i: number) => (
                               <li key={i}>• {strength}</li>
                             ))}
                           </ul>
@@ -718,7 +722,7 @@ function ConfigureInterviewContent() {
                             Focus Areas
                           </p>
                           <ul className="text-xs text-primary-foreground/80 space-y-0.5">
-                            {mockPersonalizationData.focusAreas.slice(0, 2).map((area, i) => (
+                            {personalizationData.focusAreas.slice(0, 2).map((area: string, i: number) => (
                               <li key={i}>• {area}</li>
                             ))}
                           </ul>
@@ -741,7 +745,7 @@ function ConfigureInterviewContent() {
                   {!usePersonalization && (
                     <p className="text-xs text-primary-foreground/60 mt-2">
                       Enable to get feedback tailored to your specific strengths and areas for improvement
-                      based on {mockPersonalizationData.totalInterviews} previous interviews.
+                      based on {personalizationData.totalInterviews} previous interviews.
                     </p>
                   )}
                 </div>
