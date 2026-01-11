@@ -6,7 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Loader2, Shield, Upload, FileText, X, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  ArrowLeft,
+  Loader2,
+  Shield,
+  Upload,
+  FileText,
+  X,
+  ChevronUp,
+  ChevronDown,
+  Bot,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
 import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
 import { getSupabaseClient } from '@/lib/supabase-client';
@@ -89,6 +103,99 @@ function ConfigureInterviewContent() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Personalized Coaching State
+  const [usePersonalization, setUsePersonalization] = useState(true);
+
+  // Mock data for personalization relevance (will be replaced with real API call)
+  // This simulates a user with 5 previous interviews
+  const mockPersonalizationData = {
+    hasHistory: true,
+    totalInterviews: 5,
+    relevanceScore: 72,
+    universalData: {
+      available: true,
+      interviewCount: 5,
+      communicationAvg: 7.2,
+      structureAvg: 6.8,
+    },
+    questionTypeData: {
+      behavioral: { available: true, count: 4 },
+      technical: { available: true, count: 3 },
+      situational: { available: false, count: 0 },
+      motivational: { available: true, count: 2 },
+      competency: { available: false, count: 0 },
+    },
+    industryData: {
+      technology: { available: true, count: 2 },
+      law: { available: true, count: 2 },
+      consulting: { available: true, count: 1 },
+    },
+    strengths: ['Clear articulation', 'Good rapport building', 'Structured responses'],
+    focusAreas: ['Technical depth', 'Providing specific examples'],
+    trend: 'improving' as const,
+  };
+
+  // Calculate what's relevant for this specific interview
+  const getRelevanceBreakdown = () => {
+    const breakdown: { label: string; available: boolean; count?: number; isNew?: boolean }[] = [];
+
+    // Universal is always available if they have history
+    if (mockPersonalizationData.hasHistory) {
+      breakdown.push({
+        label: 'Communication patterns',
+        available: true,
+        count: mockPersonalizationData.totalInterviews,
+      });
+      breakdown.push({
+        label: 'Response structure',
+        available: true,
+        count: mockPersonalizationData.totalInterviews,
+      });
+    }
+
+    // Check industry match
+    const industryMatch = selectedIndustry && mockPersonalizationData.industryData[selectedIndustry as keyof typeof mockPersonalizationData.industryData];
+    if (industryMatch?.available) {
+      breakdown.push({
+        label: `${selectedIndustry} industry context`,
+        available: true,
+        count: industryMatch.count,
+      });
+    } else if (selectedIndustry) {
+      breakdown.push({
+        label: `${selectedIndustry} industry context`,
+        available: false,
+        isNew: true,
+      });
+    }
+
+    // Check question type matches
+    questionTypes.forEach(qType => {
+      const typeData = mockPersonalizationData.questionTypeData[qType as keyof typeof mockPersonalizationData.questionTypeData];
+      if (typeData?.available) {
+        breakdown.push({
+          label: `${qType.charAt(0).toUpperCase() + qType.slice(1)} questions`,
+          available: true,
+          count: typeData.count,
+        });
+      } else {
+        breakdown.push({
+          label: `${qType.charAt(0).toUpperCase() + qType.slice(1)} questions`,
+          available: false,
+          isNew: true,
+        });
+      }
+    });
+
+    return breakdown;
+  };
+
+  const relevanceBreakdown = getRelevanceBreakdown();
+  const hasNewQuestionTypes = relevanceBreakdown.some(item => item.isNew);
+  const availableCount = relevanceBreakdown.filter(item => item.available).length;
+  const totalCount = relevanceBreakdown.length;
+  const calculatedRelevance = totalCount > 0 ? Math.round((availableCount / totalCount) * 100) : 0;
 
   const suggestions = selectedIndustry ? INDUSTRY_SUGGESTIONS[selectedIndustry] : null;
 
@@ -235,6 +342,9 @@ function ConfigureInterviewContent() {
           cvText: cvText.trim() || undefined,
           questionPriority: questionPriority,
           includeMandatoryQuestion: includeMandatoryQuestion,
+          // Personalized Coaching settings
+          usePersonalization: mockPersonalizationData.hasHistory ? usePersonalization : false,
+          personalizationRelevance: usePersonalization ? calculatedRelevance : 0,
         }),
       });
 
@@ -503,6 +613,140 @@ function ConfigureInterviewContent() {
                 </div>
               </label>
             </div>
+
+            {/* Personalized Coaching Card - Dark Teal Theme */}
+            {mockPersonalizationData.hasHistory && (
+              <div className="bg-primary rounded-xl p-6 text-primary-foreground relative overflow-hidden">
+                {/* Subtle decorative element */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+
+                <div className="relative z-10">
+                  {/* Header with toggle */}
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
+                        <Bot className="h-5 w-5 text-accent" aria-hidden="true" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-primary-foreground flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
+                          Personalized Coaching
+                        </h3>
+                        <p className="text-xs text-primary-foreground/70">
+                          Use insights from your previous interviews
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => setUsePersonalization(!usePersonalization)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${
+                        usePersonalization ? 'bg-accent' : 'bg-primary-foreground/20'
+                      }`}
+                      role="switch"
+                      aria-checked={usePersonalization}
+                      aria-label="Enable personalized coaching"
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          usePersonalization ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {usePersonalization && (
+                    <>
+                      {/* Relevance Score Bar */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-xs mb-1.5">
+                          <span className="text-primary-foreground/80">Relevance to this interview</span>
+                          <span className="font-semibold text-accent">{calculatedRelevance}%</span>
+                        </div>
+                        <div className="h-2 bg-primary-foreground/10 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-accent rounded-full transition-all duration-500"
+                            style={{ width: `${calculatedRelevance}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Data Breakdown */}
+                      <div className="space-y-2 mb-4">
+                        {relevanceBreakdown.slice(0, 5).map((item, index) => (
+                          <div key={index} className="flex items-center gap-2 text-xs">
+                            {item.available ? (
+                              <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" aria-hidden="true" />
+                            ) : (
+                              <AlertCircle className="h-3.5 w-3.5 text-primary-foreground/50 flex-shrink-0" aria-hidden="true" />
+                            )}
+                            <span className={item.available ? 'text-primary-foreground/90' : 'text-primary-foreground/50'}>
+                              {item.label}
+                              {item.available && item.count && (
+                                <span className="text-primary-foreground/60"> ({item.count} interviews)</span>
+                              )}
+                              {item.isNew && (
+                                <span className="text-accent ml-1">(first time)</span>
+                              )}
+                            </span>
+                          </div>
+                        ))}
+                        {relevanceBreakdown.length > 5 && (
+                          <p className="text-xs text-primary-foreground/60 pl-5">
+                            +{relevanceBreakdown.length - 5} more...
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Identified Strengths & Focus Areas */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-primary/50 rounded-lg p-3 border border-primary-foreground/10">
+                          <p className="text-xs font-medium text-accent mb-1.5 flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3" aria-hidden="true" />
+                            Your Strengths
+                          </p>
+                          <ul className="text-xs text-primary-foreground/80 space-y-0.5">
+                            {mockPersonalizationData.strengths.slice(0, 2).map((strength, i) => (
+                              <li key={i}>• {strength}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="bg-primary/50 rounded-lg p-3 border border-primary-foreground/10">
+                          <p className="text-xs font-medium text-primary-foreground/90 mb-1.5">
+                            Focus Areas
+                          </p>
+                          <ul className="text-xs text-primary-foreground/80 space-y-0.5">
+                            {mockPersonalizationData.focusAreas.slice(0, 2).map((area, i) => (
+                              <li key={i}>• {area}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* First Time Notice */}
+                      {hasNewQuestionTypes && (
+                        <div className="bg-accent/20 border border-accent/30 rounded-lg p-3">
+                          <p className="text-xs text-primary-foreground">
+                            <span className="font-semibold text-accent">New territory:</span>{' '}
+                            Some question types or industry context will be new for you.
+                            We&apos;ll establish a baseline and provide foundational feedback in these areas.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {!usePersonalization && (
+                    <p className="text-xs text-primary-foreground/60 mt-2">
+                      Enable to get feedback tailored to your specific strengths and areas for improvement
+                      based on {mockPersonalizationData.totalInterviews} previous interviews.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Job Description (Optional) */}
             <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
