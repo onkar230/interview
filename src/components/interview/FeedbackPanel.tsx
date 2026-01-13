@@ -104,8 +104,8 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.strengths.length > 0 && (
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <CheckCircle2 className="h-5 w-5 text-green-900 dark:text-green-400" />
-                    <span className="text-sm font-bold text-green-900 dark:text-green-300 uppercase tracking-wide">
+                    <CheckCircle2 className="h-5 w-5 text-green-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       Strengths
                     </span>
                   </div>
@@ -123,8 +123,8 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.weaknesses.length > 0 && (
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <AlertTriangle className="h-5 w-5 text-amber-900 dark:text-amber-400" />
-                    <span className="text-sm font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wide">
+                    <AlertTriangle className="h-5 w-5 text-amber-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       Areas to Improve
                     </span>
                   </div>
@@ -142,8 +142,8 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.suggestedImprovements && feedback.suggestedImprovements.length > 0 && (
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <Plus className="h-5 w-5 text-blue-900 dark:text-blue-400" />
-                    <span className="text-sm font-bold text-blue-900 dark:text-blue-300 uppercase tracking-wide">
+                    <Plus className="h-5 w-5 text-blue-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       What to Add Next Time
                     </span>
                   </div>
@@ -161,8 +161,8 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.opportunities.length > 0 && (
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <Lightbulb className="h-5 w-5 text-purple-900 dark:text-purple-400" />
-                    <span className="text-sm font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wide">
+                    <Lightbulb className="h-5 w-5 text-purple-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       Missed Opportunities
                     </span>
                   </div>
@@ -178,16 +178,16 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
 
               {/* Threats */}
               {feedback.threats.length > 0 && (
-                <div className="space-y-2.5 p-3 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-900 dark:border-red-400 rounded-r">
+                <div className="space-y-2.5 p-3 bg-red-50 border-l-4 border-red-700 rounded-r">
                   <div className="flex items-center gap-2.5">
-                    <AlertCircle className="h-5 w-5 text-red-900 dark:text-red-400" />
-                    <span className="text-sm font-bold text-red-900 dark:text-red-300 uppercase tracking-wide">
+                    <AlertCircle className="h-5 w-5 text-red-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       Red Flags
                     </span>
                   </div>
                   <ul className="space-y-2 ml-7">
                     {feedback.threats.map((threat, i) => (
-                      <li key={i} className="text-sm text-red-950 dark:text-red-200 list-disc font-semibold leading-relaxed">
+                      <li key={i} className="text-sm text-foreground list-disc font-semibold leading-relaxed">
                         {threat}
                       </li>
                     ))}
@@ -199,8 +199,8 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
               {feedback.idealAnswer && (
                 <div className="space-y-2.5 pt-4 border-t-2 border-border">
                   <div className="flex items-center gap-2.5">
-                    <GraduationCap className="h-5 w-5 text-indigo-900 dark:text-indigo-400" />
-                    <span className="text-sm font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wide">
+                    <GraduationCap className="h-5 w-5 text-indigo-700" />
+                    <span className="text-sm font-bold text-foreground uppercase tracking-wide">
                       How to Improve Your Answer
                     </span>
                   </div>

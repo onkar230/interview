@@ -81,6 +81,16 @@ function FeedbackContent() {
   const [personalizedInsights, setPersonalizedInsights] = useState<PersonalizedInsights | null>(null);
   const [isLoadingInsights, setIsLoadingInsights] = useState(false);
 
+  // Helper function to clean markdown from ideal answer
+  const cleanMarkdown = (text: string): string => {
+    return text
+      .replace(/^#{1,6}\s+/gm, '') // Remove markdown headings (## )
+      .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold (**text**)
+      .replace(/\*(.+?)\*/g, '$1') // Remove italic (*text*)
+      .replace(/^\s*[-*+]\s+/gm, '• ') // Convert markdown lists to bullet points
+      .trim();
+  };
+
   // Load feedback and session data
   useEffect(() => {
     const loadFeedback = async () => {
@@ -231,12 +241,6 @@ function FeedbackContent() {
               Back to Dashboard
             </Button>
             <h1 className="text-2xl font-bold text-foreground">Interview Feedback</h1>
-            {sessionData?.use_personalization && (
-              <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1 ml-auto">
-                <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
-                <span className="text-xs font-medium text-accent">Personalized</span>
-              </div>
-            )}
           </div>
         </div>
       </header>
@@ -244,7 +248,7 @@ function FeedbackContent() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-6">
           <p className="text-muted-foreground">
-            Review the detailed SWOT feedback for each question from your interview
+            Review the detailed feedback for each question from your interview
           </p>
         </div>
 
@@ -376,7 +380,7 @@ function FeedbackContent() {
                     <Target className="h-5 w-5 text-primary" />
                     <h4 className="font-semibold text-foreground">Ideal Answer</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.ideal_answer}</p>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{cleanMarkdown(item.ideal_answer)}</p>
                 </div>
               )}
             </div>

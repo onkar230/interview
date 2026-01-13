@@ -19,7 +19,6 @@ import {
   CheckCircle,
   AlertCircle,
   Sparkles,
-  TrendingUp,
 } from 'lucide-react';
 import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
@@ -75,6 +74,7 @@ function ConfigureInterviewContent() {
   const urlIndustry = searchParams.get('industry') as Industry | null;
 
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(urlIndustry);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(!urlIndustry); // Only load history if no URL param
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const difficulty: Difficulty = 'entry-level'; // Fixed to entry-level for student/grad-level jobs
@@ -87,7 +87,6 @@ function ConfigureInterviewContent() {
   const [customQuestions, setCustomQuestions] = useState('');
   const [followUpIntensity, setFollowUpIntensity] = useState<'none' | 'light' | 'moderate' | 'intensive'>('light');
   const [questionCount, setQuestionCount] = useState(10);
-  const [includeMandatoryQuestion, setIncludeMandatoryQuestion] = useState(true);
   const [errors, setErrors] = useState<{
     company?: string;
     role?: string;
@@ -137,6 +136,47 @@ function ConfigureInterviewContent() {
 
     fetchPersonalizationContext();
   }, []);
+
+  // Auto-select most common industry for returning users
+  useEffect(() => {
+    // Skip if URL already has industry or if we're not loading history
+    if (urlIndustry || !isLoadingHistory) return;
+
+    const fetchMostCommonIndustry = async () => {
+      try {
+        const response = await fetch('/api/interview/sessions');
+        if (!response.ok) throw new Error('Failed to fetch sessions');
+
+        const data = await response.json();
+        const sessions = data.sessions || [];
+
+        if (sessions.length > 0) {
+          // Count industries
+          const industryCounts: Record<string, number> = {};
+          sessions.forEach((session: any) => {
+            const industry = session.industry;
+            if (industry) {
+              industryCounts[industry] = (industryCounts[industry] || 0) + 1;
+            }
+          });
+
+          // Find most common industry
+          const mostCommon = Object.entries(industryCounts)
+            .sort(([, a], [, b]) => (b as number) - (a as number))[0]?.[0] as Industry;
+
+          if (mostCommon) {
+            setSelectedIndustry(mostCommon);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching industry history:', error);
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
+    fetchMostCommonIndustry();
+  }, [urlIndustry, isLoadingHistory]);
 
   // Calculate what's relevant for this specific interview
   const getRelevanceBreakdown = () => {
@@ -345,7 +385,7 @@ function ConfigureInterviewContent() {
           maxQuestions: questionCount,
           cvText: cvText.trim() || undefined,
           questionPriority: questionPriority,
-          includeMandatoryQuestion: includeMandatoryQuestion,
+          includeMandatoryQuestion: true, // Always include company motivation question
           // Personalized Coaching settings
           usePersonalization: personalizationData?.hasHistory ? usePersonalization : false,
           personalizationRelevance: usePersonalization ? calculatedRelevance : 0,
@@ -367,12 +407,24 @@ function ConfigureInterviewContent() {
     }
   };
 
+  // Show loading state while checking user's history
+  if (isLoadingHistory) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading your preferences...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!selectedIndustry) {
     // Show industry selection
-    const AVAILABLE_INDUSTRIES: { id: Industry; name: string; icon: string }[] = [
-      { id: 'technology', name: 'Technology', icon: '💻' },
-      { id: 'law', name: 'Law', icon: '⚖️' },
-      { id: 'other', name: 'Other', icon: '🏢' },
+    const AVAILABLE_INDUSTRIES: { id: Industry; name: string }[] = [
+      { id: 'technology', name: 'Technology' },
+      { id: 'law', name: 'Law' },
+      { id: 'other', name: 'Other' },
     ];
 
     return (
@@ -396,7 +448,6 @@ function ConfigureInterviewContent() {
                 onClick={() => setSelectedIndustry(ind.id)}
                 className="bg-card border border-border rounded-xl p-8 shadow-md hover:shadow-xl hover:shadow-primary/10 transition-all duration-200 hover:scale-105 text-center group"
               >
-                <div className="text-5xl mb-4">{ind.icon}</div>
                 <h3 className="text-2xl font-semibold text-card-foreground mb-2">
                   {ind.name}
                 </h3>
@@ -569,8 +620,8 @@ function ConfigureInterviewContent() {
                   onValueChange={(value) => {
                     const newCount = value[0];
                     setQuestionCount(newCount);
-                    // Clear all optional inputs if only 1 question AND mandatory question is enabled
-                    if (newCount === 1 && includeMandatoryQuestion) {
+                    // Clear all optional inputs if only 1 question (mandatory company motivation question)
+                    if (newCount === 1) {
                       setQuestionTypes([]);
                       setJobDescription('');
                       setCustomQuestions('');
@@ -595,29 +646,6 @@ function ConfigureInterviewContent() {
               </p>
             </div>
 
-            {/* Mandatory Question Toggle */}
-            <div className="bg-blue-50/50 border border-blue-200 rounded-lg p-4">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={includeMandatoryQuestion}
-                  onChange={(e) => setIncludeMandatoryQuestion(e.target.checked)}
-                  className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary"
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-sm text-blue-900">
-                    Include company motivation question
-                  </div>
-                  <div className="text-xs text-blue-700 mt-1">
-                    Start with: "Why do you want to work at {company || '[company name]'}?"
-                  </div>
-                  <div className="text-xs text-blue-600 mt-1 italic">
-                    This is typically the first question in real interviews. Uncheck if you want to practice other questions only.
-                  </div>
-                </div>
-              </label>
-            </div>
-
             {/* Personalized Coaching Card - Dark Teal Theme */}
             {!isLoadingPersonalization && personalizationData?.hasHistory && (
               <div className="bg-primary rounded-xl p-6 text-primary-foreground relative overflow-hidden">
@@ -634,7 +662,7 @@ function ConfigureInterviewContent() {
                       <div>
                         <h3 className="font-semibold text-primary-foreground flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
-                          Personalized Coaching
+                          Adaptive Coaching
                         </h3>
                         <p className="text-xs text-primary-foreground/70">
                           Use insights from your previous interviews
@@ -697,36 +725,6 @@ function ConfigureInterviewContent() {
                             </span>
                           </div>
                         ))}
-                        {relevanceBreakdown.length > 5 && (
-                          <p className="text-xs text-primary-foreground/60 pl-5">
-                            +{relevanceBreakdown.length - 5} more...
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Identified Strengths & Focus Areas */}
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-primary/50 rounded-lg p-3 border border-primary-foreground/10">
-                          <p className="text-xs font-medium text-accent mb-1.5 flex items-center gap-1">
-                            <TrendingUp className="h-3 w-3" aria-hidden="true" />
-                            Your Strengths
-                          </p>
-                          <ul className="text-xs text-primary-foreground/80 space-y-0.5">
-                            {personalizationData.strengths.slice(0, 2).map((strength: string, i: number) => (
-                              <li key={i}>• {strength}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="bg-primary/50 rounded-lg p-3 border border-primary-foreground/10">
-                          <p className="text-xs font-medium text-primary-foreground/90 mb-1.5">
-                            Focus Areas
-                          </p>
-                          <ul className="text-xs text-primary-foreground/80 space-y-0.5">
-                            {personalizationData.focusAreas.slice(0, 2).map((area: string, i: number) => (
-                              <li key={i}>• {area}</li>
-                            ))}
-                          </ul>
-                        </div>
                       </div>
 
                       {/* First Time Notice */}
@@ -753,14 +751,14 @@ function ConfigureInterviewContent() {
             )}
 
             {/* Job Description (Optional) */}
-            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
+            <div className={questionCount === 1 ? 'opacity-50' : ''}>
               <label
                 htmlFor="jobDescription"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Job Description (Optional)
               </label>
-              {questionCount === 1 && includeMandatoryQuestion && (
+              {questionCount === 1 && (
                 <p className="text-xs text-yellow-600 mb-2">
                   Not used with 1 question - you'll only get the mandatory opening question
                 </p>
@@ -772,7 +770,7 @@ function ConfigureInterviewContent() {
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={6}
                 maxLength={2000}
-                disabled={questionCount === 1 && includeMandatoryQuestion}
+                disabled={questionCount === 1}
                 className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
               />
               <p className="mt-1 text-sm text-muted-foreground">
@@ -781,14 +779,14 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* CV Upload (Optional) */}
-            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
+            <div className={questionCount === 1 ? 'opacity-50' : ''}>
               <label
                 htmlFor="cvUpload"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Upload Your CV/Resume (Optional)
               </label>
-              {questionCount === 1 && includeMandatoryQuestion ? (
+              {questionCount === 1 ? (
                 <p className="text-xs text-yellow-600 mb-3">
                   Not used with 1 question - you'll only get the mandatory opening question
                 </p>
@@ -805,13 +803,13 @@ function ConfigureInterviewContent() {
                     type="file"
                     accept=".pdf,.doc,.docx,image/*"
                     onChange={handleCvUpload}
-                    disabled={questionCount === 1 && includeMandatoryQuestion}
+                    disabled={questionCount === 1}
                     className="hidden"
                   />
                   <label
                     htmlFor="cvUpload"
                     className={`flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg transition-colors bg-muted ${
-                      questionCount === 1 && includeMandatoryQuestion
+                      questionCount === 1
                         ? 'cursor-not-allowed'
                         : 'cursor-pointer hover:border-primary hover:bg-primary/5'
                     }`}
@@ -874,9 +872,9 @@ function ConfigureInterviewContent() {
               <label className="block text-sm font-medium text-muted-foreground mb-2">
                 What types of questions do you want to practise? (Optional)
               </label>
-              {questionCount === 1 && includeMandatoryQuestion ? (
+              {questionCount === 1 ? (
                 <p className="text-xs text-muted-foreground mb-3">
-                  With 1 question selected and mandatory question enabled, you'll only get: "Why do you want to work at this company?"
+                  With 1 question selected, you'll only get: "Why do you want to work at this company?"
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground mb-3">
@@ -895,7 +893,7 @@ function ConfigureInterviewContent() {
                   <label
                     key={type.id}
                     className={`flex items-start gap-3 p-3 border border-border rounded-lg transition-colors ${
-                      questionCount === 1 && includeMandatoryQuestion
+                      questionCount === 1
                         ? 'opacity-50 cursor-not-allowed bg-muted'
                         : 'cursor-pointer hover:bg-muted bg-muted'
                     }`}
@@ -904,7 +902,7 @@ function ConfigureInterviewContent() {
                       type="checkbox"
                       checked={questionTypes.includes(type.id)}
                       onChange={() => handleQuestionTypeToggle(type.id)}
-                      disabled={questionCount === 1 && includeMandatoryQuestion}
+                      disabled={questionCount === 1}
                       className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary disabled:cursor-not-allowed"
                     />
                     <div className="flex-1">
@@ -917,14 +915,14 @@ function ConfigureInterviewContent() {
             </div>
 
             {/* Custom Questions */}
-            <div className={questionCount === 1 && includeMandatoryQuestion ? 'opacity-50' : ''}>
+            <div className={questionCount === 1 ? 'opacity-50' : ''}>
               <label
                 htmlFor="customQuestions"
                 className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 Add Your Own Questions (Optional)
               </label>
-              {questionCount === 1 && includeMandatoryQuestion ? (
+              {questionCount === 1 ? (
                 <p className="text-xs text-yellow-600 mb-2">
                   Not used with 1 question - you'll only get the mandatory opening question
                 </p>
@@ -939,7 +937,7 @@ function ConfigureInterviewContent() {
                 value={customQuestions}
                 onChange={(e) => setCustomQuestions(e.target.value)}
                 rows={5}
-                disabled={questionCount === 1 && includeMandatoryQuestion}
+                disabled={questionCount === 1}
                 className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
               />
               <p className="mt-1 text-sm text-muted-foreground">

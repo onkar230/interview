@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Plus,
   CheckCircle,
   Clock,
   BarChart3,
@@ -49,12 +48,21 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
     inProgress: 0,
     averageScore: 0,
   });
+
+  const ITEMS_PER_PAGE = 5;
+
+  // Calculate pagination
+  const totalPages = Math.ceil(sessions.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedSessions = sessions.slice(startIndex, endIndex);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -176,6 +184,12 @@ export default function DashboardPage() {
       const averageScore = scoresCount > 0 ? scoresSum / scoresCount : 0;
 
       setStats({ total, completed, inProgress, averageScore });
+
+      // Reset to page 1 if current page is now empty
+      const newTotalPages = Math.ceil(updatedSessions.length / ITEMS_PER_PAGE);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
     } catch (error) {
       console.error('Error deleting session:', error);
       alert('Failed to delete interview. Please try again.');
@@ -204,14 +218,6 @@ export default function DashboardPage() {
           Every interview you complete brings you one step closer to landing your dream role.
           Keep practicing, keep improving, and watch your confidence grow.
         </p>
-        <Button
-          onClick={() => router.push('/interview/configure')}
-          size="lg"
-          className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl"
-        >
-          <Plus className="h-5 w-5 mr-2" aria-hidden="true" />
-          Start New Interview
-        </Button>
 
         {/* Trust Indicators - Matches Landing Page */}
         <div className="flex flex-wrap items-center justify-center gap-8 mt-8 text-muted-foreground text-sm">
@@ -408,7 +414,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-4 max-w-5xl mx-auto">
-            {sessions.map((session) => (
+            {paginatedSessions.map((session) => (
               <div
                 key={session.id}
                 className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow"
@@ -610,28 +616,49 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3"
+                >
+                  Previous
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={
+                      currentPage === page
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 min-w-[2.5rem]'
+                        : 'min-w-[2.5rem]'
+                    }
+                  >
+                    {page}
+                  </Button>
+                ))}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
-      </div>
-
-      {/* Final CTA Section - Matches Landing Page */}
-      <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-          Ready for your next challenge?
-        </h2>
-        <p className="text-xl text-muted-foreground mb-8">
-          The more you practice, the more confident you become. Start another session now.
-        </p>
-        <Button
-          onClick={() => router.push('/interview/configure')}
-          size="lg"
-          className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground"
-        >
-          Start New Interview
-        </Button>
-        <p className="text-sm text-muted-foreground mt-8">
-          Your future self will thank you for the practice you put in today.
-        </p>
       </div>
 
       {/* Footer - Matches Landing Page */}
