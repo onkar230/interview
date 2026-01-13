@@ -224,7 +224,7 @@ export default function Home() {
       {/* Navigation */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="text-2xl font-bold text-primary">
-          InterviewAI
+          Mojo Interview
         </div>
         <div className="hidden md:flex items-center gap-8">
           <Link href="#features" className="text-foreground hover:text-primary transition-colors">
@@ -239,7 +239,7 @@ export default function Home() {
             ) : (
               <Link href="/login">
                 <Button className="bg-primary hover:bg-secondary text-primary-foreground">
-                  Get Started Free
+                  Get Started
                 </Button>
               </Link>
             )
@@ -250,7 +250,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-6 py-20 text-center">
         <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6">
-          The Only Free{' '}
+          The Only{' '}
           <span className="text-primary">
             AI Mock Interview Platform
           </span>{' '}
@@ -267,7 +267,7 @@ export default function Home() {
             size="lg"
             className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl"
           >
-            {isAuthenticated ? 'Go to Dashboard →' : 'Get Started Free →'}
+            {isAuthenticated ? 'Go to Dashboard →' : 'Get Started →'}
           </Button>
         </Link>
 
@@ -275,10 +275,6 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-400" />
             No credit card required
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-400" />
-            Free forever
           </div>
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-400" />
@@ -580,7 +576,7 @@ export default function Home() {
               size="lg"
               className="px-10 py-7 text-lg bg-accent hover:bg-accent/90 text-accent-foreground"
             >
-              {isAuthenticated ? 'Go to Your Dashboard' : 'Start Your First Interview Free'}
+              {isAuthenticated ? 'Go to Your Dashboard' : 'Start Your First Interview'}
             </Button>
           </Link>
         </div>
@@ -593,7 +589,7 @@ export default function Home() {
       {/* Footer */}
       <div className="border-t border-border py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
-          <p>© 2024 InterviewAI. All rights reserved.</p>
+          <p>© 2024 Mojo Interview. All rights reserved.</p>
         </div>
       </div>
     </div>

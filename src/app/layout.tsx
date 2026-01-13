@@ -16,9 +16,9 @@ const crimsonPro = Crimson_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "AI Mock Interview Platform",
+  title: "Mojo Interview - AI Mock Interview Platform",
   description: "Practise your interview skills with AI-powered interviews. Get real-time feedback and improve your performance across 8 different industries.",
-  keywords: ["interview", "AI", "practise", "mock interview", "career", "job search"],
+  keywords: ["interview", "AI", "practise", "mock interview", "career", "job search", "Mojo Interview"],
 };
 
 export default function RootLayout({

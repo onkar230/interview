@@ -203,7 +203,7 @@ export default function DashboardPage() {
       {/* Navigation - Clean, task-focused for authenticated users */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold text-primary">
-          InterviewAI
+          Mojo Interview
         </Link>
         <UserNav />
       </nav>
@@ -664,7 +664,7 @@ export default function DashboardPage() {
       {/* Footer - Matches Landing Page */}
       <div className="border-t border-border py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
-          <p>© 2024 InterviewAI. All rights reserved.</p>
+          <p>© 2024 Mojo Interview. All rights reserved.</p>
         </div>
       </div>
     </div>
