@@ -184,9 +184,17 @@ function EvaluationContent() {
         {/* Detailed Feedback */}
         <div className="bg-card rounded-xl shadow-md p-6 mb-8 border border-border">
           <h2 className="text-xl font-semibold font-serif text-card-foreground mb-4">Detailed Feedback</h2>
-          <p className="text-card-foreground leading-relaxed whitespace-pre-wrap">
-            {evaluation.detailedFeedback}
-          </p>
+          <div className="text-card-foreground leading-relaxed whitespace-pre-wrap">
+            {evaluation.detailedFeedback
+              .replace(/\n{3,}/g, '\n\n')
+              .split(/(\*\*.*?\*\*)/)
+              .map((part, index) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return <strong key={index}>{part.slice(2, -2)}</strong>;
+                }
+                return part;
+              })}
+          </div>
         </div>
 
         {/* Actions */}
