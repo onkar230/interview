@@ -209,36 +209,20 @@ export default function DashboardPage() {
       </nav>
 
       {/* Hero/Welcome Section - Centered, Inspirational */}
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-          Welcome Back to Your{' '}
+      <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          Welcome to Your{' '}
           <span className="text-primary">Practice Space</span>
         </h1>
-        <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-          Every interview you complete brings you one step closer to landing your dream role.
-          Keep practicing, keep improving, and watch your confidence grow.
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Practise a little more, improve a little more, and build real confidence along the way.
         </p>
 
-        {/* Trust Indicators - Matches Landing Page */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-8 text-muted-foreground text-sm">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Unlimited practice sessions
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Real-time AI feedback
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Track your improvement
-          </div>
-        </div>
       </div>
 
       {/* Stats Section - Centered Header */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-12">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Your Progress at a Glance
           </h2>
@@ -301,21 +285,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Motivational Trust Indicators */}
-        <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-muted-foreground text-sm">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Detailed performance analytics
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Personalized improvement tips
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-            Industry-specific insights
-          </div>
-        </div>
       </div>
 
       {/* Dark Teal "Practice Room" Bridge Section - Matches Interview Session Theme */}

@@ -90,6 +90,11 @@ export default function SignupPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
+          <Link href="/" className="inline-block mb-6">
+            <div className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
+              Mojo Interview
+            </div>
+          </Link>
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Create Account
           </h1>
