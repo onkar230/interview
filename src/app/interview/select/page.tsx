@@ -303,12 +303,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Step Into the Practice Room
-          </h2>
           <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
             Experience a realistic interview environment with AI-powered feedback.
-            Your next session awaits - just like the real thing, but with room to grow.
           </p>
 
           {/* Feature pills - styled like interview session UI elements */}
