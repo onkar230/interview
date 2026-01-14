@@ -531,7 +531,7 @@ export default function Home() {
           Your career is your most valuable asset.
         </h2>
         <p className="text-xl text-muted-foreground mb-8">
-          Start building it today with AI-powered interview practise.
+          Start building it today with Mojo Interview.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -546,7 +546,7 @@ export default function Home() {
         </div>
 
         <p className="text-sm text-muted-foreground mt-8">
-          Built by someone who understands the interview struggle. No credit card required.
+          Built by someone who understands the interview struggle.
         </p>
       </div>
 
