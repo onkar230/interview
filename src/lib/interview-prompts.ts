@@ -481,15 +481,15 @@ export const INDUSTRY_PROMPTS: Record<
   law: {
     description: 'UK commercial law firm roles - training contracts, vacation schemes, and solicitor positions',
     focusAreas: [
-      'Commercial awareness',
-      'Time management and prioritisation',
-      'Client service and relationship building',
-      'Legal reasoning and analytical thinking',
-      'Teamwork and resilience',
+      'Experience and past examples (STAR method)',
+      'Skills and work style (time management, prioritisation, motivation)',
+      'Situational judgment and ethical decision-making',
+      'Commercial awareness and role understanding',
+      'Motivation, firm fit, and self-insight',
     ],
     sampleQuestions: [
-      // BEHAVIORAL - Tell me about a time when... (Use STAR method)
-      '[BEHAVIORAL] Describe a situation where you had to deal with difficult people',
+      // 1. EXPERIENCE (Past Examples) - BEHAVIORAL questions using STAR method
+      '[BEHAVIORAL] Tell me about a time you had to deal with difficult people',
       '[BEHAVIORAL] Can you share a situation where you had to make a difficult decision?',
       '[BEHAVIORAL] Which of your achievements are you most proud of?',
       '[BEHAVIORAL] Tell us about a time you worked in a team and the challenges you faced',
@@ -497,53 +497,56 @@ export const INDUSTRY_PROMPTS: Record<
       '[BEHAVIORAL] Describe a time when you made a valuable contribution to a team',
       '[BEHAVIORAL] When have you explained a complex idea to someone?',
       '[BEHAVIORAL] Tell us about a time you made a mistake and how you handled it',
+      '[BEHAVIORAL] Tell me about a time you managed expectations with someone senior or a client',
+      '[BEHAVIORAL] Describe a time you spotted a problem early and acted on it',
+      '[BEHAVIORAL] Tell me about a time you improved a process or way of working',
 
-      // TECHNICAL / ROLE-SPECIFIC - Industry knowledge and trainee role understanding
-      '[TECHNICAL] What tasks do trainees typically handle, and why would you excel at them?',
-      '[TECHNICAL] How does a trainee\'s role differ from that of a partner?',
-      '[TECHNICAL] In what ways is legal tech transforming the legal industry?',
-      '[TECHNICAL] Tell us about a recent news story and its potential impact on our firm',
-      '[TECHNICAL] Do you think legal tech will lead to less skilled future lawyers?',
-      '[TECHNICAL] What do you think a typical day looks like for a trainee solicitor?',
-
-      // COMPETENCY-BASED - How would you handle / demonstrate key skills
+      // 2. SKILLS & WORK STYLE - COMPETENCY-BASED questions
       '[COMPETENCY] How do you manage your time effectively?',
-      '[COMPETENCY] How have you demonstrated your commercial awareness in the past?',
+      '[COMPETENCY] How do you handle multiple tasks with tight deadlines?',
       '[COMPETENCY] How do you stay motivated when working on tasks that aren\'t very exciting?',
       '[COMPETENCY] How do you keep up with current events?',
-      '[COMPETENCY] How do you handle multiple tasks with tight deadlines?',
       '[COMPETENCY] How do you manage receiving critical feedback?',
+      '[COMPETENCY] Describe feedback that fundamentally changed how you work',
 
-      // SITUATIONAL - What would you do if...
+      // 3. SITUATIONAL JUDGMENT - What would you do if...
       '[SITUATIONAL] A partner asks you to attend a client dinner, but you already have a personal commitment',
       '[SITUATIONAL] Opposing counsel accidentally sends you confidential information',
-      '[SITUATIONAL] A client wants to sign a deal, but the supervising partner isn\'t available',
+      '[SITUATIONAL] A client wants to change something, but the supervising partner isn\'t available',
       '[SITUATIONAL] A partner asks you to prioritise urgent work, but you are already at capacity with another partner\'s deadline',
       '[SITUATIONAL] A client asks for advice that you believe may be legally permissible but ethically questionable',
 
-      // STRENGTHS & WEAKNESSES - Self-assessment
+      // 4. COMMERCIAL & ROLE AWARENESS - TECHNICAL knowledge of the trainee role and commercial law
+      '[TECHNICAL] What tasks do trainees typically handle, and why would you excel at them?',
+      '[TECHNICAL] How does a trainee\'s role differ from that of a partner?',
+      '[TECHNICAL] What do you think a typical day looks like for a trainee solicitor?',
+      '[TECHNICAL] Tell us about a recent news story and its potential impact on our firm',
+      '[TECHNICAL] How have you demonstrated your commercial awareness in the past?',
+      '[TECHNICAL] How would you balance legal risk with commercial objectives for a client?',
+
+      // 5. MOTIVATION, FIT & SELF-INSIGHT - STRENGTHS
       '[STRENGTHS] What qualities make you well-suited to a career in law?',
       '[STRENGTHS] What do you think you do better than most people at your level?',
       '[STRENGTHS] What feedback do you receive most often from supervisors or peers?',
       '[STRENGTHS] Which skill has most contributed to your academic or professional success?',
-      '[STRENGTHS] What personal quality would your colleagues say you bring to a team?',
       '[STRENGTHS] What strength would you rely on most during a demanding transaction or trial?',
+
+      // 5. MOTIVATION, FIT & SELF-INSIGHT - WEAKNESSES
       '[WEAKNESSES] What is a professional weakness you are actively working to improve?',
       '[WEAKNESSES] What type of task do you find most challenging, and why?',
-      '[WEAKNESSES] What feedback initially surprised you, and how did you respond to it?',
       '[WEAKNESSES] When have you struggled under pressure, and what did you learn?',
 
-      // COMPANY / CULTURE FIT - Values, motivation, and alignment
+      // 5. MOTIVATION, FIT & SELF-INSIGHT - CULTURE FIT
       '[CULTURE FIT] Why do you want to be a lawyer rather than a banker or consultant?',
       '[CULTURE FIT] Why are you interested in becoming a City lawyer?',
+      '[CULTURE FIT] Why are you drawn to commercial law?',
+      '[CULTURE FIT] Why do you want to be a solicitor instead of a barrister?',
       '[CULTURE FIT] What factors did you consider when deciding where to apply?',
       '[CULTURE FIT] What attracts you to this firm?',
-      '[CULTURE FIT] Why do you want to be a solicitor instead of a barrister?',
-      '[CULTURE FIT] Why are you applying for a training contract rather than a vacation scheme?',
-      '[CULTURE FIT] Why are you drawn to commercial law?',
       '[CULTURE FIT] How would you pitch our firm to a potential client?',
       '[CULTURE FIT] What are your core values, and when were they tested?',
       '[CULTURE FIT] If you couldn\'t become a commercial lawyer, what alternative career would you choose and why?',
+      '[CULTURE FIT] What motivates you outside of law?',
     ],
     companies: [
       'Clifford Chance',
