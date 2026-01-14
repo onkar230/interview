@@ -1034,11 +1034,11 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 <h3 className="text-sm font-semibold text-primary-foreground/90">
                   Interview Conversation
                 </h3>
-                {/* Personalized Mode Indicator */}
+                {/* Personalised Mode Indicator */}
                 {usePersonalization && personalizationContext?.hasHistory && (
                   <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1">
                     <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
-                    <span className="text-[10px] font-medium text-accent">Personalized</span>
+                    <span className="text-[10px] font-medium text-accent">Personalised</span>
                   </div>
                 )}
               </div>
