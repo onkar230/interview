@@ -252,9 +252,9 @@ export default function Home() {
         <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6">
           The Only{' '}
           <span className="text-primary">
-            AI Mock Interview Platform
+            Mock Interview Platform
           </span>{' '}
-          You'll Ever Need
+          You Ever Need
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto">
@@ -274,11 +274,11 @@ export default function Home() {
         <div className="flex items-center justify-center gap-8 mt-6 text-gray-400 text-sm">
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-400" />
-            No credit card required
+            Smart optimisation
           </div>
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-400" />
-            Setup in 2 minutes
+            100% realistic feedback
           </div>
         </div>
 
@@ -375,10 +375,10 @@ export default function Home() {
             <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center mb-6">
               <Mic className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-card-foreground mb-3">Voice-Based Interviews</h3>
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">Speak Naturally</h3>
             <p className="text-muted-foreground">
-              Speak naturally just like a real interview. Our AI understands your responses
-              and provides instant feedback on your communication style.
+              Just like you would in a real interview. Our AI listens to your responses
+              and gives instant feedback on your communication style.
             </p>
           </div>
 
@@ -389,7 +389,7 @@ export default function Home() {
             <h3 className="text-2xl font-bold text-card-foreground mb-3">Industry-Specific AI</h3>
             <p className="text-muted-foreground">
               From Big Tech to Big Law, our AI interviewers are trained on real questions
-              from top companies in 9 different industries.
+              from top companies.
             </p>
           </div>
 
@@ -406,12 +406,12 @@ export default function Home() {
 
           <div className="bg-card rounded-xl p-8 border border-border">
             <div className="h-14 w-14 bg-primary rounded-xl flex items-center justify-center mb-6">
-              <Brain className="h-7 w-7 text-primary-foreground" />
+              <CheckCircle className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h3 className="text-2xl font-bold text-card-foreground mb-3">Real-Time SWOT Analysis</h3>
+            <h3 className="text-2xl font-bold text-card-foreground mb-3">No Need for an Expensive Career Coach</h3>
             <p className="text-muted-foreground">
-              See your Strengths, Weaknesses, Opportunities, and Threats in real-time
-              as you answer each question.
+              Get real-time insight on what you're doing well, where you can improve,
+              and how to strengthen your answers as you go.
             </p>
           </div>
 
@@ -421,7 +421,7 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-bold text-card-foreground mb-3">Custom Questions</h3>
             <p className="text-muted-foreground">
-              Add your own questions that you struggle with. Practice the exact scenarios
+              Add the questions you struggle with most and practise the exact scenarios
               that make you nervous.
             </p>
           </div>
@@ -448,7 +448,7 @@ export default function Home() {
           Start free and upgrade when you're ready to accelerate your interview prep
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Free Plan */}
           <div className="bg-card rounded-2xl p-8 border border-border">
             <h3 className="text-2xl font-bold text-card-foreground mb-2">Free</h3>
@@ -522,42 +522,6 @@ export default function Home() {
               Coming Soon
             </Button>
           </div>
-
-          {/* Enterprise Plan */}
-          <div className="bg-card rounded-2xl p-8 border border-border">
-            <h3 className="text-2xl font-bold text-card-foreground mb-2">Enterprise</h3>
-            <div className="text-5xl font-bold text-card-foreground mb-6">
-              $60<span className="text-xl text-muted-foreground">/6 months</span>
-            </div>
-            <p className="text-muted-foreground mb-6">For your entire job search journey</p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-center gap-3 text-card-foreground">
-                <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                Everything in Pro, plus:
-              </li>
-              <li className="flex items-center gap-3 text-card-foreground">
-                <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                6 months unlimited access
-              </li>
-              <li className="flex items-center gap-3 text-card-foreground">
-                <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                Interview history & analytics
-              </li>
-              <li className="flex items-center gap-3 text-card-foreground">
-                <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                Advanced AI feedback
-              </li>
-              <li className="flex items-center gap-3 text-card-foreground">
-                <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                1-on-1 coaching session
-              </li>
-            </ul>
-
-            <Button className="w-full bg-muted hover:bg-muted/80">
-              Coming Soon
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -589,7 +553,7 @@ export default function Home() {
       {/* Footer */}
       <div className="border-t border-border py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-muted-foreground text-sm">
-          <p>© 2024 Mojo Interview. All rights reserved.</p>
+          <p>© 2026 Mojo Interview. All rights reserved.</p>
         </div>
       </div>
     </div>
