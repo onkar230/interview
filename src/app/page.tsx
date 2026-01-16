@@ -223,13 +223,16 @@ export default function Home() {
 
   const ctaLink = isAuthenticated ? '/interview/select' : '/login';
 
-  const handleUpgradeClick = () => {
+  const handleUpgradeClick = async () => {
+    console.log('🔵 Upgrade button clicked, authenticated:', isAuthenticated);
     if (!isAuthenticated) {
       // Redirect to signup if not authenticated
+      console.log('🔵 Not authenticated, redirecting to signup');
       window.location.href = '/signup';
     } else {
-      // Show upgrade modal and trigger Stripe checkout
-      upgradeToPro();
+      // Trigger Stripe checkout
+      console.log('🔵 Authenticated, calling upgradeToPro');
+      await upgradeToPro();
     }
   };
 

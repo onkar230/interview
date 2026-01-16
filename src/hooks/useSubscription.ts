@@ -44,17 +44,32 @@ export function useSubscription() {
 
   const upgradeToPro = async () => {
     try {
+      console.log('🔵 Starting upgrade to Pro...');
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
       });
+
+      console.log('🔵 Response status:', response.status);
+
       if (response.ok) {
-        const { url } = await response.json();
-        window.location.href = url;
+        const data = await response.json();
+        console.log('✅ Checkout session created:', data);
+
+        if (data.url) {
+          console.log('🔵 Redirecting to Stripe Checkout:', data.url);
+          window.location.href = data.url;
+        } else {
+          console.error('❌ No checkout URL in response:', data);
+          alert('Error: No checkout URL received. Please try again.');
+        }
       } else {
-        console.error('Failed to create checkout session');
+        const errorData = await response.json();
+        console.error('❌ Failed to create checkout session:', response.status, errorData);
+        alert(`Failed to start checkout: ${errorData.error || 'Unknown error'}. Please try again.`);
       }
     } catch (error) {
-      console.error('Error upgrading to Pro:', error);
+      console.error('❌ Error upgrading to Pro:', error);
+      alert('Network error while starting checkout. Please check your connection and try again.');
     }
   };
 
