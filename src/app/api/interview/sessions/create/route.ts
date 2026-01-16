@@ -1,9 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, createInterviewSession } from '@/lib/supabase';
+import {
+  requireAuth,
+  createInterviewSession,
+  canUserStartInterview,
+  incrementInterviewCounter,
+} from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
+
+    // CHECK INTERVIEW LIMIT BEFORE CREATING SESSION
+    const accessCheck = await canUserStartInterview(user.id);
+
+    if (!accessCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: accessCheck.reason,
+          limitReached: true,
+          tier: accessCheck.tier,
+          limit: accessCheck.limit,
+          used: accessCheck.used,
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
 
     const session = await createInterviewSession(user.id, {
@@ -24,7 +46,17 @@ export async function POST(request: NextRequest) {
       personalizationRelevance: body.personalizationRelevance,
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    // INCREMENT COUNTER FOR FREE USERS AFTER SUCCESSFUL SESSION CREATION
+    if (accessCheck.tier === 'free') {
+      await incrementInterviewCounter(user.id);
+    }
+
+    return NextResponse.json({
+      sessionId: session.id,
+      tier: accessCheck.tier,
+      interviewsUsed: (accessCheck.used || 0) + 1,
+      interviewsLimit: accessCheck.limit,
+    });
   } catch (error) {
     console.error('Error creating session:', error);
     return NextResponse.json(

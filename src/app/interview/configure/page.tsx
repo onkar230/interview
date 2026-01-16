@@ -23,6 +23,8 @@ import {
 import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
 import { getSupabaseClient } from '@/lib/supabase-client';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 
 // Industry-specific suggestions
 const INDUSTRY_SUGGESTIONS: Record<Industry, { companies: string[]; roles: string[] }> = {
@@ -107,6 +109,11 @@ function ConfigureInterviewContent() {
   const [usePersonalization, setUsePersonalization] = useState(true);
   const [personalizationData, setPersonalizationData] = useState<any>(null);
   const [isLoadingPersonalization, setIsLoadingPersonalization] = useState(true);
+
+  // Subscription state
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [limitReachedReason, setLimitReachedReason] = useState<string | undefined>();
+  const { upgradeToPro } = useSubscription();
 
   // Fetch personalization context from API
   useEffect(() => {
@@ -393,6 +400,17 @@ function ConfigureInterviewContent() {
       });
 
       if (!response.ok) {
+        // Check if it's a limit reached error (403)
+        if (response.status === 403) {
+          const errorData = await response.json();
+          if (errorData.limitReached) {
+            // Show upgrade modal instead of generic error
+            setLimitReachedReason(errorData.error);
+            setShowUpgradeModal(true);
+            setIsLoading(false);
+            return;
+          }
+        }
         throw new Error('Failed to create session');
       }
 
@@ -517,10 +535,10 @@ function ConfigureInterviewContent() {
                   <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-semibold text-blue-900 mb-1">
-                      Behavioral Interview Practice
+                      Behavioural Interview Practice
                     </h3>
                     <p className="text-sm text-blue-800">
-                      This practice focuses on behavioral and communication skills for tech interviews.
+                      This practice focuses on behavioural and communication skills for tech interviews.
                       For coding rounds (LeetCode, algorithms, data structures), supplement with platforms like
                       LeetCode, HackerRank, or AlgoExpert.
                     </p>
@@ -679,7 +697,7 @@ function ConfigureInterviewContent() {
                       }`}
                       role="switch"
                       aria-checked={usePersonalization}
-                      aria-label="Enable personalized coaching"
+                      aria-label="Enable personalised coaching"
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -1055,6 +1073,17 @@ function ConfigureInterviewContent() {
           </p>
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={() => {
+          setShowUpgradeModal(false);
+          upgradeToPro();
+        }}
+        reason={limitReachedReason}
+      />
     </div>
   );
 }

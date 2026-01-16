@@ -17,6 +17,8 @@ import {
 import { FaAmazon, FaMicrosoft } from 'react-icons/fa'; // Font Awesome brand icons
 import { getSupabaseClient } from '@/lib/supabase-client';
 import UserNav from '@/components/navigation/UserNav';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 
 // Animated Score Component with Skill Scores
 function AnimatedScoreSection() {
@@ -200,6 +202,8 @@ function CompanyCarousel() {
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { upgradeToPro } = useSubscription();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -218,6 +222,16 @@ export default function Home() {
   }, []);
 
   const ctaLink = isAuthenticated ? '/interview/select' : '/login';
+
+  const handleUpgradeClick = () => {
+    if (!isAuthenticated) {
+      // Redirect to signup if not authenticated
+      window.location.href = '/signup';
+    } else {
+      // Show upgrade modal and trigger Stripe checkout
+      upgradeToPro();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -460,7 +474,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                5 mock interviews per month
+                1 mock interview per month
               </li>
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
@@ -491,9 +505,9 @@ export default function Home() {
 
             <h3 className="text-2xl font-bold text-primary-foreground mb-2">Pro</h3>
             <div className="text-5xl font-bold text-primary-foreground mb-6">
-              $15<span className="text-xl text-primary-foreground/70">/month</span>
+              £20<span className="text-xl text-primary-foreground/70">/month</span>
             </div>
-            <p className="text-primary-foreground/80 mb-6">Supercharge your interview prep</p>
+            <p className="text-primary-foreground/80 mb-6">7-day free trial • Cancel anytime</p>
 
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-primary-foreground">
@@ -518,8 +532,11 @@ export default function Home() {
               </li>
             </ul>
 
-            <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-              Coming Soon
+            <Button
+              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+              onClick={handleUpgradeClick}
+            >
+              {isAuthenticated ? 'Start Free Trial' : 'Sign Up & Start Trial'}
             </Button>
           </div>
         </div>

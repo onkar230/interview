@@ -332,3 +332,157 @@ export async function saveFeedbackItem(
   if (error) throw error;
   return data;
 }
+
+// ============================================
+// SUBSCRIPTION HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Get user subscription data
+ */
+export async function getUserSubscription(userId: string) {
+  const supabase = await getServerSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('subscription_tier, subscription_status, interviews_used_this_month, interviews_reset_at, trial_ends_at, stripe_customer_id, stripe_subscription_id, subscription_current_period_end')
+    .eq('id', userId)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Check if user can start interview
+ */
+export async function canUserStartInterview(userId: string): Promise<{
+  allowed: boolean;
+  reason?: string;
+  limit?: number;
+  used?: number;
+  tier: string;
+}> {
+  const subscription = await getUserSubscription(userId);
+
+  if (subscription.subscription_tier === 'pro') {
+    return { allowed: true, tier: 'pro' };
+  }
+
+  const freeTierLimit = parseInt(process.env.FREE_TIER_MONTHLY_LIMIT || '10', 10);
+  const now = new Date();
+  const resetAt = subscription.interviews_reset_at ? new Date(subscription.interviews_reset_at) : null;
+
+  // Auto-reset if needed
+  if (resetAt && now >= resetAt) {
+    await resetInterviewCounter(userId);
+    return { allowed: true, tier: 'free', limit: freeTierLimit, used: 0 };
+  }
+
+  const used = subscription.interviews_used_this_month || 0;
+
+  if (used >= freeTierLimit) {
+    return {
+      allowed: false,
+      reason: `You've reached your monthly limit of ${freeTierLimit} interviews. Upgrade to Pro for unlimited interviews.`,
+      limit: freeTierLimit,
+      used: used,
+      tier: 'free'
+    };
+  }
+
+  return { allowed: true, tier: 'free', limit: freeTierLimit, used: used };
+}
+
+/**
+ * Increment interview counter (for free tier users)
+ */
+export async function incrementInterviewCounter(userId: string) {
+  const supabase = await getServerSupabase();
+  const { error } = await supabase.rpc('increment_interview_counter', { p_user_id: userId });
+  if (error) throw error;
+}
+
+/**
+ * Reset interview counter
+ */
+export async function resetInterviewCounter(userId: string) {
+  const supabase = await getServerSupabase();
+  const nextResetDate = new Date();
+  nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+  nextResetDate.setDate(1);
+  nextResetDate.setHours(0, 0, 0, 0);
+
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({
+      interviews_used_this_month: 0,
+      interviews_reset_at: nextResetDate.toISOString()
+    })
+    .eq('id', userId);
+  if (error) throw error;
+}
+
+/**
+ * Update user subscription from Stripe data
+ */
+export async function updateUserSubscription(
+  userId: string,
+  subscriptionData: {
+    stripeCustomerId?: string;
+    stripeSubscriptionId?: string;
+    tier: 'free' | 'pro';
+    status: string;
+    currentPeriodStart?: Date;
+    currentPeriodEnd?: Date;
+    trialEndsAt?: Date | null;
+  }
+) {
+  const supabase = await getServerSupabase();
+  const updateData: any = {
+    subscription_tier: subscriptionData.tier,
+    subscription_status: subscriptionData.status,
+  };
+
+  if (subscriptionData.stripeCustomerId) updateData.stripe_customer_id = subscriptionData.stripeCustomerId;
+  if (subscriptionData.stripeSubscriptionId) updateData.stripe_subscription_id = subscriptionData.stripeSubscriptionId;
+  if (subscriptionData.currentPeriodStart) updateData.subscription_current_period_start = subscriptionData.currentPeriodStart.toISOString();
+  if (subscriptionData.currentPeriodEnd) updateData.subscription_current_period_end = subscriptionData.currentPeriodEnd.toISOString();
+  if (subscriptionData.trialEndsAt) updateData.trial_ends_at = subscriptionData.trialEndsAt.toISOString();
+
+  const { error } = await supabase.from('user_profiles').update(updateData).eq('id', userId);
+  if (error) throw error;
+}
+
+/**
+ * Log subscription event for audit trail
+ */
+export async function logSubscriptionEvent(userId: string, eventData: {
+  stripeEventId: string;
+  eventType: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  data: any;
+}) {
+  const supabase = await getServerSupabase();
+  await supabase.from('subscription_events').insert({
+    user_id: userId,
+    stripe_event_id: eventData.stripeEventId,
+    event_type: eventData.eventType,
+    stripe_customer_id: eventData.stripeCustomerId,
+    stripe_subscription_id: eventData.stripeSubscriptionId,
+    event_data: eventData.data,
+  });
+}
+
+/**
+ * Get user by Stripe customer ID
+ */
+export async function getUserByStripeCustomerId(stripeCustomerId: string) {
+  const supabase = await getServerSupabase();
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('stripe_customer_id', stripeCustomerId)
+    .single();
+  if (error) throw error;
+  return data;
+}

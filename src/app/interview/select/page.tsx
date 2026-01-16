@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserNav from '@/components/navigation/UserNav';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionBadge } from '@/components/subscription/SubscriptionBadge';
+import { Crown } from 'lucide-react';
 
 interface InterviewSession {
   id: string;
@@ -55,6 +58,15 @@ export default function DashboardPage() {
     inProgress: 0,
     averageScore: 0,
   });
+
+  const {
+    tier,
+    interviewsUsed,
+    interviewLimit,
+    canStartInterview,
+    upgradeToPro,
+    manageSubscription
+  } = useSubscription();
 
   const ITEMS_PER_PAGE = 5;
 
@@ -102,6 +114,13 @@ export default function DashboardPage() {
       day: 'numeric',
       year: 'numeric',
     });
+  };
+
+  const getDaysUntilReset = () => {
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const daysLeft = Math.ceil((nextMonth.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return daysLeft;
   };
 
   const getStatusBadge = (status: string) => {
@@ -283,6 +302,94 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Average Score</p>
             </div>
           </div>
+        </div>
+
+        {/* Subscription Status Card */}
+        <div className="max-w-5xl mx-auto mt-8">
+          {tier === 'free' ? (
+            <div className="bg-card rounded-xl p-6 border-2 border-amber-300">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 w-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <SubscriptionBadge tier="free" />
+                    <h3 className="text-xl font-semibold text-foreground">
+                      {canStartInterview
+                        ? `${interviewLimit! - interviewsUsed} of ${interviewLimit} interview${interviewLimit === 1 ? '' : 's'} left this month`
+                        : 'Monthly limit reached'}
+                    </h3>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-4">
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          canStartInterview ? 'bg-accent' : 'bg-amber-500'
+                        }`}
+                        style={{
+                          width: `${interviewLimit ? ((interviewLimit - interviewsUsed) / interviewLimit) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Only show reset countdown AFTER they've used their interview */}
+                  {!canStartInterview && (
+                    <>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Resets in {getDaysUntilReset()} day{getDaysUntilReset() === 1 ? '' : 's'}
+                      </p>
+
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-sm text-amber-800 font-medium">
+                          You've used your free interview this month. Upgrade to Pro for unlimited interviews!
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex-shrink-0">
+                  <Button
+                    size="lg"
+                    onClick={upgradeToPro}
+                    className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold px-8"
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    Upgrade to Pro
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    £20/month • 7-day free trial
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl p-6 text-white">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Crown className="h-6 w-6" />
+                    <h3 className="text-2xl font-bold">Pro Member</h3>
+                  </div>
+                  <p className="text-white/90">
+                    You have unlimited interviews • Keep practicing!
+                  </p>
+                </div>
+
+                <div className="flex-shrink-0">
+                  <Button
+                    size="lg"
+                    onClick={manageSubscription}
+                    variant="outline"
+                    className="bg-white text-amber-600 hover:bg-white/90 border-0 px-6"
+                  >
+                    Manage Subscription
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>
