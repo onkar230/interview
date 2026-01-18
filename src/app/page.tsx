@@ -481,7 +481,7 @@ export default function Home() {
               </li>
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                All 9 industries available
+                Multiple industries available
               </li>
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
