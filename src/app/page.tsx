@@ -470,7 +470,7 @@ export default function Home() {
           <div className="bg-card rounded-2xl p-8 border border-border">
             <h3 className="text-2xl font-bold text-card-foreground mb-2">Free</h3>
             <div className="text-5xl font-bold text-card-foreground mb-6">
-              $0<span className="text-xl text-muted-foreground">/forever</span>
+              £0<span className="text-xl text-muted-foreground">/forever</span>
             </div>
             <p className="text-muted-foreground mb-6">Perfect for getting started</p>
 
