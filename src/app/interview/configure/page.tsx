@@ -900,14 +900,23 @@ function ConfigureInterviewContent() {
                 </p>
               )}
               <div className="space-y-2">
-                {[
-                  { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
-                  { id: 'technical', label: 'Technical/Role-specific', description: 'Industry-specific knowledge and skills' },
-                  { id: 'competency', label: 'Competency-based', description: 'How would you handle...' },
-                  { id: 'situational', label: 'Situational', description: 'What would you do if...' },
-                  { id: 'strengths', label: 'Strengths & Weaknesses', description: 'Self-assessment questions' },
-                  { id: 'culture', label: 'Company/Culture Fit', description: 'Values and work style alignment' },
-                ].map((type) => (
+                {(selectedIndustry === 'law'
+                  ? [
+                      { id: 'behavioral', label: 'Experience (Past Examples)', description: 'Tell me about a time when...' },
+                      { id: 'competency', label: 'Skills & Work Style', description: 'Time management, prioritisation, motivation' },
+                      { id: 'situational', label: 'Situational Judgment', description: 'What would you do if...' },
+                      { id: 'technical', label: 'Commercial & Role Awareness', description: 'Understanding trainee role, firm, and market' },
+                      { id: 'motivation', label: 'Motivation, Fit & Self-Insight', description: 'Why law, why this firm, strengths/weaknesses' },
+                    ]
+                  : [
+                      { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
+                      { id: 'technical', label: 'Technical/Role-specific', description: 'Industry-specific knowledge and skills' },
+                      { id: 'competency', label: 'Competency-based', description: 'How would you handle...' },
+                      { id: 'situational', label: 'Situational', description: 'What would you do if...' },
+                      { id: 'strengths', label: 'Strengths & Weaknesses', description: 'Self-assessment questions' },
+                      { id: 'culture', label: 'Company/Culture Fit', description: 'Values and work style alignment' },
+                    ]
+                ).map((type) => (
                   <label
                     key={type.id}
                     className={`flex items-start gap-3 p-3 border border-border rounded-lg transition-colors ${

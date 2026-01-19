@@ -775,6 +775,7 @@ IMPORTANT: Use the job description to tailor your questions. Ask about specific 
       situational: 'Situational questions (What would you do if...)',
       strengths: 'Strengths & Weaknesses questions (Self-assessment)',
       culture: 'Company/Culture Fit questions (Values and work style alignment)',
+      motivation: 'Motivation, Fit & Self-Insight questions (Why law, why this firm, strengths/weaknesses)',
     };
 
     const typeExamples: Record<string, string[]> = {
@@ -807,6 +808,12 @@ IMPORTANT: Use the job description to tailor your questions. Ask about specific 
         'What type of work environment do you thrive in?',
         'How do you prefer to receive feedback?',
         'What company values are most important to you?'
+      ],
+      motivation: [
+        'Why do you want to be a solicitor instead of a barrister?',
+        'What attracts you to this firm?',
+        'What are your greatest strengths?',
+        'What is a professional weakness you are actively working to improve?'
       ]
     };
 
@@ -845,6 +852,7 @@ ${selectedTypes}
    - SITUATIONAL: "What would you do if..." (specific hypothetical situations, ethical dilemmas)
    - STRENGTHS: Self-assessment questions (strengths, weaknesses, motivations)
    - CULTURE FIT: Work style, values, team preferences
+   - MOTIVATION: Why law, why this firm, strengths, weaknesses, values (Law-specific category)
 
 3. EXAMPLE QUESTIONS FOR SELECTED TYPES:
 ${selectedExamples}
@@ -1291,12 +1299,20 @@ INSTRUCTIONS FOR USING THESE QUESTIONS:
           const category = categoryMatch[1].toLowerCase();
 
           // Map category tags to questionTypes values
+          // Law-specific mapping:
+          // - 'behavioral' → [BEHAVIORAL] (Experience/Past Examples)
+          // - 'competency' → [COMPETENCY] (Skills & Work Style)
+          // - 'situational' → [SITUATIONAL] (Situational Judgment)
+          // - 'technical' → [TECHNICAL] (Commercial & Role Awareness)
+          // - 'motivation' → [STRENGTHS], [WEAKNESSES], [CULTURE FIT] (Motivation, Fit & Self-Insight)
+
           if (category.includes('behavioral') && questionTypes.includes('behavioral')) return true;
           if (category.includes('technical') && questionTypes.includes('technical')) return true;
           if (category.includes('situational') && questionTypes.includes('situational')) return true;
           if (category.includes('competency') && questionTypes.includes('competency')) return true;
-          if ((category.includes('strengths') || category.includes('weaknesses')) && questionTypes.includes('strengths')) return true;
-          if (category.includes('culture') && questionTypes.includes('culture')) return true;
+
+          // New 'motivation' category maps to strengths, weaknesses, and culture fit
+          if ((category.includes('strengths') || category.includes('weaknesses') || category.includes('culture')) && questionTypes.includes('motivation')) return true;
 
           return false;
         })
