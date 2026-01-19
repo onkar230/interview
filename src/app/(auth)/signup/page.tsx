@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getSupabaseClient } from '@/lib/supabase-client';
-import { Loader2, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,7 +16,6 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +37,9 @@ export default function SignupPage() {
 
       if (error) throw error;
 
-      // Show success message (email verification required)
-      setSuccess(true);
+      // Since email verification is disabled, user is automatically logged in
+      // Redirect to dashboard
+      router.push('/interview/select');
     } catch (err) {
       console.error('Signup error:', err);
       setError(err instanceof Error ? err.message : 'Signup failed');
@@ -64,28 +64,6 @@ export default function SignupPage() {
       setError(err instanceof Error ? err.message : 'OAuth signup failed');
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="max-w-md w-full">
-          <div className="bg-card border border-border rounded-xl shadow-lg p-8 text-center">
-            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Check Your Email
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              We've sent a verification link to <strong>{email}</strong>.
-              Click the link to activate your account.
-            </p>
-            <Link href="/login">
-              <Button>Go to Login</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">

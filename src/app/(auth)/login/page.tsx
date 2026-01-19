@@ -290,19 +290,12 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="mt-6 space-y-3">
-            <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-primary hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
-            <div className="pt-3 border-t border-border">
-              <p className="text-center text-xs text-muted-foreground">
-                Just signed up? Check your email for a verification link before logging in.
-              </p>
-            </div>
-          </div>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Don't have an account?{' '}
+            <Link href="/signup" className="text-primary hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
