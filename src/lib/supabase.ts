@@ -423,6 +423,7 @@ export async function resetInterviewCounter(userId: string) {
 
 /**
  * Update user subscription from Stripe data
+ * Uses service role key for webhook access (no user session required)
  */
 export async function updateUserSubscription(
   userId: string,
@@ -436,7 +437,7 @@ export async function updateUserSubscription(
     trialEndsAt?: Date | null;
   }
 ) {
-  const supabase = await getServerSupabase();
+  const supabase = getServiceSupabase();
   const updateData: any = {
     subscription_tier: subscriptionData.tier,
     subscription_status: subscriptionData.status,
@@ -454,6 +455,7 @@ export async function updateUserSubscription(
 
 /**
  * Log subscription event for audit trail
+ * Uses service role key for webhook access (no user session required)
  */
 export async function logSubscriptionEvent(userId: string, eventData: {
   stripeEventId: string;
@@ -462,7 +464,7 @@ export async function logSubscriptionEvent(userId: string, eventData: {
   stripeSubscriptionId?: string;
   data: any;
 }) {
-  const supabase = await getServerSupabase();
+  const supabase = getServiceSupabase();
   await supabase.from('subscription_events').insert({
     user_id: userId,
     stripe_event_id: eventData.stripeEventId,
@@ -475,9 +477,10 @@ export async function logSubscriptionEvent(userId: string, eventData: {
 
 /**
  * Get user by Stripe customer ID
+ * Uses service role key for webhook access (no user session required)
  */
 export async function getUserByStripeCustomerId(stripeCustomerId: string) {
-  const supabase = await getServerSupabase();
+  const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')
