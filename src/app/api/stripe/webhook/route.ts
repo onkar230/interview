@@ -110,7 +110,7 @@ async function handleCheckoutCompleted(
 
   if (subscriptionId) {
     try {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any;
       subscriptionStatus = subscription.status;
       subscriptionTier = (subscription.status === 'active' || subscription.status === 'trialing') ? 'pro' : 'free';
       currentPeriodStart = new Date(subscription.current_period_start * 1000).toISOString();
