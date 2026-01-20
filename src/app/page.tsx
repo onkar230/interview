@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Check, Mic, Brain, TrendingUp, CheckCircle, Sparkles, Target, Award } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -240,8 +241,15 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="text-2xl font-bold text-primary">
-          Mojo Interview
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="Mojo Interview Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <span className="text-2xl font-bold text-primary">Mojo Interview</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
           <Link href="#features" className="text-foreground hover:text-primary transition-colors">

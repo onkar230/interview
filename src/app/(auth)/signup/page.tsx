@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getSupabaseClient } from '@/lib/supabase-client';
@@ -78,10 +79,17 @@ export default function SignupPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-6">
-            <div className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
+          <Link href="/" className="inline-flex items-center justify-center gap-3 mb-6">
+            <Image
+              src="/logo.png"
+              alt="Mojo Interview Logo"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
+            <span className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
               Mojo Interview
-            </div>
+            </span>
           </Link>
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Create Account

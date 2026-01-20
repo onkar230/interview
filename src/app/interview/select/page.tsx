@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   CheckCircle,
   Clock,
@@ -221,8 +222,15 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       {/* Navigation - Clean, task-focused for authenticated users */}
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-primary">
-          Mojo Interview
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="Mojo Interview Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <span className="text-2xl font-bold text-primary">Mojo Interview</span>
         </Link>
         <UserNav />
       </nav>
