@@ -482,7 +482,9 @@ export async function getUserByStripeCustomerId(stripeCustomerId: string) {
     .from('user_profiles')
     .select('*')
     .eq('stripe_customer_id', stripeCustomerId)
-    .single();
+    .maybeSingle();
+
+  // maybeSingle returns null if no rows found (instead of throwing error)
   if (error) throw error;
   return data;
 }
