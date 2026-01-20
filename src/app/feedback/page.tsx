@@ -1,17 +1,38 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import FeedbackForm from '@/components/feedback/FeedbackForm';
-
-export const metadata = {
-  title: 'Feedback & Support',
-  description: 'Send us your feedback or get support for Mojo Interview',
-};
+import { useState, useEffect } from 'react';
+import { getSupabaseClient } from '@/lib/supabase-client';
 
 export default function FeedbackPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  const backLink = isAuthenticated ? '/interview/select' : '/';
+  const backText = isAuthenticated ? '← Back to Dashboard' : '← Back to Home';
+
   return (
     <div className="min-h-screen bg-background">
       <nav className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between border-b border-border">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={backLink} className="flex items-center gap-3">
           <Image
             src="/logo.png"
             alt="Mojo Interview Logo"
@@ -36,14 +57,16 @@ export default function FeedbackPage() {
 
         <FeedbackForm />
 
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="text-primary hover:underline text-sm"
-          >
-            ← Back to Home
-          </Link>
-        </div>
+        {!isLoading && (
+          <div className="mt-8 text-center">
+            <Link
+              href={backLink}
+              className="text-primary hover:underline text-sm"
+            >
+              {backText}
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
