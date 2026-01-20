@@ -83,8 +83,8 @@ export default function SignupPage() {
             <Image
               src="/logo.png"
               alt="Mojo Interview Logo"
-              width={40}
-              height={40}
+              width={48}
+              height={48}
               className="object-contain"
             />
             <span className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">

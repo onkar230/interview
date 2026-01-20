@@ -245,8 +245,8 @@ export default function Home() {
           <Image
             src="/logo.png"
             alt="Mojo Interview Logo"
-            width={40}
-            height={40}
+            width={48}
+            height={48}
             className="object-contain"
           />
           <span className="text-2xl font-bold text-primary">Mojo Interview</span>
