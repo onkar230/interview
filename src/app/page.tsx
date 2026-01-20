@@ -519,7 +519,7 @@ export default function Home() {
 
             <h3 className="text-2xl font-bold text-primary-foreground mb-2">Pro</h3>
             <div className="text-5xl font-bold text-primary-foreground mb-6">
-              £20<span className="text-xl text-primary-foreground/70">/month</span>
+              £15<span className="text-xl text-primary-foreground/70">/month</span>
             </div>
             <p className="text-primary-foreground/80 mb-6">7-day free trial • Cancel anytime</p>
 
