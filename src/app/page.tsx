@@ -488,7 +488,7 @@ export default function Home() {
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
-                1 mock interview per month
+                3 mock interviews per month
               </li>
               <li className="flex items-center gap-3 text-card-foreground">
                 <Check className="h-5 w-5 text-accent flex-shrink-0" />
