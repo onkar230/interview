@@ -66,7 +66,8 @@ export default function DashboardPage() {
     interviewLimit,
     canStartInterview,
     upgradeToPro,
-    manageSubscription
+    manageSubscription,
+    isLoading: subscriptionLoading
   } = useSubscription();
 
   const ITEMS_PER_PAGE = 5;
@@ -319,7 +320,19 @@ export default function DashboardPage() {
 
         {/* Subscription Status Card */}
         <div className="max-w-5xl mx-auto mt-8">
-          {tier === 'free' ? (
+          {subscriptionLoading ? (
+            <div className="bg-card rounded-xl p-6 border-2 border-border animate-pulse">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex-1 w-full">
+                  <div className="h-8 bg-muted rounded w-2/3 mb-4"></div>
+                  <div className="h-3 bg-muted rounded-full mb-4"></div>
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="h-12 w-48 bg-muted rounded"></div>
+                </div>
+              </div>
+            </div>
+          ) : tier === 'free' ? (
             <div className="bg-card rounded-xl p-6 border-2 border-amber-300">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex-1 w-full">
