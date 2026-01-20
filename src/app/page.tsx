@@ -258,6 +258,9 @@ export default function Home() {
           <Link href="#pricing" className="text-foreground hover:text-primary transition-colors">
             Pricing
           </Link>
+          <Link href="/feedback" className="text-foreground hover:text-primary transition-colors">
+            Feedback
+          </Link>
           {!isLoading && (
             isAuthenticated ? (
               <UserNav />

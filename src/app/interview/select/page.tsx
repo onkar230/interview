@@ -232,7 +232,12 @@ export default function DashboardPage() {
           />
           <span className="text-2xl font-bold text-primary">Mojo Interview</span>
         </Link>
-        <UserNav />
+        <div className="flex items-center gap-6">
+          <Link href="/feedback" className="text-foreground hover:text-primary transition-colors">
+            Feedback
+          </Link>
+          <UserNav />
+        </div>
       </nav>
 
       {/* Hero/Welcome Section - Centered, Inspirational */}
