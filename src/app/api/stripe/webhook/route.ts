@@ -101,12 +101,48 @@ async function handleCheckoutCompleted(
   const customerId = session.customer as string;
   const subscriptionId = session.subscription as string;
 
-  // Update user with Stripe customer ID
+  // Fetch full subscription details from Stripe to avoid race conditions
+  let subscriptionTier: 'free' | 'pro' = 'free';
+  let subscriptionStatus = 'active';
+  let currentPeriodStart: string | null = null;
+  let currentPeriodEnd: string | null = null;
+  let trialEndsAt: string | null = null;
+
+  if (subscriptionId) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      subscriptionStatus = subscription.status;
+      subscriptionTier = (subscription.status === 'active' || subscription.status === 'trialing') ? 'pro' : 'free';
+      currentPeriodStart = new Date(subscription.current_period_start * 1000).toISOString();
+      currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      if (subscription.trial_end) {
+        trialEndsAt = new Date(subscription.trial_end * 1000).toISOString();
+      }
+    } catch (err) {
+      console.error('Failed to fetch subscription details:', err);
+    }
+  }
+
+  // Update user with ALL subscription data in single atomic operation
+  // This eliminates race conditions with subsequent webhook events
   const supabase = getServiceSupabase();
-  await supabase
+  const { error } = await supabase
     .from('user_profiles')
-    .update({ stripe_customer_id: customerId })
+    .update({
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      subscription_tier: subscriptionTier,
+      subscription_status: subscriptionStatus,
+      subscription_current_period_start: currentPeriodStart,
+      subscription_current_period_end: currentPeriodEnd,
+      trial_ends_at: trialEndsAt,
+    })
     .eq('id', userId);
+
+  if (error) {
+    console.error('Failed to update user subscription:', error);
+    throw error;
+  }
 
   // Log event
   await logSubscriptionEvent(userId, {
@@ -117,7 +153,7 @@ async function handleCheckoutCompleted(
     data: session,
   });
 
-  console.log(`Checkout completed for user ${userId}, customer ${customerId}`);
+  console.log(`Checkout completed for user ${userId}, customer ${customerId}, tier=${subscriptionTier}, status=${subscriptionStatus}`);
 }
 
 async function handleSubscriptionUpdate(
