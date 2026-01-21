@@ -258,9 +258,14 @@ export default function Home() {
           <Link href="#pricing" className="text-foreground hover:text-primary transition-colors">
             Pricing
           </Link>
-          <Link href="/feedback" className="text-foreground hover:text-primary transition-colors">
+          <a
+            href="https://forms.gle/dFtAVdEtGJAgfpaQA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-foreground hover:text-primary transition-colors"
+          >
             Feedback
-          </Link>
+          </a>
           {!isLoading && (
             isAuthenticated ? (
               <UserNav />
