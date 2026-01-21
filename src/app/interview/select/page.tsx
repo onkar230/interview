@@ -234,14 +234,9 @@ export default function DashboardPage() {
           <span className="text-2xl font-bold text-primary">Mojo Interview</span>
         </Link>
         <div className="flex items-center gap-6">
-          <a
-            href="https://forms.gle/dFtAVdEtGJAgfpaQA"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground hover:text-primary transition-colors"
-          >
+          <Link href="/feedback" className="text-foreground hover:text-primary transition-colors">
             Feedback
-          </a>
+          </Link>
           <UserNav />
         </div>
       </nav>
@@ -473,6 +468,40 @@ export default function DashboardPage() {
           <p className="text-sm text-primary-foreground/60 mt-6">
             Take a deep breath. You have got this.
           </p>
+        </div>
+      </div>
+
+      {/* Feedback Section */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-card rounded-xl p-8 border-2 border-accent/30">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                  <MessageSquare className="h-6 w-6 text-accent" />
+                  <h3 className="text-2xl font-bold text-foreground">Share Your Feedback</h3>
+                </div>
+                <p className="text-muted-foreground">
+                  Help us improve! Follow the Google Form link to share your thoughts and suggestions.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <a
+                  href="https://forms.gle/dFtAVdEtGJAgfpaQA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    size="lg"
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground px-8"
+                  >
+                    Open Feedback Form
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
