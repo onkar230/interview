@@ -13,5 +13,4 @@ export const stripe = new Stripe(stripeSecretKey, {
 export const STRIPE_CONFIG = {
   proPriceId: process.env.STRIPE_PRO_PRICE_ID || '',
   freeTierLimit: parseInt(process.env.FREE_TIER_MONTHLY_LIMIT || '10', 10),
-  trialPeriodDays: 7,
 };

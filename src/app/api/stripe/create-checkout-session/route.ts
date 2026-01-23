@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
       },
       subscription_data: {
-        trial_period_days: STRIPE_CONFIG.trialPeriodDays,
         metadata: {
           user_id: user.id,
         },
