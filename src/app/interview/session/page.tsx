@@ -484,21 +484,41 @@ function InterviewSessionContent() {
       console.log('[CLIENT] Sending fetch request to /api/interview/audio...');
       const fetchStartTime = Date.now();
 
-      const transcriptResponse = await fetch('/api/interview/audio', {
-        method: 'POST',
-        body: formData,
-      }).catch((fetchError) => {
-        const fetchDuration = Date.now() - fetchStartTime;
-        console.error(`[CLIENT] ❌ FETCH FAILED after ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
-        console.error('[CLIENT] Fetch error details:', fetchError);
-        console.error('[CLIENT] Error name:', fetchError?.name);
-        console.error('[CLIENT] Error message:', fetchError?.message);
-        throw fetchError;
-      });
+      // Retry logic for audio transcription
+      const maxRetries = 3;
+      let transcriptResponse: Response | null = null;
+      let lastError: Error | null = null;
 
-      const fetchDuration = Date.now() - fetchStartTime;
-      console.log(`[CLIENT] ✓ Fetch completed in ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
-      console.log(`[CLIENT] Response status: ${transcriptResponse.status} ${transcriptResponse.statusText}`);
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`[CLIENT] Attempt ${attempt}/${maxRetries}...`);
+          transcriptResponse = await fetch('/api/interview/audio', {
+            method: 'POST',
+            body: formData,
+          });
+
+          // If we get here, fetch succeeded
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.log(`[CLIENT] ✓ Fetch completed in ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
+          console.log(`[CLIENT] Response status: ${transcriptResponse.status} ${transcriptResponse.statusText}`);
+          break; // Success, exit retry loop
+        } catch (fetchError) {
+          lastError = fetchError as Error;
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.error(`[CLIENT] ❌ Attempt ${attempt} FAILED after ${fetchDuration}ms`);
+          console.error('[CLIENT] Error:', lastError?.message);
+
+          if (attempt < maxRetries) {
+            console.log(`[CLIENT] Waiting 2 seconds before retry...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      }
+
+      if (!transcriptResponse) {
+        console.error(`[CLIENT] ❌ All ${maxRetries} attempts failed`);
+        throw lastError || new Error('Failed to transcribe audio after multiple attempts');
+      }
 
       if (!transcriptResponse.ok) {
         const errorData = await transcriptResponse.json().catch(() => ({}));
