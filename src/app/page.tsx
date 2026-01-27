@@ -282,7 +282,7 @@ export default function Home() {
           <span className="text-primary">
             Mock Interview Platform
           </span>{' '}
-          You Ever Need
+          You'll Ever Need
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto">
