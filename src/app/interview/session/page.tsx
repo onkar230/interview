@@ -544,6 +544,26 @@ function InterviewSessionContent() {
           break;
         }
       }
+
+      // Extract just the question if the message contains an introduction
+      // This handles cases like "Hi, I'm Oliver. Why do you want to work here?"
+      if (lastQuestion.match(/^(hi|hello|hey|good morning|good afternoon)/i)) {
+        // Try to find the actual question - usually after a period or the last sentence
+        const sentences = lastQuestion.split(/(?<=[.!])\s+/);
+        if (sentences.length > 1) {
+          // Get the last sentence(s) that contain a question mark or look like a question
+          const questionSentences = sentences.filter(s =>
+            s.includes('?') ||
+            s.match(/^(tell me|describe|what|why|how|when|where|who|can you|could you|walk me)/i)
+          );
+          if (questionSentences.length > 0) {
+            lastQuestion = questionSentences.join(' ');
+          } else {
+            // Fallback: take everything after the first sentence (the intro)
+            lastQuestion = sentences.slice(1).join(' ');
+          }
+        }
+      }
       console.log(`[handleRecordingComplete] Captured question for feedback: ${lastQuestion.substring(0, 50)}...`);
 
       // Add user message to conversation FIRST
