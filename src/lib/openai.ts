@@ -77,6 +77,8 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     const transcriptionPromise = client.audio.transcriptions.create({
       file: audioFile,
       model: 'whisper-1',
+      language: 'en',
+      prompt: 'Professional job interview. Transcribe exactly what is spoken - do not add words that were not said. If the speaker says filler words like "um" or "like", include them. Do not hallucinate or insert words like "actually" unless clearly spoken.',
     });
 
     const timeoutPromise = new Promise<never>((_, reject) =>
