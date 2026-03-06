@@ -56,10 +56,10 @@ function SuccessContent() {
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6 text-left">
             <h3 className="font-semibold text-foreground mb-2">
-              Your trial has started!
+              Your subscription is active!
             </h3>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• 7-day free trial included</li>
+              <li>• Subscription active</li>
               <li>• Unlimited mock interviews</li>
               <li>• Advanced AI feedback</li>
               <li>• Cancel anytime, no commitment</li>

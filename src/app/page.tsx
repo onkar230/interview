@@ -521,7 +521,7 @@ export default function Home() {
             <div className="text-5xl font-bold text-primary-foreground mb-6">
               £14.99<span className="text-xl text-primary-foreground/70">/month</span>
             </div>
-            <p className="text-primary-foreground/80 mb-6">7-day free trial • Cancel anytime</p>
+            <p className="text-primary-foreground/80 mb-6">Cancel anytime</p>
 
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3 text-primary-foreground">
@@ -550,7 +550,7 @@ export default function Home() {
               className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
               onClick={handleUpgradeClick}
             >
-              {isAuthenticated ? 'Start Free Trial' : 'Sign Up & Start Trial'}
+              {isAuthenticated ? 'Upgrade to Pro' : 'Sign Up & Upgrade'}
             </Button>
           </div>
         </div>

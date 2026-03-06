@@ -38,7 +38,7 @@ export function UpgradeModal({
             </p>
           )}
           <p className="text-muted-foreground">
-            Unlock unlimited interviews with your 7-day free trial
+            Unlock unlimited interviews
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export function UpgradeModal({
             <div className="text-4xl font-bold text-primary">£20</div>
             <div className="text-sm text-muted-foreground">per month</div>
             <div className="text-xs text-green-700 font-medium mt-1">
-              7-day free trial included
+              Cancel anytime
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export function UpgradeModal({
 
         <div className="space-y-3">
           <Button size="lg" className="w-full" onClick={onUpgrade}>
-            Start 7-Day Free Trial
+            Upgrade Now
           </Button>
           <Button
             size="lg"

@@ -385,7 +385,7 @@ export default function DashboardPage() {
                     Upgrade to Pro
                   </Button>
                   <p className="text-xs text-center text-muted-foreground mt-2">
-                    £14.99/month • 7-day free trial
+                    £14.99/month
                   </p>
                 </div>
               </div>
