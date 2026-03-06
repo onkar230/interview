@@ -268,12 +268,44 @@ export async function analyzeAnswer(params: {
   const industrySpecificInstructions = industry === 'law'
     ? `
 CRITICAL - LAW FIRM SPECIFIC ANALYSIS:
-- Focus on: Commercial awareness, structured thinking (STAR method), professional communication
+- Focus on: Commercial awareness, structured thinking (CARL method), professional communication
 - Assess whether they demonstrated knowledge of the legal market, firms, or deals
 - Check for ethical awareness and professional standards (SRA Code of Conduct)
 - Evaluate use of structure: "Firstly... Secondly... Finally..."
 - DO NOT assess technical coding accuracy - this is a law interview
 - British English and legal terminology expected
+
+MOJO FRAMEWORK - ANSWER QUALITY CHECKS:
+
+1. MOTIVATION ANSWERS (Why Law / Why This Firm):
+   Check for three components: Personal trigger → Legal interest → Firm connection
+   - Missing personal trigger → Flag in weaknesses: "No personal experience linking them to law"
+   - Missing legal interest → Flag in weaknesses: "Did not explain what about legal work interests them"
+   - Missing firm connection → Flag in weaknesses: "Generic answer - no link to the specific firm"
+   - All three present → Flag in strengths: "Strong motivation structure with personal, legal, and firm-specific elements"
+
+2. FIRM-SPECIFIC LINKING:
+   - Answers that reference specific deals, practice areas, or firm culture → Boost commercialAwareness score
+   - Generic answers with no firm connection → Flag in opportunities: "Could strengthen by referencing specific firm deals or practice areas"
+
+3. DEAL REFERENCES:
+   - Mentioning a specific deal/case + explaining why it interested them → Strong commercialAwareness (7-9/10)
+   - Mentioning a practice area without specific examples → Average commercialAwareness (5-6/10)
+   - No deal or practice area references when relevant → Flag in opportunities
+
+4. CARL METHOD (Context, Action, Result, Learning):
+   - For competency/behavioural answers, check for the Learning element specifically
+   - Answer with CARL including Learning → Flag in strengths: "Demonstrated reflective thinking with clear learning takeaway"
+   - Answer missing Learning/reflection → Flag in opportunities: "Could strengthen by explaining what they learned and how it applies to a trainee role"
+
+5. ANSWER STRUCTURE:
+   - Strong: Clear thesis → Structured points → Examples → Conclusion linking to role
+   - Weak: No clear structure, too short, no examples, no conclusion
+   - Flag structured answers in strengths, unstructured in weaknesses
+
+6. ANSWER DRIFT:
+   - If the answer does not address the question asked → Flag in threats: "Answer drifted off-topic"
+   - If the answer includes unrelated information → Flag in weaknesses: "Included irrelevant information"
 
 FATAL ERRORS TO FLAG IN THREATS (Score 0-1):
 ✗ Purely money-motivated ("I love money", "high salary", "prestige only") → Score: 0-1/10
@@ -288,6 +320,9 @@ LAW INTERVIEW SCORING SPECIFICS:
 - No commercial awareness → 2-3/10 for commercialAwareness
 - Unethical response → 0-1/10 across all categories
 - Strong commercial awareness + genuine interest + structured → 8-9/10
+- Motivation answer with all 3 Mojo components (personal + legal + firm) → 8-9/10 for relevantExperience
+- CARL answer with strong Learning element → 8-9/10 for relevantExperience
+- References specific deals with personal insight → 8-9/10 for commercialAwareness
 `
     : industry === 'technology'
     ? `
@@ -335,7 +370,7 @@ LANGUAGE REQUIREMENT:
 CRITICAL ANALYSIS REQUIREMENTS:
 
 1. ANSWER STRUCTURE CHECK:
-   - ONLY mention STAR/CAR/PEEL if the answer is genuinely rambling, disorganized, or jumping between topics
+   - ONLY mention CARL/STAR/CAR/PEEL if the answer is genuinely rambling, disorganized, or jumping between topics
    - If the answer has a clear flow and makes sense, DO NOT mention structure frameworks
    - Structure feedback should be RARE - only for truly confusing answers
    - Many good answers don't explicitly use STAR and that's perfectly fine
@@ -502,16 +537,29 @@ Before assigning verdict, scan the entire transcript for these INSTANT FAIL scen
    → If found: Major weakness
 
 5. UNSTRUCTURED RAMBLING:
-   - Consistently gave long, unstructured answers without STAR or clear points
+   - Consistently gave long, unstructured answers without CARL or clear points
    - No improvement even when prompted to structure
+   → If found: Add to weaknesses
+
+6. MOTIVATION WITHOUT SUBSTANCE (MOJO FRAMEWORK CHECK):
+   - Motivation answers that lack all three components: personal trigger, legal interest, firm connection
+   - Never linked answers back to the specific firm
+   - No specific deals, cases, or practice areas referenced throughout the interview
+   → If found: Add to weaknesses
+
+7. ANSWER DRIFT:
+   - Consistently drifted off-topic or included irrelevant information
+   - Did not address the exact question asked
    → If found: Add to weaknesses
 
 Focus evaluation on:
 - Commercial awareness (critical for Magic Circle)
 - Structured communication (lawyers must be clear)
 - Ethical judgment (non-negotiable)
-- Genuine motivation for law career
-- Knowledge of legal market/firms
+- Genuine motivation for law career (Mojo 3-part structure: personal trigger → legal interest → firm link)
+- Knowledge of legal market/firms (specific deals and practice areas)
+- CARL method usage (Context, Action, Result, Learning) for competency answers
+- Firm-specific linking throughout answers
 `
     : industry === 'technology'
     ? `

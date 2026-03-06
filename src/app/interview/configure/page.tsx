@@ -902,7 +902,7 @@ function ConfigureInterviewContent() {
               <div className="space-y-2">
                 {(selectedIndustry === 'law'
                   ? [
-                      { id: 'behavioral', label: 'Experience (Past Examples)', description: 'Tell me about a time when...' },
+                      { id: 'behavioral', label: 'Experience (CARL Method)', description: 'Context, Action, Result, Learning' },
                       { id: 'competency', label: 'Skills & Work Style', description: 'Time management, prioritisation, motivation' },
                       { id: 'situational', label: 'Situational Judgment', description: 'What would you do if...' },
                       { id: 'technical', label: 'Commercial & Role Awareness', description: 'Understanding trainee role, firm, and market' },

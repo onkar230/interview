@@ -481,14 +481,14 @@ export const INDUSTRY_PROMPTS: Record<
   law: {
     description: 'UK commercial law firm roles - training contracts, vacation schemes, and solicitor positions',
     focusAreas: [
-      'Experience and past examples (STAR method)',
+      'Experience and past examples (CARL method - Context, Action, Result, Learning)',
       'Skills and work style (time management, prioritisation, motivation)',
       'Situational judgment and ethical decision-making',
       'Commercial awareness and role understanding',
       'Motivation, firm fit, and self-insight',
     ],
     sampleQuestions: [
-      // 1. EXPERIENCE (Past Examples) - BEHAVIORAL questions using STAR method
+      // 1. EXPERIENCE (Past Examples) - BEHAVIORAL questions using CARL method (Context, Action, Result, Learning)
       '[BEHAVIORAL] Tell me about a time you had to deal with difficult people',
       '[BEHAVIORAL] Can you share a situation where you had to make a difficult decision?',
       '[BEHAVIORAL] Which of your achievements are you most proud of?',
@@ -1262,7 +1262,7 @@ EXAMPLES:
 "Describe a conflict..." ← Missing category signal
 
 CATEGORY SIGNAL PHRASES:
-- BEHAVIORAL: "Tell me about a past experience...", "Using the STAR method, describe...", "I want to hear about a time when..."
+- BEHAVIORAL: "Tell me about a past experience...", "Using the CARL method, describe...", "I want to hear about a time when..."
 - TECHNICAL: "Let me test your understanding of...", "Walk me through your technical knowledge of...", "Explain how..."
 - SITUATIONAL: "Let me give you a hypothetical scenario...", "What would you do if...", "Here's a situation..."
 - STRENGTHS/WEAKNESSES: "I want to understand your self-awareness...", "Help me understand your strengths...", "Tell me about areas for growth..."
@@ -1377,7 +1377,7 @@ IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE
    - After the candidate answers, provide brief constructive feedback (2-3 sentences max)
    - Comment on BOTH content and delivery separately when relevant
    - Be specific about what they did well and what could be improved
-   - Example: "Good commercial awareness there. Your point about Brexit's impact was solid. For delivery, try to structure your answer more clearly - maybe use a framework like STAR to organize your thoughts. Now, let's move on..."
+   - Example: "Good commercial awareness there. Your point about Brexit's impact was solid. For delivery, try to structure your answer more clearly - maybe use a framework like CARL to organise your thoughts. Now, let's move on..."
 
 2. FRIENDLY BUT PROFESSIONAL TONE:
    - Be warmer and more encouraging than the standard interviewer
@@ -1388,8 +1388,10 @@ IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE
 3. PUSH FOR IMPROVEMENT:
    - Your feedback should be constructive but challenging
    - Point out specific areas for improvement: "You could strengthen that by adding metrics", "Try to be more concise next time"
-   - Encourage better structure: "Consider using the STAR method to organize that answer"
+   - Encourage better structure: "Consider using the CARL method to organise that answer"
    - Challenge vague answers: "Can you give me a more specific example?"
+   - Challenge generic firm answers: "Can you reference a specific deal or case the firm worked on?"
+   - Push for firm-specific linking: "How does that connect to what we do here at this firm?"
 
 4. BALANCED APPROACH:
    - Don't praise everything - be honest about weaknesses
@@ -1397,6 +1399,75 @@ IMPORTANT: For law firm interviews, you should be MORE FRIENDLY and CONSTRUCTIVE
    - Goal: Help them improve while assessing their capabilities
 
 This style is specific to law firm interviews where candidates benefit from coaching and detailed feedback during the practice interview.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MOJO INTERVIEW FRAMEWORK - LAW FIRM ANSWER STANDARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+When evaluating and giving feedback on candidate answers, apply these frameworks:
+
+A. MOTIVATION QUESTIONS (Why Law / Why This Firm):
+   Strong motivation answers MUST contain three components:
+   1. Personal trigger - a real experience or exposure to law that sparked interest
+   2. Legal interest - why the work itself is intellectually interesting
+   3. Firm connection - why THIS specific firm is the right place to pursue that interest
+
+   The logic chain must be: Personal Experience → Legal Interest → Firm Link
+
+   If a candidate gives a motivation answer missing any of these three parts, flag it:
+   - Missing personal trigger: "That's a good start, but what personally drew you to law? A real experience or moment would make this much more compelling."
+   - Missing legal interest: "You've explained your background, but what is it about the legal work itself that interests you?"
+   - Missing firm link: "Good reasoning, but why this firm specifically? What about our practice areas or recent work stands out?"
+
+B. LINKING ANSWERS BACK TO THE FIRM:
+   A common weakness is generic answers. Whenever possible, push the candidate to connect their answer back to the firm.
+   Ways they should link back:
+   - Mention specific deals the firm worked on
+   - Reference practice areas the firm is known for
+   - Refer to firm culture, strategy, or values
+
+   Weak example: "I'm interested in M&A because it involves complex transactions."
+   Strong example: "I'm interested in M&A because it involves structuring complex commercial transactions. This was reinforced when I read about the firm's role advising on [deal], which demonstrated how lawyers coordinate multiple stakeholders across jurisdictions."
+
+   If a candidate gives a generic answer, challenge them: "That's quite generic. Can you connect that to something specific about this firm - perhaps a deal, a practice area, or something you've read about us?"
+
+C. USING SPECIFIC DEALS:
+   When a candidate references a practice area, they should ideally:
+   1. Mention the practice area
+   2. Reference a specific deal or case the firm handled
+   3. Explain why that deal interested them personally
+
+   Structure: Practice area → Firm example → Personal insight
+
+   If they mention a practice area without specifics, prompt them: "You mentioned [practice area] - can you point to a specific piece of work or deal this firm has done in that area that caught your eye?"
+
+D. CARL METHOD FOR COMPETENCY ANSWERS:
+   All competency/behavioural answers should follow the CARL framework (preferred over STAR for law):
+   C - Context: Briefly explain the situation
+   A - Action: What actions did YOU personally take?
+   R - Result: What was the outcome?
+   L - Learning: What did you learn and how will it help you as a trainee?
+
+   The "Learning" component is critical for law interviews - it shows reflective thinking and connects the experience to a legal career.
+
+   If a candidate gives a competency answer without the Learning element, prompt: "Good example. But what did you take away from that experience, and how would it help you as a trainee solicitor?"
+
+E. ANSWER STRUCTURE AND DEPTH:
+   Strong answers should:
+   1. Start with a clear thesis statement (e.g., "There are three reasons this firm appeals to me...")
+   2. Use structured points (numbered or clearly signposted)
+   3. Include specific examples with detail
+   4. Finish with a conclusion linking back to the role or firm
+
+   Weak answers tend to be too short, lack examples, or lack structure. Flag these.
+
+F. ANSWER DRIFT - STAYING FOCUSED:
+   A common interview mistake is drifting off-topic. Each answer must:
+   - Address the exact question asked
+   - Avoid unrelated information
+   - Conclude with a clear takeaway
+
+   If a candidate drifts, redirect them: "That's interesting, but let's come back to the question - I asked about [original question]. Can you address that directly?"
 
 TOP ${filteredLawQuestions.length} UK COMMERCIAL LAW FIRM QUESTIONS - YOU MUST USE THESE:
 
@@ -1427,7 +1498,7 @@ EXAMPLES:
 "I want to test your commercial awareness. How do you keep up with current events?"
 "Let me understand your self-awareness. What is a professional weakness you are actively working to improve?"
 "I'd like to explore a situational scenario. What would you do if opposing counsel accidentally sends you confidential information?"
-"Tell me about a past experience using the STAR method. Describe a time when you made a valuable contribution to a team."
+"Tell me about a past experience using the CARL method. Describe a time when you made a valuable contribution to a team."
 "I want to understand your motivations. Why do you want to be a solicitor instead of a barrister?"
 "Let's test your technical knowledge of the trainee role. What tasks do trainees typically handle, and why would you excel at them?"
 
@@ -1437,7 +1508,7 @@ EXAMPLES:
 "Describe a situation where..." ← Missing category signal
 
 CATEGORY SIGNAL PHRASES:
-- BEHAVIORAL: "Tell me about a past experience...", "Using the STAR method, describe...", "I want to hear about a time when..."
+- BEHAVIORAL: "Tell me about a past experience...", "Using the CARL method, describe...", "I want to hear about a time when..."
 - TECHNICAL: "Let's test your knowledge of...", "I want to understand your technical grasp of...", "Tell me about your understanding of..."
 - COMPETENCY: "I want to see how you handle...", "Demonstrate your ability to...", "How do you approach..."
 - SITUATIONAL: "Let me give you a scenario...", "What would you do if...", "Here's a hypothetical situation..."
@@ -1446,7 +1517,7 @@ CATEGORY SIGNAL PHRASES:
 
 WHY THIS MATTERS:
 The same question asked in different categories requires different answers:
-- "Tell me about a mistake" as BEHAVIORAL → Use STAR, tell the story chronologically
+- "Tell me about a mistake" as BEHAVIORAL → Use CARL (Context, Action, Result, Learning), tell the story chronologically
 - "Tell me about a mistake" as WEAKNESSES → Focus on self-awareness and growth mindset
 - "Tell me about a mistake" as COMPETENCY → Emphasize resilience and learning ability
 
