@@ -51,10 +51,8 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
     if (!isVisible) {
       // Clean up stream when hidden
       if (streamRef.current) {
-        console.log('Stopping camera - webcam hidden');
         streamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('Track stopped:', track.kind, track.label);
         });
         streamRef.current = null;
         setStream(null);
@@ -79,7 +77,6 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
         // Only set stream if still visible (avoid race condition)
         if (isVisible) {
           streamRef.current = mediaStream;
-          console.log('Camera started:', mediaStream.getVideoTracks()[0]?.label);
           setStream(mediaStream);
           setStatus('active');
         } else {
@@ -109,10 +106,8 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
     // Cleanup on unmount or when isVisible changes
     return () => {
       if (streamRef.current) {
-        console.log('Cleanup: Stopping camera tracks');
         streamRef.current.getTracks().forEach(track => {
           track.stop();
-          console.log('Cleanup: Track stopped:', track.kind);
         });
         streamRef.current = null;
       }
@@ -122,29 +117,16 @@ export default function WebcamMirror({ isVisible, onClose, mode = 'floating', si
   // Separate effect to attach stream to video element
   useEffect(() => {
     if (stream && videoRef.current && status === 'active') {
-      console.log('Attaching stream to video element', {
-        stream,
-        videoRef: videoRef.current,
-        streamActive: stream.active,
-        videoTracks: stream.getVideoTracks().length
-      });
-
       videoRef.current.srcObject = stream;
 
       // Ensure video plays
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('Video playback started successfully');
-          })
-          .catch(err => {
-            console.error('Error playing video:', err);
-          });
+        playPromise.catch(() => {
+          // Silently handle autoplay failures
+        });
       }
     } else if (!stream && videoRef.current) {
-      // Clear video source when stream is null
-      console.log('Clearing video srcObject');
       videoRef.current.pause();
       videoRef.current.srcObject = null;
     }

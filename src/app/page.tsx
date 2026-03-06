@@ -213,7 +213,7 @@ export default function Home() {
         const { data: { session } } = await supabase.auth.getSession();
         setIsAuthenticated(!!session);
       } catch (error) {
-        console.error('Error checking auth:', error);
+        // Auth check failed silently
       } finally {
         setIsLoading(false);
       }
@@ -225,14 +225,11 @@ export default function Home() {
   const ctaLink = isAuthenticated ? '/interview/select' : '/login';
 
   const handleUpgradeClick = async () => {
-    console.log('🔵 Upgrade button clicked, authenticated:', isAuthenticated);
     if (!isAuthenticated) {
       // Redirect to signup if not authenticated
-      console.log('🔵 Not authenticated, redirecting to signup');
       window.location.href = '/signup';
     } else {
       // Trigger Stripe checkout
-      console.log('🔵 Authenticated, calling upgradeToPro');
       await upgradeToPro();
     }
   };

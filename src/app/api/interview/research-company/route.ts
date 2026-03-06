@@ -19,11 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[research-company] Researching company: ${company} (${industry}, ${role})`);
-
     // Check if Tavily API key is configured
     if (!process.env.TAVILY_API_KEY) {
-      console.warn('[research-company] TAVILY_API_KEY not configured, returning empty research');
       return NextResponse.json({
         research: '',
         message: 'Web search not configured'
@@ -59,7 +56,6 @@ export async function POST(request: NextRequest) {
     }
 
     const searchData = await searchResponse.json();
-    console.log(`[research-company] Found ${searchData.results?.length || 0} search results`);
 
     // Extract and format the research
     let research = '';
@@ -81,11 +77,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!research || research.trim().length === 0) {
-      console.warn('[research-company] No research found for company');
       return NextResponse.json({ research: '' });
     }
-
-    console.log(`[research-company] Research compiled: ${research.length} characters`);
 
     return NextResponse.json({
       research: research.trim(),

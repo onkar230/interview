@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log(`Processing webhook event: ${event.type}`);
 
   try {
     switch (event.type) {
@@ -68,14 +67,12 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.trial_will_end': {
-        const subscription = event.data.object as Stripe.Subscription;
-        console.log(`Trial ending soon for subscription: ${subscription.id}`);
         // Optional: Send email notification to user
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        break;
     }
 
     return NextResponse.json({ received: true });
@@ -153,7 +150,6 @@ async function handleCheckoutCompleted(
     data: session,
   });
 
-  console.log(`Checkout completed for user ${userId}, customer ${customerId}, tier=${subscriptionTier}, status=${subscriptionStatus}`);
 }
 
 async function handleSubscriptionUpdate(
@@ -193,9 +189,6 @@ async function handleSubscriptionUpdate(
     data: subscription,
   });
 
-  console.log(
-    `Subscription updated for user ${user.id}: tier=${tier}, status=${status}`
-  );
 }
 
 async function handleSubscriptionDeleted(
@@ -227,7 +220,6 @@ async function handleSubscriptionDeleted(
     data: subscription,
   });
 
-  console.log(`Subscription canceled for user ${user.id}, downgraded to free`);
 }
 
 async function handlePaymentSucceeded(
@@ -257,7 +249,6 @@ async function handlePaymentSucceeded(
     data: invoice,
   });
 
-  console.log(`Payment succeeded for user ${user.id}`);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice, eventId: string) {
@@ -284,5 +275,4 @@ async function handlePaymentFailed(invoice: Stripe.Invoice, eventId: string) {
     data: invoice,
   });
 
-  console.log(`Payment failed for user ${user.id}, status set to past_due`);
 }

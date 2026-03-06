@@ -971,7 +971,6 @@ REMEMBER: The candidate paid for this interview to practice THESE SPECIFIC QUEST
   // CV/Resume context section
   let cvSection = '';
   if (cvText && cvText.trim()) {
-    console.log(`[generateInterviewPrompt] CV provided with ${cvText.trim().length} characters`);
     cvSection = `
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1050,7 +1049,6 @@ PRIORITY HIERARCHY (VERY IMPORTANT):
 REMEMBER: The candidate took the time to upload their CV. They expect CV-based questions. If you ask generic questions and ignore their CV, you are FAILING this interview.`;
 
   } else {
-    console.log('[generateInterviewPrompt] No CV provided');
   }
 
   // Follow-up intensity configuration

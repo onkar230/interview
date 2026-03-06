@@ -29,37 +29,19 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔵 LOGIN STARTED - Form submitted');
-    console.log('📧 Email being used:', email);
-    console.log('🔐 Password length:', password?.length || 0);
 
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log('🔵 STEP 1: Getting Supabase client...');
       const supabase = getSupabaseClient();
-      console.log('✅ STEP 1 COMPLETE: Supabase client obtained');
-
-      console.log('🔵 STEP 2: Calling signInWithPassword...');
-      console.log('   Using email:', email);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      console.log('🔵 STEP 2 COMPLETE: Login response received');
-      console.log('   Response data:', data);
-      console.log('   Response error:', error);
-
       if (error) {
-        console.error('❌ ERROR DETECTED from Supabase');
-        console.error('   Error code:', error.status);
-        console.error('   Error message:', error.message);
-        console.error('   Error name:', error.name);
-        console.error('   Full error object:', error);
-
         // Check for specific error cases
         if (error.message.includes('Email not confirmed')) {
           throw new Error('Please confirm your email address. Check your inbox for the confirmation link.');
@@ -70,55 +52,27 @@ export default function LoginPage() {
         }
       }
 
-      console.log('✅ LOGIN SUCCESS!');
-      console.log('   User ID:', data.user?.id);
-      console.log('   User email:', data.user?.email);
-      console.log('   Email confirmed:', data.user?.email_confirmed_at);
-      console.log('   Session exists:', !!data.session);
-      console.log('   Access token exists:', !!data.session?.access_token);
-
       // Verify session is actually set
-      console.log('🔵 STEP 3: Verifying session...');
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('   Session verified:', !!session);
-      console.log('   Session user:', session?.user?.email);
 
       if (!session) {
-        console.error('❌ ERROR: Session not found after login!');
         throw new Error('Login succeeded but session was not created. Please try again.');
       }
-
-      console.log('✅ STEP 3 COMPLETE: Session verified');
-      console.log('🔵 STEP 4: Saving remember me preference and initiating redirect');
 
       // Save or clear remembered email based on checkbox
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
-        console.log('✅ Email saved to localStorage');
       } else {
         localStorage.removeItem('rememberedEmail');
-        console.log('✅ Cleared remembered email from localStorage');
       }
 
       // Redirect using Next.js router
       router.push('/interview/select');
       router.refresh(); // Refresh to update middleware session
-
-      console.log('✅ REDIRECT INITIATED - If you see this, redirect should happen soon');
     } catch (err) {
-      console.error('❌❌❌ CATCH BLOCK - ERROR OCCURRED ❌❌❌');
-      console.error('Error type:', err?.constructor?.name);
-      console.error('Error message:', err instanceof Error ? err.message : 'Unknown error');
-      console.error('Full error:', err);
-
       const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
       setError(errorMessage);
       setIsLoading(false);
-
-      // Also log to console in a very visible way
-      console.error('='.repeat(80));
-      console.error('FINAL ERROR MESSAGE SHOWN TO USER:', errorMessage);
-      console.error('='.repeat(80));
     }
   };
 
@@ -134,7 +88,6 @@ export default function LoginPage() {
 
       if (error) throw error;
     } catch (err) {
-      console.error('OAuth error:', err);
       setError(err instanceof Error ? err.message : 'OAuth login failed');
     }
   };

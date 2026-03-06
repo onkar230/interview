@@ -99,7 +99,6 @@ function InterviewSessionContent() {
 
   // Memoized callback to prevent AudioPlayer from re-playing on every render
   const handleAudioPlaybackEnd = useCallback(() => {
-    console.log('Audio playback ended, clearing audio URL');
     setCurrentAudioUrl(null);
   }, []);
 
@@ -174,7 +173,6 @@ function InterviewSessionContent() {
 
     const loadSession = async () => {
       try {
-        console.log('Loading session from database:', sessionId);
         const response = await fetch(`/api/interview/sessions/${sessionId}`);
 
         if (!response.ok) {
@@ -182,7 +180,6 @@ function InterviewSessionContent() {
         }
 
         const data = await response.json();
-        console.log('Session loaded:', data);
 
         setSessionData(data.session);
 
@@ -238,7 +235,6 @@ function InterviewSessionContent() {
           });
         }
       } catch (err) {
-        console.error('Error loading session:', err);
         setError('Failed to load interview session. Please try again.');
       } finally {
         setIsLoadingSession(false);
@@ -255,18 +251,13 @@ function InterviewSessionContent() {
     const fetchPersonalizationContext = async () => {
       setIsLoadingPersonalization(true);
       try {
-        console.log('[Personalization] Fetching personalization context...');
         const response = await fetch('/api/interview/personalization');
 
         if (response.ok) {
           const data = await response.json();
-          console.log('[Personalization] Context loaded:', data);
           setPersonalizationContext(data);
-        } else {
-          console.warn('[Personalization] Failed to fetch context, continuing without personalization');
         }
       } catch (err) {
-        console.error('[Personalization] Error fetching context:', err);
         // Continue without personalization if fetch fails
       } finally {
         setIsLoadingPersonalization(false);
@@ -296,12 +287,9 @@ function InterviewSessionContent() {
       setCurrentAudioUrl(null);
 
       try {
-        console.log('Initializing interview...');
-
         // Research company if it's not in our hardcoded list
         let companyInfo = '';
         if (company && !hasCompanyStyle(company)) {
-          console.log(`[initializeInterview] Company "${company}" not in database, searching web...`);
           try {
             const searchResponse = await fetch('/api/interview/research-company', {
               method: 'POST',
@@ -317,16 +305,10 @@ function InterviewSessionContent() {
               const data = await searchResponse.json();
               companyInfo = data.research || '';
               setCompanyResearch(companyInfo);
-              console.log(`[initializeInterview] Company research found:`, companyInfo.substring(0, 100) + '...');
-            } else {
-              console.warn('[initializeInterview] Company research failed, continuing with generic interview');
             }
           } catch (err) {
-            console.error('[initializeInterview] Error researching company:', err);
             // Continue without company research if it fails
           }
-        } else if (company) {
-          console.log(`[initializeInterview] Using hardcoded info for "${company}"`);
         }
 
         let systemPrompt = generateInterviewPrompt(
@@ -348,7 +330,6 @@ function InterviewSessionContent() {
         if (usePersonalization && personalizationContext && personalizationContext.hasHistory) {
           const personalizationPrompt = generatePersonalizationPrompt(personalizationContext);
           systemPrompt = systemPrompt + '\n\n' + personalizationPrompt;
-          console.log('[Personalization] Injected personalization context into system prompt');
         }
 
         // Add optimistic message immediately
@@ -376,8 +357,6 @@ function InterviewSessionContent() {
           }
         );
 
-        console.log('Got AI response, generating TTS in background...');
-
         // Generate TTS in background (non-blocking)
         fetch('/api/interview/tts', {
           method: 'POST',
@@ -387,7 +366,6 @@ function InterviewSessionContent() {
           if (ttsResponse.ok) {
             const audioBlob = await ttsResponse.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
-            console.log('Initial TTS ready, auto-playing...');
 
             // Update message with audio
             setMessages([{
@@ -410,7 +388,7 @@ function InterviewSessionContent() {
                   }),
                 });
               } catch (err) {
-                console.error('Failed to save initial AI message to database:', err);
+                // Failed to save initial AI message to database
               }
             }
 
@@ -418,15 +396,13 @@ function InterviewSessionContent() {
             setCurrentAudioUrl(audioUrl);
           }
         }).catch((err) => {
-          console.error('Initial TTS failed:', err);
+          // Initial TTS failed - text is already showing
         });
 
         // Don't increment questionCount here - it should only increment AFTER user answers
         // questionCount tracks "number of questions answered", not "questions asked"
         setIsInitialized(true);
-        console.log('Interview initialized successfully');
       } catch (err) {
-        console.error('Error initializing interview:', err);
         setError('Failed to start interview. Please check your API key and try again.');
       } finally {
         setIsProcessing(false);
@@ -472,17 +448,8 @@ function InterviewSessionContent() {
 
     try {
       // Step 1: Transcribe audio
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('[CLIENT] ========== STARTING AUDIO TRANSCRIPTION ==========');
-      console.log(`[CLIENT] Audio blob size: ${(audioBlob.size / 1024 / 1024).toFixed(2)} MB (${audioBlob.size} bytes)`);
-      console.log(`[CLIENT] Audio type: ${audioBlob.type}`);
-      console.log(`[CLIENT] Current time: ${new Date().toISOString()}`);
-
       const formData = new FormData();
       formData.append('audio', audioBlob);
-
-      console.log('[CLIENT] Sending fetch request to /api/interview/audio...');
-      const fetchStartTime = Date.now();
 
       // Retry logic for audio transcription
       const maxRetries = 3;
@@ -491,49 +458,31 @@ function InterviewSessionContent() {
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          console.log(`[CLIENT] Attempt ${attempt}/${maxRetries}...`);
           transcriptResponse = await fetch('/api/interview/audio', {
             method: 'POST',
             body: formData,
           });
 
-          // If we get here, fetch succeeded
-          const fetchDuration = Date.now() - fetchStartTime;
-          console.log(`[CLIENT] ✓ Fetch completed in ${fetchDuration}ms (${(fetchDuration / 1000).toFixed(2)}s)`);
-          console.log(`[CLIENT] Response status: ${transcriptResponse.status} ${transcriptResponse.statusText}`);
           break; // Success, exit retry loop
         } catch (fetchError) {
           lastError = fetchError as Error;
-          const fetchDuration = Date.now() - fetchStartTime;
-          console.error(`[CLIENT] ❌ Attempt ${attempt} FAILED after ${fetchDuration}ms`);
-          console.error('[CLIENT] Error:', lastError?.message);
 
           if (attempt < maxRetries) {
-            console.log(`[CLIENT] Waiting 2 seconds before retry...`);
             await new Promise(resolve => setTimeout(resolve, 2000));
           }
         }
       }
 
       if (!transcriptResponse) {
-        console.error(`[CLIENT] ❌ All ${maxRetries} attempts failed`);
         throw lastError || new Error('Failed to transcribe audio after multiple attempts');
       }
 
       if (!transcriptResponse.ok) {
         const errorData = await transcriptResponse.json().catch(() => ({}));
-        console.error('[CLIENT] ❌ Transcription API returned error');
-        console.error('[CLIENT] Status:', transcriptResponse.status);
-        console.error('[CLIENT] Error data:', errorData);
         throw new Error(errorData.error || `Failed to transcribe audio (${transcriptResponse.status})`);
       }
 
       const { text } = await transcriptResponse.json();
-      console.log(`[CLIENT] ✓ Transcription successful`);
-      console.log(`[CLIENT] Text length: ${text.length} characters`);
-      console.log(`[CLIENT] Text preview: ${text.substring(0, 100)}...`);
-      console.log('[CLIENT] ========== TRANSCRIPTION COMPLETE ==========');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
       // Get the last AI question for feedback context BEFORE modifying messages
       // This prevents race conditions where we might read stale state
@@ -564,8 +513,6 @@ function InterviewSessionContent() {
           }
         }
       }
-      console.log(`[handleRecordingComplete] Captured question for feedback: ${lastQuestion.substring(0, 50)}...`);
-
       // Add user message to conversation FIRST
       const userMessage: Message = {
         role: 'user',
@@ -586,7 +533,7 @@ function InterviewSessionContent() {
             }),
           });
         } catch (err) {
-          console.error('Failed to save user message to database:', err);
+          // Failed to save user message to database
         }
       }
 
@@ -703,7 +650,7 @@ function InterviewSessionContent() {
             newFeedback.idealAnswer = idealAnswer;
           }
         } catch (error) {
-          console.error('Failed to generate ideal answer:', error);
+          // Failed to generate ideal answer
         }
 
         setFeedbackHistory((prev) => [newFeedback, ...prev]); // Newest at top
@@ -728,11 +675,9 @@ function InterviewSessionContent() {
               }),
             });
           } catch (err) {
-            console.error('Failed to save feedback to database:', err);
+            // Failed to save feedback to database
           }
         }
-      } else {
-        console.error('Failed to generate feedback');
       }
       setIsAnalyzing(false);
 
@@ -748,7 +693,6 @@ function InterviewSessionContent() {
         if (ttsResponse.ok) {
           const audioBlob = await ttsResponse.blob();
           const audioUrl = URL.createObjectURL(audioBlob);
-          console.log('[handleRecordingComplete] TTS ready, setting audio URL');
 
           // Update the message with audio URL
           setMessages((prev) => {
@@ -776,7 +720,7 @@ function InterviewSessionContent() {
                 }),
               });
             } catch (err) {
-              console.error('Failed to save AI message to database:', err);
+              // Failed to save AI message to database
             }
           }
 
@@ -784,8 +728,7 @@ function InterviewSessionContent() {
           setCurrentAudioUrl(audioUrl);
         }
       }).catch((err) => {
-        console.error('TTS generation failed:', err);
-        // Text is already showing, so this is non-critical
+        // TTS generation failed - text is already showing, so this is non-critical
       });
 
       setQuestionCount((prev) => prev + 1);
@@ -794,8 +737,6 @@ function InterviewSessionContent() {
       // The AI will naturally wrap up by asking "Do you have any questions for me?" after maxQuestions
       // but the user controls when to actually end the session
     } catch (err) {
-      console.error('Error processing response:', err);
-
       // Provide more specific error messages
       let errorMessage = 'An error occurred. Please try again.';
 
@@ -930,8 +871,6 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           if (ttsResponse.ok) {
             const audioBlob = await ttsResponse.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
-            console.log('[handleSkipQuestion] TTS ready');
-
             // Update message with audio
             setMessages((prev) => {
               const updated = [...prev];
@@ -949,11 +888,10 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             setCurrentAudioUrl(audioUrl);
           }
         }).catch((err) => {
-          console.error('Skip question TTS failed:', err);
+          // Skip question TTS failed - text is already showing
         });
 
       } catch (err) {
-        console.error('Error skipping question:', err);
         setError('Failed to generate new question. Please try again.');
       } finally {
         setIsProcessing(false);
@@ -965,8 +903,6 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
     setIsProcessing(true);
 
     try {
-      console.log('Ending interview - aggregating live feedback from', feedbackHistory.length, 'questions');
-
       // Aggregate all live feedback into final evaluation
       const evaluationResponse = await fetch(`/api/interview/sessions/${sessionId}/aggregate-feedback`, {
         method: 'POST',
@@ -975,12 +911,10 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
 
       if (!evaluationResponse.ok) {
         const errorData = await evaluationResponse.json().catch(() => ({}));
-        console.error('Evaluation API error:', evaluationResponse.status, errorData);
         throw new Error(errorData.error || `Failed to aggregate feedback: ${evaluationResponse.status}`);
       }
 
       const { evaluation } = await evaluationResponse.json();
-      console.log('Live feedback aggregated successfully');
 
       // Save evaluation to database
       if (sessionId) {
@@ -993,13 +927,11 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
         if (!saveResponse.ok) {
           throw new Error('Failed to save evaluation to database');
         }
-        console.log('Evaluation saved to database');
       }
 
       // Navigate to evaluation page with sessionId
       router.push(`/interview/evaluation?sessionId=${sessionId}`);
     } catch (err) {
-      console.error('Error ending interview:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(`Failed to generate evaluation: ${errorMessage}`);
       setIsProcessing(false);

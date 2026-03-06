@@ -44,7 +44,7 @@ export function UpgradeModal({
 
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6">
           <div className="text-center mb-4">
-            <div className="text-4xl font-bold text-primary">£20</div>
+            <div className="text-4xl font-bold text-primary">£14.99</div>
             <div className="text-sm text-muted-foreground">per month</div>
             <div className="text-xs text-green-700 font-medium mt-1">
               Cancel anytime

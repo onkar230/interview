@@ -25,25 +25,13 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
   }, [onPlaybackEnd]);
 
   useEffect(() => {
-    if (!audioUrl) {
-      console.log('[AudioPlayer] audioUrl is null, skipping');
-      return;
-    }
+    if (!audioUrl) return;
 
     // Don't recreate audio if it's the same URL AND we're already initializing
-    if (audioUrl === lastAudioUrlRef.current && isInitializingRef.current) {
-      console.log('[AudioPlayer] Same audio URL detected and already initializing, skipping recreation:', audioUrl.substring(0, 50));
-      return;
-    }
+    if (audioUrl === lastAudioUrlRef.current && isInitializingRef.current) return;
 
     // Don't recreate audio if it's the same URL AND audio is currently playing
-    if (audioUrl === lastAudioUrlRef.current && internalAudioRef.current && !internalAudioRef.current.paused) {
-      console.log('[AudioPlayer] Same audio URL detected and audio is playing, skipping recreation:', audioUrl.substring(0, 50));
-      return;
-    }
-
-    console.log('[AudioPlayer] Creating new audio for URL:', audioUrl.substring(0, 50));
-    console.log('[AudioPlayer] Previous URL was:', lastAudioUrlRef.current?.substring(0, 50) || 'null');
+    if (audioUrl === lastAudioUrlRef.current && internalAudioRef.current && !internalAudioRef.current.paused) return;
 
     isInitializingRef.current = true;
 
@@ -79,49 +67,33 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
 
     // Set up event handlers BEFORE setting src
     audio.oncanplaythrough = () => {
-      if (!isCurrent) {
-        console.log('[AudioPlayer] oncanplaythrough fired but audio is stale, ignoring');
-        return;
-      }
-      console.log('[AudioPlayer] Audio can play through');
+      if (!isCurrent) return;
       setIsLoading(false);
-      isInitializingRef.current = false; // Mark initialization as complete
+      isInitializingRef.current = false;
       if (autoPlay && isCurrent && !hasStartedPlaying) {
         hasStartedPlaying = true;
-        console.log('[AudioPlayer] Auto-playing audio');
         audio.play().catch((err) => {
-          // Silently ignore AbortError (expected when audio changes quickly)
           if (err.name !== 'AbortError') {
-            console.error('[AudioPlayer] Error playing audio:', err);
             setError('Unable to play audio');
           }
         });
       }
     };
 
-    audio.onloadstart = () => {
-      if (!isCurrent) return;
-      console.log('[AudioPlayer] Audio load started');
-    };
+    audio.onloadstart = () => {};
 
-    audio.onloadedmetadata = () => {
-      if (!isCurrent) return;
-      console.log('[AudioPlayer] Audio metadata loaded');
-    };
+    audio.onloadedmetadata = () => {};
 
     audio.onloadeddata = () => {
       if (!isCurrent) return;
-      console.log('[AudioPlayer] Audio data loaded');
       // If canplaythrough doesn't fire within 500ms, try to play anyway
       setTimeout(() => {
         if (isCurrent && !hasStartedPlaying && autoPlay) {
           hasStartedPlaying = true;
-          console.log('[AudioPlayer] Forcing play after loadeddata (canplaythrough didnt fire)');
           setIsLoading(false);
-          isInitializingRef.current = false; // Mark initialization as complete
+          isInitializingRef.current = false;
           audio.play().catch((err) => {
             if (err.name !== 'AbortError') {
-              console.error('[AudioPlayer] Error force-playing audio:', err);
               setError('Unable to play audio');
             }
           });
@@ -147,9 +119,8 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
       }
     };
 
-    audio.onerror = (e) => {
+    audio.onerror = () => {
       if (!isCurrent) return;
-      console.error('[AudioPlayer] Audio error:', e);
       setIsLoading(false);
       isInitializingRef.current = false; // Reset on error
       setError('Error loading audio');
@@ -158,7 +129,6 @@ export default function AudioPlayer({ audioUrl, autoPlay = true, onPlaybackEnd, 
     // Set src and load AFTER all event handlers are attached
     audio.src = audioUrl;
     audio.load();
-    console.log('[AudioPlayer] Audio src set and load() called');
 
     // Only update lastAudioUrlRef after we've started loading
     // This prevents duplicate URL check from firing before audio loads

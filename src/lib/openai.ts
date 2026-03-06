@@ -58,22 +58,14 @@ export const OPENAI_CONFIG = {
  * Transcribes audio to text using Whisper
  */
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  console.log('[openai/transcribeAudio] ===== WHISPER API CALL START =====');
-  const startTime = Date.now();
-
   const client = getOpenAIClient();
 
   // Convert Blob to File (required by OpenAI API)
   const audioFile = new File([audioBlob], 'audio.webm', { type: audioBlob.type });
-  const fileSizeMB = (audioFile.size / 1024 / 1024).toFixed(2);
-  console.log(`[openai/transcribeAudio] File details: ${fileSizeMB}MB, type: ${audioFile.type}`);
 
   try {
     // Add timeout to prevent hanging (Whisper typically takes 5-15 seconds for long audio)
     const timeoutMs = 50000; // 50 seconds timeout
-    console.log(`[openai/transcribeAudio] Calling Whisper API (timeout: ${timeoutMs}ms)...`);
-
-    const apiCallStart = Date.now();
     const transcriptionPromise = client.audio.transcriptions.create({
       file: audioFile,
       model: 'whisper-1',
@@ -83,31 +75,17 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => {
-        const elapsed = Date.now() - apiCallStart;
-        console.error(`[openai/transcribeAudio] ⏱️ TIMEOUT after ${elapsed}ms`);
         reject(new Error('Whisper transcription timeout after 50 seconds'));
       }, timeoutMs)
     );
 
     const transcription = await Promise.race([transcriptionPromise, timeoutPromise]);
-    const apiCallDuration = Date.now() - apiCallStart;
-    const totalDuration = Date.now() - startTime;
-
-    console.log(`[openai/transcribeAudio] ✓ Whisper API success`);
-    console.log(`[openai/transcribeAudio] API call duration: ${apiCallDuration}ms (${(apiCallDuration / 1000).toFixed(2)}s)`);
-    console.log(`[openai/transcribeAudio] Total duration: ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
-    console.log(`[openai/transcribeAudio] Text length: ${transcription.text.length} chars`);
-    console.log(`[openai/transcribeAudio] ===== WHISPER API CALL END =====`);
 
     return transcription.text;
   } catch (error) {
-    const totalDuration = Date.now() - startTime;
-    console.error(`[openai/transcribeAudio] ❌ FAILED after ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
-    console.error('[openai/transcribeAudio] Error details:', error);
+    console.error('[openai/transcribeAudio] Transcription failed:', error instanceof Error ? error.message : error);
 
     if (error instanceof Error) {
-      console.error('[openai/transcribeAudio] Error name:', error.name);
-      console.error('[openai/transcribeAudio] Error message:', error.message);
       throw new Error(`Whisper transcription failed: ${error.message}`);
     }
     throw error;
@@ -505,7 +483,6 @@ export async function evaluateInterview(
 }> {
   const client = getOpenAIClient();
 
-  console.log(`Evaluating interview with ${transcript.length} messages for ${industry} industry`);
 
   // Industry-specific fatal error checks
   const industryFatalErrorChecks = industry === 'law'
@@ -657,8 +634,6 @@ Be fair but honest. Pass means strong hire, borderline means potential with rese
     }
 
     const result = JSON.parse(content);
-    console.log('Evaluation completed successfully');
-
     return {
       verdict: result.verdict || 'borderline',
       strengths: result.strengths || [],

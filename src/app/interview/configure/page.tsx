@@ -15,10 +15,14 @@ import {
   X,
   ChevronUp,
   ChevronDown,
+  ChevronRight,
   Bot,
   CheckCircle,
   AlertCircle,
   Sparkles,
+  Settings,
+  ListChecks,
+  FileUp,
 } from 'lucide-react';
 import { Industry, Difficulty, QuestionSourceType } from '@/lib/interview-prompts';
 import ProgressSteps from '@/components/interview/ProgressSteps';
@@ -247,6 +251,17 @@ function ConfigureInterviewContent() {
   const availableCount = relevanceBreakdown.filter(item => item.available).length;
   const totalCount = relevanceBreakdown.length;
   const calculatedRelevance = totalCount > 0 ? Math.round((availableCount / totalCount) * 100) : 0;
+
+  // Collapsible section state
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    settings: false,
+    questions: false,
+    context: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const suggestions = selectedIndustry ? INDUSTRY_SUGGESTIONS[selectedIndustry] : null;
 
@@ -505,582 +520,615 @@ function ConfigureInterviewContent() {
           </p>
         </div>
 
-        {/* Form Card */}
-        <div className="bg-card border border-border rounded-xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Industry (Read-only with change option) */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Industry
-              </label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 px-4 py-3 bg-white rounded-lg border border-border text-gray-900 capitalize font-medium">
-                  {selectedIndustry}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setSelectedIndustry(null)}
-                  className="whitespace-nowrap"
-                >
-                  Change
-                </Button>
-              </div>
-            </div>
-
-            {/* Industry-Specific Disclaimer for Tech */}
-            {selectedIndustry === 'technology' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex gap-3">
-                  <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-blue-900 mb-1">
-                      Behavioural Interview Practice
-                    </h3>
-                    <p className="text-sm text-blue-800">
-                      This practice focuses on behavioural and communication skills for tech interviews.
-                      For coding rounds (LeetCode, algorithms, data structures), supplement with platforms like
-                      LeetCode, HackerRank, or AlgoExpert.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Company Name */}
-            <div>
-              <label
-                htmlFor="company"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                What company are you interviewing for?{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <Input
-                id="company"
-                type="text"
-                placeholder={suggestions ? `e.g., ${suggestions.companies.slice(0, 3).join(', ')}` : 'e.g., Google, Meta'}
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.company ? 'border-red-500' : 'border-border'}`}
-                aria-invalid={!!errors.company}
-              />
-              {errors.company && (
-                <p className="mt-1 text-sm text-red-600">{errors.company}</p>
-              )}
-            </div>
-
-            {/* Role/Position */}
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                What role are you applying for?{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <Input
-                id="role"
-                type="text"
-                placeholder={suggestions ? `e.g., ${suggestions.roles.slice(0, 2).join(', ')}` : 'e.g., Senior Software Engineer'}
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.role ? 'border-red-500' : 'border-border'}`}
-                aria-invalid={!!errors.role}
-              />
-              {errors.role && (
-                <p className="mt-1 text-sm text-red-600">{errors.role}</p>
-              )}
-            </div>
-
-            {/* Follow-up Intensity */}
-            <div>
-              <label
-                htmlFor="followUpIntensity"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                Follow-up Question Intensity <span className="text-red-500">*</span>
-              </label>
-              <p className="text-xs text-muted-foreground mb-3">
-                Control how much the interviewer probes your answers. Real interviewers follow up on vague responses.
-              </p>
-              <select
-                id="followUpIntensity"
-                value={followUpIntensity}
-                onChange={(e) => setFollowUpIntensity(e.target.value as 'none' | 'light' | 'moderate' | 'intensive')}
-                className="w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors bg-white text-gray-900"
-              >
-                <option value="none">No Follow-ups - Move to next question immediately</option>
-                <option value="light">Light - Only follow up if answer is very vague (max 1 follow-up)</option>
-                <option value="moderate">Moderate - Follow up on vague answers (1-2 follow-ups) [Recommended]</option>
-                <option value="intensive">Intensive - Deep probing like real interviews (2-3 follow-ups)</option>
-              </select>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {followUpIntensity === 'none' && '📝 Quick practise mode - cover more questions in less time'}
-                {followUpIntensity === 'light' && '🎯 Gentle practise - some follow-ups for very unclear answers'}
-                {followUpIntensity === 'moderate' && '⚖️ Balanced - realistic follow-ups without excessive pressure'}
-                {followUpIntensity === 'intensive' && '🔥 Maximum pressure - just like a real challenging interview'}
-              </p>
-            </div>
-
-            {/* Question Count Slider */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                Number of Questions
-              </label>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">{questionCount}</span>
-                  <span className="text-xs text-muted-foreground">questions</span>
-                </div>
-                <Slider
-                  value={[questionCount]}
-                  onValueChange={(value) => {
-                    const newCount = value[0];
-                    setQuestionCount(newCount);
-                    // Clear all optional inputs if only 1 question (mandatory company motivation question)
-                    if (newCount === 1) {
-                      setQuestionTypes([]);
-                      setJobDescription('');
-                      setCustomQuestions('');
-                      setCvFile(null);
-                      setCvText('');
-                    }
-                  }}
-                  min={1}
-                  max={10}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>1 (Quick)</span>
-                  <span>10 (Full)</span>
-                </div>
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {questionCount <= 3 && '⚡ Quick practise - focus on a few key areas'}
-                {questionCount > 3 && questionCount <= 6 && '🎯 Medium session - balanced coverage'}
-                {questionCount > 6 && '📋 Full interview - comprehensive practise'}
-              </p>
-            </div>
-
-            {/* Personalized Coaching Card - Dark Teal Theme */}
-            {!isLoadingPersonalization && personalizationData?.hasHistory && (
-              <div className="bg-primary rounded-xl p-6 text-primary-foreground relative overflow-hidden">
-                {/* Subtle decorative element */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-
-                <div className="relative z-10">
-                  {/* Header with toggle */}
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                        <Bot className="h-5 w-5 text-accent" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-primary-foreground flex items-center gap-2">
-                          <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
-                          Adaptive Coaching
-                        </h3>
-                        <p className="text-xs text-primary-foreground/70">
-                          Use insights from your previous interviews
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Toggle Switch */}
-                    <button
-                      type="button"
-                      onClick={() => setUsePersonalization(!usePersonalization)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${
-                        usePersonalization ? 'bg-accent' : 'bg-primary-foreground/20'
-                      }`}
-                      role="switch"
-                      aria-checked={usePersonalization}
-                      aria-label="Enable personalised coaching"
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          usePersonalization ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {usePersonalization && (
-                    <>
-                      {/* Relevance Score Bar */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-primary-foreground/80">Relevance to this interview</span>
-                          <span className="font-semibold text-accent">{calculatedRelevance}%</span>
-                        </div>
-                        <div className="h-2 bg-primary-foreground/10 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-accent rounded-full transition-all duration-500"
-                            style={{ width: `${calculatedRelevance}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Data Breakdown */}
-                      <div className="space-y-2 mb-4">
-                        {relevanceBreakdown.slice(0, 5).map((item, index) => (
-                          <div key={index} className="flex items-center gap-2 text-xs">
-                            {item.available ? (
-                              <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" aria-hidden="true" />
-                            ) : (
-                              <AlertCircle className="h-3.5 w-3.5 text-primary-foreground/50 flex-shrink-0" aria-hidden="true" />
-                            )}
-                            <span className={item.available ? 'text-primary-foreground/90' : 'text-primary-foreground/50'}>
-                              {item.label}
-                              {item.available && item.count && (
-                                <span className="text-primary-foreground/60"> ({item.count} interviews)</span>
-                              )}
-                              {item.isNew && (
-                                <span className="text-accent ml-1">(first time)</span>
-                              )}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* First Time Notice */}
-                      {hasNewQuestionTypes && (
-                        <div className="bg-accent/20 border border-accent/30 rounded-lg p-3">
-                          <p className="text-xs text-primary-foreground">
-                            <span className="font-semibold text-accent">New territory:</span>{' '}
-                            Some question types or industry context will be new for you.
-                            We&apos;ll establish a baseline and provide foundational feedback in these areas.
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {!usePersonalization && (
-                    <p className="text-xs text-primary-foreground/60 mt-2">
-                      Enable to get feedback tailored to your specific strengths and areas for improvement
-                      based on {personalizationData.totalInterviews} previous interviews.
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Job Description (Optional) */}
-            <div className={questionCount === 1 ? 'opacity-50' : ''}>
-              <label
-                htmlFor="jobDescription"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                Job Description (Optional)
-              </label>
-              {questionCount === 1 && (
-                <p className="text-xs text-yellow-600 mb-2">
-                  Not used with 1 question - you'll only get the mandatory opening question
-                </p>
-              )}
-              <Textarea
-                id="jobDescription"
-                placeholder="Paste the job description here to help the AI ask more relevant questions..."
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                rows={6}
-                maxLength={2000}
-                disabled={questionCount === 1}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
-              />
-              <p className="mt-1 text-sm text-muted-foreground">
-                {jobDescription.length}/2000 characters
-              </p>
-            </div>
-
-            {/* CV Upload (Optional) */}
-            <div className={questionCount === 1 ? 'opacity-50' : ''}>
-              <label
-                htmlFor="cvUpload"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                Upload Your CV/Resume (Optional)
-              </label>
-              {questionCount === 1 ? (
-                <p className="text-xs text-yellow-600 mb-3">
-                  Not used with 1 question - you'll only get the mandatory opening question
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground mb-3">
-                  Upload your CV to get more personalised questions based on your experience. Supports PDF, DOCX, and images.
-                </p>
-              )}
-
-              {!cvFile ? (
-                <div className="relative">
-                  <input
-                    id="cvUpload"
-                    type="file"
-                    accept=".pdf,.doc,.docx,image/*"
-                    onChange={handleCvUpload}
-                    disabled={questionCount === 1}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="cvUpload"
-                    className={`flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg transition-colors bg-muted ${
-                      questionCount === 1
-                        ? 'cursor-not-allowed'
-                        : 'cursor-pointer hover:border-primary hover:bg-primary/5'
-                    }`}
-                  >
-                    <Upload className="h-6 w-6 text-muted-foreground" />
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-card-foreground">
-                        Click to upload your CV
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        PDF, DOCX, or image (max 10MB)
-                      </p>
-                    </div>
-                  </label>
-                </div>
-              ) : (
-                <div className="p-4 border border-border rounded-lg bg-primary/5">
-                  {isUploadingCv ? (
-                    <div className="flex items-center gap-3">
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-card-foreground">
-                          Analysing your CV...
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          This may take a few seconds
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-start gap-3">
-                      <FileText className="h-5 w-5 text-primary mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-card-foreground">
-                          {cvFile.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {(cvFile.size / 1024).toFixed(1)} KB • {cvText.length} characters extracted
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleRemoveCv}
-                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
-                      >
-                        <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {cvError && (
-                <p className="mt-2 text-sm text-red-600">{cvError}</p>
-              )}
-            </div>
-
-            {/* Question Types */}
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">
-                What types of questions do you want to practise? (Optional)
-              </label>
-              {questionCount === 1 ? (
-                <p className="text-xs text-muted-foreground mb-3">
-                  With 1 question selected, you'll only get: "Why do you want to work at this company?"
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground mb-3">
-                  Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
-                </p>
-              )}
-              <div className="space-y-2">
-                {(selectedIndustry === 'law'
-                  ? [
-                      { id: 'behavioral', label: 'Experience (CARL Method)', description: 'Context, Action, Result, Learning' },
-                      { id: 'competency', label: 'Skills & Work Style', description: 'Time management, prioritisation, motivation' },
-                      { id: 'situational', label: 'Situational Judgment', description: 'What would you do if...' },
-                      { id: 'technical', label: 'Commercial & Role Awareness', description: 'Understanding trainee role, firm, and market' },
-                      { id: 'motivation', label: 'Motivation, Fit & Self-Insight', description: 'Why law, why this firm, strengths/weaknesses' },
-                    ]
-                  : [
-                      { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
-                      { id: 'technical', label: 'Technical/Role-specific', description: 'Industry-specific knowledge and skills' },
-                      { id: 'competency', label: 'Competency-based', description: 'How would you handle...' },
-                      { id: 'situational', label: 'Situational', description: 'What would you do if...' },
-                      { id: 'strengths', label: 'Strengths & Weaknesses', description: 'Self-assessment questions' },
-                      { id: 'culture', label: 'Company/Culture Fit', description: 'Values and work style alignment' },
-                    ]
-                ).map((type) => (
-                  <label
-                    key={type.id}
-                    className={`flex items-start gap-3 p-3 border border-border rounded-lg transition-colors ${
-                      questionCount === 1
-                        ? 'opacity-50 cursor-not-allowed bg-muted'
-                        : 'cursor-pointer hover:bg-muted bg-muted'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={questionTypes.includes(type.id)}
-                      onChange={() => handleQuestionTypeToggle(type.id)}
-                      disabled={questionCount === 1}
-                      className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary disabled:cursor-not-allowed"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-sm text-card-foreground">{type.label}</div>
-                      <div className="text-xs text-muted-foreground">{type.description}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Custom Questions */}
-            <div className={questionCount === 1 ? 'opacity-50' : ''}>
-              <label
-                htmlFor="customQuestions"
-                className="block text-sm font-medium text-muted-foreground mb-2"
-              >
-                Add Your Own Questions (Optional)
-              </label>
-              {questionCount === 1 ? (
-                <p className="text-xs text-yellow-600 mb-2">
-                  Not used with 1 question - you'll only get the mandatory opening question
-                </p>
-              ) : (
-                <p className="text-xs text-muted-foreground mb-2">
-                  Enter specific questions that you struggle with or want to practise. One question per line, max 5 questions.
-                </p>
-              )}
-              <Textarea
-                id="customQuestions"
-                placeholder="Example:&#10;Tell me about a time you failed and what you learned from it&#10;How do you handle conflicts with team members?&#10;Describe a situation where you had to meet a tight deadline"
-                value={customQuestions}
-                onChange={(e) => setCustomQuestions(e.target.value)}
-                rows={5}
-                disabled={questionCount === 1}
-                className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
-              />
-              <p className="mt-1 text-sm text-muted-foreground">
-                {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
-              </p>
-            </div>
-
-            {/* Question Priority Order */}
-            {/* Only show if user has at least 2 question sources (custom questions or CV) */}
-            {(customQuestions.trim().length > 0 || cvText.trim().length > 0) && (
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Essential Fields - Always Visible */}
+          <div className="bg-card border border-border rounded-xl shadow-lg p-8">
+            <div className="space-y-6">
+              {/* Industry (Read-only with change option) */}
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">
-                  Question Priority Order
+                  Industry
                 </label>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Choose the order in which questions will be asked during the interview. Use the arrow buttons to reorder.
-                </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 px-4 py-3 bg-white rounded-lg border border-border text-gray-900 capitalize font-medium">
+                    {selectedIndustry}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setSelectedIndustry(null)}
+                    className="whitespace-nowrap"
+                  >
+                    Change
+                  </Button>
+                </div>
+              </div>
 
-                <div className="space-y-2">
-                  {questionPriority
-                    .filter(source => {
-                      // Only show 'custom' if user has custom questions
-                      if (source === 'custom' && customQuestions.trim().length === 0) return false;
-                      // Only show 'cv' if user has uploaded a CV
-                      if (source === 'cv' && cvText.trim().length === 0) return false;
-                      // Always show 'generic'
-                      return true;
-                    })
-                    .map((source, index, filteredArray) => (
-                      <div
-                        key={source}
-                        className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white"
-                      >
-                        <span className="text-lg font-bold text-muted-foreground min-w-[24px]">
-                          {index + 1}
-                        </span>
+              {/* Industry-Specific Disclaimer for Tech */}
+              {selectedIndustry === 'technology' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex gap-3">
+                    <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-blue-900 mb-1">
+                        Behavioural Interview Practice
+                      </h3>
+                      <p className="text-sm text-blue-800">
+                        This practice focuses on behavioural and communication skills for tech interviews.
+                        For coding rounds (LeetCode, algorithms, data structures), supplement with platforms like
+                        LeetCode, HackerRank, or AlgoExpert.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                        <div className="flex-1">
-                          <div className="font-medium text-card-foreground">
-                            {QUESTION_SOURCE_LABELS[source]}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {QUESTION_SOURCE_DESCRIPTIONS[source]}
-                          </div>
-                        </div>
+              {/* Company Name */}
+              <div>
+                <label
+                  htmlFor="company"
+                  className="block text-sm font-medium text-muted-foreground mb-2"
+                >
+                  What company are you interviewing for?{' '}
+                  <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="company"
+                  type="text"
+                  placeholder={suggestions ? `e.g., ${suggestions.companies.slice(0, 3).join(', ')}` : 'e.g., Google, Meta'}
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.company ? 'border-red-500' : 'border-border'}`}
+                  aria-invalid={!!errors.company}
+                />
+                {errors.company && (
+                  <p className="mt-1 text-sm text-red-600">{errors.company}</p>
+                )}
+              </div>
 
-                        <div className="flex gap-1">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => moveUp(questionPriority.indexOf(source))}
-                            disabled={index === 0}
-                            aria-label="Move up"
-                            className="h-8 w-8"
-                          >
-                            <ChevronUp className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => moveDown(questionPriority.indexOf(source))}
-                            disabled={index === filteredArray.length - 1}
-                            aria-label="Move down"
-                            className="h-8 w-8"
-                          >
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+              {/* Role/Position */}
+              <div>
+                <label
+                  htmlFor="role"
+                  className="block text-sm font-medium text-muted-foreground mb-2"
+                >
+                  What role are you applying for?{' '}
+                  <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="role"
+                  type="text"
+                  placeholder={suggestions ? `e.g., ${suggestions.roles.slice(0, 2).join(', ')}` : 'e.g., Senior Software Engineer'}
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className={`bg-white text-gray-900 placeholder:text-gray-500 ${errors.role ? 'border-red-500' : 'border-border'}`}
+                  aria-invalid={!!errors.role}
+                />
+                {errors.role && (
+                  <p className="mt-1 text-sm text-red-600">{errors.role}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsible: Interview Settings */}
+          <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('settings')}
+              className="w-full flex items-center justify-between p-6 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Settings className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-card-foreground">Interview Settings</h3>
+                  <p className="text-xs text-muted-foreground">Follow-up intensity, number of questions</p>
+                </div>
+              </div>
+              <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openSections.settings ? 'rotate-90' : ''}`} />
+            </button>
+
+            {openSections.settings && (
+              <div className="px-6 pb-6 space-y-6 border-t border-border pt-6">
+                {/* Follow-up Intensity */}
+                <div>
+                  <label
+                    htmlFor="followUpIntensity"
+                    className="block text-sm font-medium text-muted-foreground mb-2"
+                  >
+                    Follow-up Question Intensity
+                  </label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Control how much the interviewer probes your answers.
+                  </p>
+                  <select
+                    id="followUpIntensity"
+                    value={followUpIntensity}
+                    onChange={(e) => setFollowUpIntensity(e.target.value as 'none' | 'light' | 'moderate' | 'intensive')}
+                    className="w-full px-4 py-2 border border-border rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors bg-white text-gray-900"
+                  >
+                    <option value="none">No Follow-ups - Move to next question immediately</option>
+                    <option value="light">Light - Only follow up if answer is very vague (max 1 follow-up)</option>
+                    <option value="moderate">Moderate - Follow up on vague answers (1-2 follow-ups) [Recommended]</option>
+                    <option value="intensive">Intensive - Deep probing like real interviews (2-3 follow-ups)</option>
+                  </select>
+                </div>
+
+                {/* Question Count Slider */}
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Number of Questions
+                  </label>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary">{questionCount}</span>
+                      <span className="text-xs text-muted-foreground">questions</span>
+                    </div>
+                    <Slider
+                      value={[questionCount]}
+                      onValueChange={(value) => {
+                        const newCount = value[0];
+                        setQuestionCount(newCount);
+                        if (newCount === 1) {
+                          setQuestionTypes([]);
+                          setJobDescription('');
+                          setCustomQuestions('');
+                          setCvFile(null);
+                          setCvText('');
+                        }
+                      }}
+                      min={1}
+                      max={10}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1 (Quick)</span>
+                      <span>10 (Full)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
+          </div>
 
-            {/* Privacy Notice */}
-            <div className="bg-muted border border-border rounded-lg p-4 flex gap-3">
-              <div className="flex-shrink-0">
-                <Shield className="h-5 w-5 text-primary mt-0.5" />
+          {/* Collapsible: Question Types & Customisation */}
+          <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('questions')}
+              className="w-full flex items-center justify-between p-6 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ListChecks className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-card-foreground">Question Customisation</h3>
+                  <p className="text-xs text-muted-foreground">Question types, custom questions, priority order</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-card-foreground text-sm mb-1">
-                  Your privacy is protected
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  Your webcam feed stays on your device only. We never record, store, or transmit your video or audio. The AI only receives your spoken text.
-                </p>
+              <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openSections.questions ? 'rotate-90' : ''}`} />
+            </button>
+
+            {openSections.questions && (
+              <div className="px-6 pb-6 space-y-6 border-t border-border pt-6">
+                {/* Question Types */}
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    What types of questions do you want to practise?
+                  </label>
+                  {questionCount === 1 ? (
+                    <p className="text-xs text-muted-foreground mb-3">
+                      With 1 question selected, you&apos;ll only get: &quot;Why do you want to work at this company?&quot;
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Select the types of questions you want the interviewer to focus on. Leave all unchecked for a balanced mix.
+                    </p>
+                  )}
+                  <div className="space-y-2">
+                    {(selectedIndustry === 'law'
+                      ? [
+                          { id: 'behavioral', label: 'Experience (CARL Method)', description: 'Context, Action, Result, Learning' },
+                          { id: 'competency', label: 'Skills & Work Style', description: 'Time management, prioritisation, motivation' },
+                          { id: 'situational', label: 'Situational Judgment', description: 'What would you do if...' },
+                          { id: 'technical', label: 'Commercial & Role Awareness', description: 'Understanding trainee role, firm, and market' },
+                          { id: 'motivation', label: 'Motivation, Fit & Self-Insight', description: 'Why law, why this firm, strengths/weaknesses' },
+                        ]
+                      : [
+                          { id: 'behavioral', label: 'Behavioural', description: 'Tell me about a time when...' },
+                          { id: 'technical', label: 'Technical/Role-specific', description: 'Industry-specific knowledge and skills' },
+                          { id: 'competency', label: 'Competency-based', description: 'How would you handle...' },
+                          { id: 'situational', label: 'Situational', description: 'What would you do if...' },
+                          { id: 'strengths', label: 'Strengths & Weaknesses', description: 'Self-assessment questions' },
+                          { id: 'culture', label: 'Company/Culture Fit', description: 'Values and work style alignment' },
+                        ]
+                    ).map((type) => (
+                      <label
+                        key={type.id}
+                        className={`flex items-start gap-3 p-3 border border-border rounded-lg transition-colors ${
+                          questionCount === 1
+                            ? 'opacity-50 cursor-not-allowed bg-muted'
+                            : 'cursor-pointer hover:bg-muted bg-muted'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={questionTypes.includes(type.id)}
+                          onChange={() => handleQuestionTypeToggle(type.id)}
+                          disabled={questionCount === 1}
+                          className="mt-1 h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary accent-primary disabled:cursor-not-allowed"
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium text-sm text-card-foreground">{type.label}</div>
+                          <div className="text-xs text-muted-foreground">{type.description}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Questions */}
+                <div className={questionCount === 1 ? 'opacity-50' : ''}>
+                  <label
+                    htmlFor="customQuestions"
+                    className="block text-sm font-medium text-muted-foreground mb-2"
+                  >
+                    Add Your Own Questions (Optional)
+                  </label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Enter specific questions you want to practise. One per line, max 5.
+                  </p>
+                  <Textarea
+                    id="customQuestions"
+                    placeholder="Example:&#10;Tell me about a time you failed and what you learned from it&#10;How do you handle conflicts with team members?&#10;Describe a situation where you had to meet a tight deadline"
+                    value={customQuestions}
+                    onChange={(e) => setCustomQuestions(e.target.value)}
+                    rows={4}
+                    disabled={questionCount === 1}
+                    className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
+                  />
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {customQuestions.split('\n').filter(q => q.trim().length > 0).length} / 5 questions
+                  </p>
+                </div>
+
+                {/* Question Priority Order */}
+                {(customQuestions.trim().length > 0 || cvText.trim().length > 0) && (
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                      Question Priority Order
+                    </label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Choose the order in which questions will be asked. Use the arrows to reorder.
+                    </p>
+
+                    <div className="space-y-2">
+                      {questionPriority
+                        .filter(source => {
+                          if (source === 'custom' && customQuestions.trim().length === 0) return false;
+                          if (source === 'cv' && cvText.trim().length === 0) return false;
+                          return true;
+                        })
+                        .map((source, index, filteredArray) => (
+                          <div
+                            key={source}
+                            className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white"
+                          >
+                            <span className="text-lg font-bold text-muted-foreground min-w-[24px]">
+                              {index + 1}
+                            </span>
+
+                            <div className="flex-1">
+                              <div className="font-medium text-card-foreground">
+                                {QUESTION_SOURCE_LABELS[source]}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {QUESTION_SOURCE_DESCRIPTIONS[source]}
+                              </div>
+                            </div>
+
+                            <div className="flex gap-1">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => moveUp(questionPriority.indexOf(source))}
+                                disabled={index === 0}
+                                aria-label="Move up"
+                                className="h-8 w-8"
+                              >
+                                <ChevronUp className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => moveDown(questionPriority.indexOf(source))}
+                                disabled={index === filteredArray.length - 1}
+                                aria-label="Move down"
+                                className="h-8 w-8"
+                              >
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Collapsible: Additional Context */}
+          <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('context')}
+              className="w-full flex items-center justify-between p-6 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FileUp className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-card-foreground">Additional Context</h3>
+                  <p className="text-xs text-muted-foreground">Job description, CV upload</p>
+                </div>
+              </div>
+              <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openSections.context ? 'rotate-90' : ''}`} />
+            </button>
+
+            {openSections.context && (
+              <div className="px-6 pb-6 space-y-6 border-t border-border pt-6">
+                {/* Job Description (Optional) */}
+                <div className={questionCount === 1 ? 'opacity-50' : ''}>
+                  <label
+                    htmlFor="jobDescription"
+                    className="block text-sm font-medium text-muted-foreground mb-2"
+                  >
+                    Job Description (Optional)
+                  </label>
+                  {questionCount === 1 && (
+                    <p className="text-xs text-yellow-600 mb-2">
+                      Not used with 1 question - you&apos;ll only get the mandatory opening question
+                    </p>
+                  )}
+                  <Textarea
+                    id="jobDescription"
+                    placeholder="Paste the job description here to help the AI ask more relevant questions..."
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    rows={5}
+                    maxLength={2000}
+                    disabled={questionCount === 1}
+                    className="resize-y bg-white text-gray-900 placeholder:text-gray-500 border-border disabled:cursor-not-allowed disabled:bg-muted"
+                  />
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {jobDescription.length}/2000 characters
+                  </p>
+                </div>
+
+                {/* CV Upload (Optional) */}
+                <div className={questionCount === 1 ? 'opacity-50' : ''}>
+                  <label
+                    htmlFor="cvUpload"
+                    className="block text-sm font-medium text-muted-foreground mb-2"
+                  >
+                    Upload Your CV/Resume (Optional)
+                  </label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Upload your CV to get more personalised questions. Supports PDF, DOCX, and images.
+                  </p>
+
+                  {!cvFile ? (
+                    <div className="relative">
+                      <input
+                        id="cvUpload"
+                        type="file"
+                        accept=".pdf,.doc,.docx,image/*"
+                        onChange={handleCvUpload}
+                        disabled={questionCount === 1}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="cvUpload"
+                        className={`flex items-center justify-center gap-3 p-6 border-2 border-dashed border-border rounded-lg transition-colors bg-muted ${
+                          questionCount === 1
+                            ? 'cursor-not-allowed'
+                            : 'cursor-pointer hover:border-primary hover:bg-primary/5'
+                        }`}
+                      >
+                        <Upload className="h-6 w-6 text-muted-foreground" />
+                        <div className="text-center">
+                          <p className="text-sm font-medium text-card-foreground">
+                            Click to upload your CV
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PDF, DOCX, or image (max 10MB)
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="p-4 border border-border rounded-lg bg-primary/5">
+                      {isUploadingCv ? (
+                        <div className="flex items-center gap-3">
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-card-foreground">
+                              Analysing your CV...
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              This may take a few seconds
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          <FileText className="h-5 w-5 text-primary mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-card-foreground">
+                              {cvFile.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(cvFile.size / 1024).toFixed(1)} KB • {cvText.length} characters extracted
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleRemoveCv}
+                            className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                          >
+                            <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {cvError && (
+                    <p className="mt-2 text-sm text-red-600">{cvError}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Personalized Coaching Card - Always visible for returning users */}
+          {!isLoadingPersonalization && personalizationData?.hasHistory && (
+            <div className="bg-primary rounded-xl p-6 text-primary-foreground relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+
+              <div className="relative z-10">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
+                      <Bot className="h-5 w-5 text-accent" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-primary-foreground flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
+                        Adaptive Coaching
+                      </h3>
+                      <p className="text-xs text-primary-foreground/70">
+                        Use insights from your previous interviews
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setUsePersonalization(!usePersonalization)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${
+                      usePersonalization ? 'bg-accent' : 'bg-primary-foreground/20'
+                    }`}
+                    role="switch"
+                    aria-checked={usePersonalization}
+                    aria-label="Enable personalised coaching"
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        usePersonalization ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {usePersonalization && (
+                  <>
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-primary-foreground/80">Relevance to this interview</span>
+                        <span className="font-semibold text-accent">{calculatedRelevance}%</span>
+                      </div>
+                      <div className="h-2 bg-primary-foreground/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-accent rounded-full transition-all duration-500"
+                          style={{ width: `${calculatedRelevance}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-4">
+                      {relevanceBreakdown.slice(0, 5).map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 text-xs">
+                          {item.available ? (
+                            <CheckCircle className="h-3.5 w-3.5 text-accent flex-shrink-0" aria-hidden="true" />
+                          ) : (
+                            <AlertCircle className="h-3.5 w-3.5 text-primary-foreground/50 flex-shrink-0" aria-hidden="true" />
+                          )}
+                          <span className={item.available ? 'text-primary-foreground/90' : 'text-primary-foreground/50'}>
+                            {item.label}
+                            {item.available && item.count && (
+                              <span className="text-primary-foreground/60"> ({item.count} interviews)</span>
+                            )}
+                            {item.isNew && (
+                              <span className="text-accent ml-1">(first time)</span>
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {hasNewQuestionTypes && (
+                      <div className="bg-accent/20 border border-accent/30 rounded-lg p-3">
+                        <p className="text-xs text-primary-foreground">
+                          <span className="font-semibold text-accent">New territory:</span>{' '}
+                          Some question types or industry context will be new for you.
+                          We&apos;ll establish a baseline and provide foundational feedback in these areas.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {!usePersonalization && (
+                  <p className="text-xs text-primary-foreground/60 mt-2">
+                    Enable to get feedback tailored to your specific strengths and areas for improvement
+                    based on {personalizationData.totalInterviews} previous interviews.
+                  </p>
+                )}
               </div>
             </div>
+          )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push('/interview/select')}
-                className="flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-card-foreground"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-              <Button type="submit" className="flex-1 bg-primary hover:bg-secondary text-primary-foreground">
-                Start Interview
-              </Button>
+          {/* Privacy Notice */}
+          <div className="bg-muted border border-border rounded-lg p-4 flex gap-3">
+            <div className="flex-shrink-0">
+              <Shield className="h-5 w-5 text-primary mt-0.5" />
             </div>
-          </form>
-        </div>
+            <div>
+              <h4 className="font-semibold text-card-foreground text-sm mb-1">
+                Your privacy is protected
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Your webcam feed stays on your device only. We never record, store, or transmit your video or audio. The AI only receives your spoken text.
+              </p>
+            </div>
+          </div>
 
-        {/* Help Text */}
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>
-            The more details you provide, the more realistic and tailored your
-            interview will be.
-          </p>
-        </div>
+          {/* Action Buttons */}
+          <div className="flex gap-4 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/interview/select')}
+              className="flex items-center gap-2 border-border text-muted-foreground hover:bg-muted hover:text-card-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <Button type="submit" className="flex-1 bg-primary hover:bg-secondary text-primary-foreground">
+              Start Interview
+            </Button>
+          </div>
+        </form>
       </div>
 
       {/* Upgrade Modal */}
