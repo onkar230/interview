@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { marked } from 'marked';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, Loader2, ChevronDown, ChevronUp, Plus, GraduationCap } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle, ChevronDown, ChevronUp, Plus, GraduationCap } from 'lucide-react';
 
 export interface FeedbackItem {
   questionNumber: number;
@@ -61,7 +61,11 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
           <Card className="border-accent/30 bg-accent/10 shadow-lg">
             <CardContent className="py-4">
               <div className="flex items-center gap-3 text-primary">
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <div className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-primary animate-[thinking-bounce_1.4s_ease-in-out_infinite]" />
+                  <span className="h-2 w-2 rounded-full bg-primary animate-[thinking-bounce_1.4s_ease-in-out_0.2s_infinite]" />
+                  <span className="h-2 w-2 rounded-full bg-primary animate-[thinking-bounce_1.4s_ease-in-out_0.4s_infinite]" />
+                </div>
                 <span className="text-sm font-medium">Analysing your answer...</span>
               </div>
             </CardContent>

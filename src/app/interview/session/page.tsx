@@ -12,11 +12,14 @@ import {
 import VoiceRecorder from '@/components/interview/VoiceRecorder';
 import AudioPlayer from '@/components/interview/AudioPlayer';
 import FeedbackPanel, { FeedbackItem } from '@/components/interview/FeedbackPanel';
+import ThinkingIndicator from '@/components/interview/ThinkingIndicator';
 import WebcamMirror from '@/components/interview/WebcamMirror';
 import PerformanceScore from '@/components/interview/PerformanceScore';
 import { Industry, QuestionSourceType, generateInterviewPrompt, generatePersonalizationPrompt, PersonalizationData } from '@/lib/interview-prompts';
 import { hasCompanyStyle } from '@/lib/company-styles';
 import { Loader2, User, Bot, Camera, CameraOff, Home, GraduationCap, Info, Sparkles } from 'lucide-react';
+
+const THINKING_SENTINEL = '__THINKING__';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -488,7 +491,7 @@ function InterviewSessionContent() {
       // This prevents race conditions where we might read stale state
       let lastQuestion = '';
       for (let i = messages.length - 1; i >= 0; i--) {
-        if (messages[i].role === 'assistant' && messages[i].content !== 'Interviewer bot is thinking...') {
+        if (messages[i].role === 'assistant' && messages[i].content !== THINKING_SENTINEL) {
           lastQuestion = messages[i].content;
           break;
         }
@@ -540,7 +543,7 @@ function InterviewSessionContent() {
       // THEN add thinking indicator (so it appears AFTER user's message)
       const thinkingMessage: Message = {
         role: 'assistant',
-        content: 'Interviewer bot is thinking...',
+        content: THINKING_SENTINEL,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, thinkingMessage]);
@@ -1025,45 +1028,52 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 pt-3 space-y-4">
-              {messages.map((message, idx) => (
-                <div
-                  key={idx}
-                  className={`flex gap-3 ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  {message.role === 'assistant' && (
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br bg-accent/20 flex items-center justify-center">
-                        <Bot className="h-5 w-5 text-accent" />
-                      </div>
-                    </div>
-                  )}
+              {messages.map((message, idx) => {
+                // Render ThinkingIndicator for the sentinel message
+                if (message.role === 'assistant' && message.content === THINKING_SENTINEL) {
+                  return <ThinkingIndicator key={idx} />;
+                }
 
+                return (
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === 'user'
-                        ? 'bg-accent text-accent-foreground shadow-md'
-                        : 'bg-primary/50 border border-primary/20 text-primary-foreground shadow-md'
+                    key={idx}
+                    className={`flex gap-3 ${
+                      message.role === 'user' ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    <p className="text-xs whitespace-pre-wrap">
-                      {message.role === 'assistant'
-                        ? formatMessageWithBoldQuestions(message.content)
-                        : message.content
-                      }
-                    </p>
-                  </div>
-
-                  {message.role === 'user' && (
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center">
-                        <User className="h-5 w-5 text-muted-foreground" />
+                    {message.role === 'assistant' && (
+                      <div className="flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br bg-accent/20 flex items-center justify-center">
+                          <Bot className="h-5 w-5 text-accent" />
+                        </div>
                       </div>
+                    )}
+
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === 'user'
+                          ? 'bg-accent text-accent-foreground shadow-md'
+                          : 'bg-primary/50 border border-primary/20 text-primary-foreground shadow-md'
+                      }`}
+                    >
+                      <p className="text-xs whitespace-pre-wrap">
+                        {message.role === 'assistant'
+                          ? formatMessageWithBoldQuestions(message.content)
+                          : message.content
+                        }
+                      </p>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {message.role === 'user' && (
+                      <div className="flex-shrink-0">
+                        <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center">
+                          <User className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
               {streamingText && (
                 <div className="flex gap-3 justify-start">
@@ -1079,11 +1089,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 </div>
               )}
 
-              {isProcessing && !streamingText && (
-                <div className="flex items-center gap-2 text-primary-foreground/80 text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                  <span>{!isInitialized ? 'Preparing...' : 'Interviewer bot is thinking...'}</span>
-                </div>
+              {isProcessing && !streamingText && messages.length === 0 && (
+                <ThinkingIndicator isInitializing={!isInitialized} />
               )}
 
               {!isInitialized && isProcessing && (
