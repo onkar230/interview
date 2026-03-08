@@ -22,9 +22,11 @@ export interface FeedbackItem {
 interface FeedbackPanelProps {
   feedbackHistory: FeedbackItem[];
   isAnalyzing: boolean;
+  textScale?: number;
+  onTextScaleChange?: (scale: number) => void;
 }
 
-export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: FeedbackPanelProps) {
+export default function FeedbackPanel({ feedbackHistory, isAnalyzing, textScale = 1, onTextScaleChange }: FeedbackPanelProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Configure marked for safe rendering
@@ -45,18 +47,41 @@ export default function FeedbackPanel({ feedbackHistory, isAnalyzing }: Feedback
             <h2 className="text-sm font-semibold text-card-foreground">Live Feedback</h2>
             <p className="text-xs text-muted-foreground">Real-time analysis of your answers</p>
           </div>
-          <div className="lg:hidden">
-            {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-card-foreground" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-card-foreground" />
+          <div className="flex items-center gap-1.5">
+            {/* Text Scale Controls */}
+            {onTextScaleChange && (
+              <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onTextScaleChange(Math.max(0.85, +(textScale - 0.15).toFixed(2))); }}
+                  disabled={textScale <= 0.85}
+                  className="px-1.5 py-0.5 text-[11px] font-semibold rounded text-card-foreground/80 hover:bg-card-foreground/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Decrease text size"
+                >
+                  A-
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onTextScaleChange(Math.min(1.45, +(textScale + 0.15).toFixed(2))); }}
+                  disabled={textScale >= 1.45}
+                  className="px-1.5 py-0.5 text-[11px] font-semibold rounded text-card-foreground/80 hover:bg-card-foreground/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Increase text size"
+                >
+                  A+
+                </button>
+              </div>
             )}
+            <div className="lg:hidden">
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5 text-card-foreground" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-card-foreground" />
+              )}
+            </div>
           </div>
         </button>
       </div>
 
       {/* Content - Collapsible on mobile */}
-      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${!isExpanded ? 'hidden lg:block' : ''}`}>
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${!isExpanded ? 'hidden lg:block' : ''}`} style={{ zoom: textScale }}>
         {isAnalyzing && (
           <Card className="border-accent/30 bg-accent/10 shadow-lg">
             <CardContent className="py-4">

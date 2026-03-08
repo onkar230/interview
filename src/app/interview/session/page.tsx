@@ -69,6 +69,10 @@ function InterviewSessionContent() {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
 
+  // Text scale state
+  const [leftTextScale, setLeftTextScale] = useState(1);
+  const [rightTextScale, setRightTextScale] = useState(1);
+
   // Resizable panel state
   const [leftPanelWidth, setLeftPanelWidth] = useState(384);
   const [rightPanelWidth, setRightPanelWidth] = useState(384);
@@ -1051,13 +1055,34 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
                 <h3 className="text-sm font-semibold text-primary-foreground/90">
                   Interview Conversation
                 </h3>
-                {/* Personalised Mode Indicator */}
-                {usePersonalization && personalizationContext?.hasHistory && (
-                  <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1">
-                    <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
-                    <span className="text-[10px] font-medium text-accent">Personalised</span>
+                <div className="flex items-center gap-1.5">
+                  {/* Personalised Mode Indicator */}
+                  {usePersonalization && personalizationContext?.hasHistory && (
+                    <div className="flex items-center gap-1.5 bg-accent/20 border border-accent/30 rounded-full px-2.5 py-1">
+                      <Sparkles className="h-3 w-3 text-accent" aria-hidden="true" />
+                      <span className="text-[10px] font-medium text-accent">Personalised</span>
+                    </div>
+                  )}
+                  {/* Text Scale Controls */}
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      onClick={() => setLeftTextScale(s => Math.max(0.85, +(s - 0.15).toFixed(2)))}
+                      disabled={leftTextScale <= 0.85}
+                      className="px-1.5 py-0.5 text-[11px] font-semibold rounded text-primary-foreground/80 hover:bg-primary-foreground/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Decrease text size"
+                    >
+                      A-
+                    </button>
+                    <button
+                      onClick={() => setLeftTextScale(s => Math.min(1.45, +(s + 0.15).toFixed(2)))}
+                      disabled={leftTextScale >= 1.45}
+                      className="px-1.5 py-0.5 text-[11px] font-semibold rounded text-primary-foreground/80 hover:bg-primary-foreground/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Increase text size"
+                    >
+                      A+
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
             </div>
 
@@ -1069,7 +1094,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 pt-3 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 pt-3 space-y-4" style={{ zoom: leftTextScale }}>
               {messages.map((message, idx) => {
                 // Render ThinkingIndicator for the sentinel message
                 if (message.role === 'assistant' && message.content === THINKING_SENTINEL) {
@@ -1162,6 +1187,8 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}
+              textScale={rightTextScale}
+              onTextScaleChange={setRightTextScale}
             />
           </div>
 
