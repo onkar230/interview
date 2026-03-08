@@ -69,6 +69,48 @@ function InterviewSessionContent() {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const initializingRef = useRef(false); // Prevent double initialization
 
+  // Resizable panel state
+  const [leftPanelWidth, setLeftPanelWidth] = useState(384);
+  const [rightPanelWidth, setRightPanelWidth] = useState(384);
+  const dragRef = useRef<{ side: 'left' | 'right'; startX: number; startWidth: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragRef.current) return;
+      const { side, startX, startWidth } = dragRef.current;
+      const delta = side === 'left' ? e.clientX - startX : startX - e.clientX;
+      const newWidth = Math.min(600, Math.max(320, startWidth + delta));
+      if (side === 'left') {
+        setLeftPanelWidth(newWidth);
+      } else {
+        setRightPanelWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (!dragRef.current) return;
+      dragRef.current = null;
+      document.body.classList.remove('select-none');
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  const startDrag = (side: 'left' | 'right', e: React.MouseEvent) => {
+    e.preventDefault();
+    dragRef.current = {
+      side,
+      startX: e.clientX,
+      startWidth: side === 'left' ? leftPanelWidth : rightPanelWidth,
+    };
+    document.body.classList.add('select-none');
+  };
+
   // Performance scoring state
   const [cumulativeScores, setCumulativeScores] = useState({
     communication: [] as number[],
@@ -982,7 +1024,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
       <div className="flex-1 relative bg-primary overflow-hidden">
 
           {/* Fullscreen Webcam Background - Aligned with side panels */}
-          <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: 'calc(100% - 820px)' }}>
+          <div className="absolute top-4 left-0 right-0 bottom-48 mx-auto" style={{ maxWidth: `calc(100% - ${leftPanelWidth + rightPanelWidth + 52}px)` }}>
             {showWebcam ? (
               <div className="w-full h-full rounded-lg overflow-hidden border border-primary/30">
                 <WebcamMirror
@@ -1003,7 +1045,7 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
           </div>
 
           {/* Left Overlay: Conversation */}
-          <div className="absolute left-4 top-4 bottom-4 w-96 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col">
+          <div className="absolute left-4 top-4 bottom-4 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg shadow-2xl flex flex-col" style={{ width: leftPanelWidth }}>
             <div className="p-4 pb-3 border-b border-primary/30 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-primary-foreground/90">
@@ -1101,8 +1143,22 @@ Please ask me a COMPLETELY DIFFERENT question on a different topic. Do NOT rephr
             </div>
           </div>
 
+          {/* Left panel drag handle */}
+          <div
+            className="resize-handle absolute top-4 bottom-4 w-1 cursor-col-resize z-10"
+            style={{ left: 16 + leftPanelWidth }}
+            onMouseDown={(e) => startDrag('left', e)}
+          />
+
+          {/* Right panel drag handle */}
+          <div
+            className="resize-handle absolute top-4 bottom-4 w-1 cursor-col-resize z-10"
+            style={{ right: 16 + rightPanelWidth }}
+            onMouseDown={(e) => startDrag('right', e)}
+          />
+
           {/* Right Overlay: Feedback */}
-          <div className="absolute right-4 top-4 bottom-4 w-96 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg overflow-hidden shadow-2xl">
+          <div className="absolute right-4 top-4 bottom-4 bg-primary/95 backdrop-blur-md border border-primary/30 rounded-lg overflow-hidden shadow-2xl" style={{ width: rightPanelWidth }}>
             <FeedbackPanel
               feedbackHistory={feedbackHistory}
               isAnalyzing={isAnalyzing}
